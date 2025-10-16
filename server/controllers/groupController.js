@@ -8,7 +8,7 @@ const handleGroupCommand = async (req, res) => {
     try {
         //determine which operation to perform based on command
         switch (command) {
-            case 'insert':
+            case 'create':
                 //create new group document
                 const newGroup = new Group({
                     name: data.name,
@@ -23,16 +23,46 @@ const handleGroupCommand = async (req, res) => {
                 await newGroup.save()
                 return res.json({ message: 'group inserted successfully', group: newGroup })
 
-            case 'select':
+            case 'list':
                 //fetch all groups from db
+                //TODO add fetch all users in a group?????
                 const groups = await Group.find({})
                 return res.json({ message: 'all groups fetched successfully', groups: groups })
+
+            case 'search':
+                //multi-parameter search for groups
+                const { name, description, privacy, createdBy, memberId } = data
+                const groupSearchQuery = {}
+
+                // Build search query based on provided parameters
+                if (name) {
+                    groupSearchQuery.name = { $regex: name, $options: 'i' }
+                }
+                if (description) {
+                    groupSearchQuery.description = { $regex: description, $options: 'i' }
+                }
+                if (privacy) {
+                    groupSearchQuery.privacy = privacy
+                }
+                if (createdBy) {
+                    groupSearchQuery.createdBy = createdBy
+                }
+                if (memberId) {
+                    groupSearchQuery.members = memberId
+                }
+
+                const groupSearchResults = await Group.find(groupSearchQuery)
+                return res.json({
+                    message: 'group search completed successfully',
+                    groups: groupSearchResults,
+                    searchCriteria: groupSearchQuery
+                })
 
             case 'update':
                 //find group by id and update their details
                 const updateGroup = await Group.findByIdAndUpdate(
                     data.groupId,
-                    { descripation: data.newDescripation },
+                    { description: data.newDescription },
                     { new: true }
                 )
                 if (!updateGroup) {
