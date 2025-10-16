@@ -5,7 +5,7 @@ const router = express.Router();
 const { handleUserCommand } = require("../controllers/userController");
 
 //endpoint for CRUD operations
-router.post("/users", handleUserCommand);
+router.post("/", handleUserCommand);
 
 
 module.exports = router;

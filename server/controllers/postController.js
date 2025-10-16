@@ -69,51 +69,6 @@ const handlePostCommand = async (req, res) => {
                     return res.json({ message: 'post deleted successfully', post: deletePost })
                 }
 
-            case 'getFeed':
-                //get posts from user's friends and joined groups
-                const User = require("../models/User")
-                const Group = require("../models/Group")
-
-                const feedUser = await User.findById(data.userId)
-                if (!feedUser) {
-                    return res.json({ message: 'user not found' })
-                }
-
-                //get posts from friends
-                const friendPosts = await Post.find({ author: { $in: feedUser.friends } })
-
-                //get posts from user's groups
-                const userGroups = await Group.find({ _id: { $in: feedUser.groups } })
-                const groupIds = userGroups.map(group => group._id.toString())
-                const groupPosts = await Post.find({ groupId: { $in: groupIds } })
-
-                //combine and sort by creation date
-                const allFeedPosts = [...friendPosts, ...groupPosts]
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-
-                return res.json({
-                    message: 'feed retrieved successfully',
-                    posts: allFeedPosts
-                })
-
-            case 'getPostsByGroup':
-                //get all posts in a specific group
-                const postsByGroup = await Post.find({ groupId: data.groupId })
-                    .sort({ createdAt: -1 })
-                return res.json({
-                    message: 'group posts retrieved successfully',
-                    posts: postsByGroup
-                })
-
-            case 'getPostsByAuthor':
-                //get all posts by specific user
-                const authorPosts = await Post.find({ author: data.authorId })
-                    .sort({ createdAt: -1 })
-                return res.json({
-                    message: 'author posts retrieved successfully',
-                    posts: authorPosts
-                })
-
             //if command is not recognized
             default:
                 return res.json({ message: 'invalid command' })

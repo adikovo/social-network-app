@@ -146,6 +146,27 @@ const handleGroupCommand = async (req, res) => {
                 }
                 return res.json({ message: 'admin removed successfully', group: removeAdminGroup })
 
+            case 'getGroupPosts':
+                //get all posts in a specific group with privacy check
+                const Post = require("../models/Post")
+                const group = await Group.findById(data.groupId)
+
+                if (!group) {
+                    return res.json({ message: 'group not found' })
+                }
+
+                // Check if group is private and user is not a member
+                if (group.privacy === 'private' && !group.members.includes(data.userId)) {
+                    return res.json({ message: 'Permission denied: Private group access required' })
+                }
+
+                const groupPosts = await Post.find({ groupId: data.groupId })
+                    .sort({ createdAt: -1 })
+                return res.json({
+                    message: 'group posts retrieved successfully',
+                    posts: groupPosts
+                })
+
             //if command is not recognized
             default:
                 return res.json({ message: 'invalid command' })

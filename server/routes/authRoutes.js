@@ -4,6 +4,6 @@ const router = express.Router();
 const { handleAuthCommand } = require("../controllers/authController");
 
 //endpoint for register & login operations
-router.post("/auth", handleAuthCommand);
+router.post("/", handleAuthCommand);
 
 module.exports = router;

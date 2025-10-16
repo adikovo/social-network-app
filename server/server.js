@@ -8,6 +8,7 @@ const userRoutes = require('./routes/userRoutes')
 const groupRoutes = require('./routes/groupRoutes')
 const postRoutes = require('./routes/postRoutes')
 const authRoutes = require('./routes/authRoutes')
+const feedRoutes = require('./routes/feedRoutes')
 
 const app = express()
 const server = http.createServer(app)
@@ -25,7 +26,8 @@ connectDB()
 app.use("/api/users", userRoutes)
 app.use("/api/groups", groupRoutes)
 app.use("/api/posts", postRoutes)
-app.use("/api", authRoutes)
+app.use("/api/auth", authRoutes)
+app.use("/api/feed", feedRoutes)
 
 
 const PORT = 5000

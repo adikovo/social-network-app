@@ -4,6 +4,6 @@ const router = express.Router();
 const { handleGroupCommand } = require("../controllers/groupController");
 
 //endpoint for CRUD operations
-router.post("/groups", handleGroupCommand);
+router.post("/", handleGroupCommand);
 
 module.exports = router;
