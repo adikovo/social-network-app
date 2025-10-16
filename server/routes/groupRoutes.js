@@ -1,11 +1,9 @@
 
-
 const express = require("express");
 const router = express.Router();
-const { handleUserCommand } = require("../controllers/userController");
+const { handleGroupCommand } = require("../controllers/groupController");
 
 //endpoint for CRUD operations
-router.post("/users", handleUserCommand);
-
+router.post("/groups", handleGroupCommand);
 
 module.exports = router;

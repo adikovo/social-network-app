@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 
-//structure of data document in the db
+//structure of user document in the db
 const userSchema = new mongoose.Schema({
     name: String,
     email: String,
@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     groups: Array
 })
 
-//user describes the one document in db
+//user describes one document in db
 const User = mongoose.model('User', userSchema)
 
 module.exports = User;  

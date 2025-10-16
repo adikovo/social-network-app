@@ -11,13 +11,14 @@ const handleUserCommand = async (req, res) => {
         switch (command) {
             case 'insert':
                 //create new user document
-                const newUser = new User({ 
-                    name: data.name, 
-                    email: data.email, 
-                    password: String, 
-                    role: String, 
-                    friends: Array, 
-                    groups: Array })
+                const newUser = new User({
+                    name: data.name,
+                    email: data.email,
+                    password: data.password,
+                    role: data.role,
+                    friends: data.friends,
+                    groups: data.groups
+                })
 
                 //save user to db as new document
                 await newUser.save()

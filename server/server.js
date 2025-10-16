@@ -1,11 +1,18 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const http = require('http')
 const connectDB = require('./db')
-const userRoutrs = require('./routes/userRoutes')
-
+const initSocket = require('./socket')
+const userRoutes = require('./routes/userRoutes')
+const groupRoutes = require('./routes/groupRoutes')
+const postRoutes = require('./routes/postRoutes')
 
 const app = express()
+const server = http.createServer(app)
+
+//initialize Socket.io
+const io = initSocket(server)
 
 //ability to accept json data & cross origin requests
 app.use(cors())
@@ -14,9 +21,12 @@ app.use(bodyParser.json())
 connectDB()
 
 //routes
-app.use("/api/users", userRoutrs)
+app.use("/api/users", userRoutes)
+app.use("/api/groups", groupRoutes)
+app.use("/api/posts", postRoutes)
+
 
 const PORT = 5000
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`)
 })
