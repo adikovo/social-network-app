@@ -1,4 +1,4 @@
-
+const User = require("../models/User")
 const Group = require("../models/Group");
 
 //api endpoint to handle all CRUD operations
@@ -81,6 +81,71 @@ const handleGroupCommand = async (req, res) => {
                 else {
                     return res.json({ message: 'group found & deleted successfully', group: deleteGroup })
                 }
+
+            case 'joinGroup':
+                //add user to group members
+                const joinGroup = await Group.findByIdAndUpdate(
+                    data.groupId,
+                    { $addToSet: { members: data.userId } },
+                    { new: true }
+                )
+                if (!joinGroup) {
+                    return res.json({ message: 'group not found' })
+                }
+
+                //add group to user's groups array
+                await User.findByIdAndUpdate(
+                    data.userId,
+                    { $addToSet: { groups: data.groupId } },
+                    { new: true }
+                )
+
+                return res.json({ message: 'user joined group successfully', group: joinGroup })
+
+            case 'leaveGroup':
+                //remove user from group members
+                const leaveGroup = await Group.findByIdAndUpdate(
+                    data.groupId,
+                    { $pull: { members: data.userId } },
+                    { new: true }
+                )
+                if (!leaveGroup) {
+                    return res.json({ message: 'group not found' })
+                }
+
+                //also remove group from user's groups array
+                await User.findByIdAndUpdate(
+                    data.userId,
+                    { $pull: { groups: data.groupId } },
+                    { new: true }
+                )
+
+                return res.json({ message: 'user left group successfully', group: leaveGroup })
+
+            case 'addAdmin':
+                //grant admin permissions to group member
+                const addAdminGroup = await Group.findByIdAndUpdate(
+                    data.groupId,
+                    { $addToSet: { admins: data.userId } },
+                    { new: true }
+                )
+                if (!addAdminGroup) {
+                    return res.json({ message: 'group not found' })
+                }
+                return res.json({ message: 'admin added successfully', group: addAdminGroup })
+
+            case 'removeAdmin':
+                //revoke admin permissions from group member
+                const removeAdminGroup = await Group.findByIdAndUpdate(
+                    data.groupId,
+                    { $pull: { admins: data.userId } },
+                    { new: true }
+                )
+                if (!removeAdminGroup) {
+                    return res.json({ message: 'group not found' })
+                }
+                return res.json({ message: 'admin removed successfully', group: removeAdminGroup })
+
             //if command is not recognized
             default:
                 return res.json({ message: 'invalid command' })

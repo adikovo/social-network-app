@@ -5,8 +5,9 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
     content: String,
     author: String,
+    groupId: String, // Group ID if post belongs to a group
     createdAt: { type: Date, default: Date.now },
-    likes: Number,
+    likes: { type: Number, default: 0 },
     comments: Array
 });
 

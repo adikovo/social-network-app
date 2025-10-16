@@ -113,6 +113,20 @@ const handleUserCommand = async (req, res) => {
                 )
                 return res.json({ message: 'friend removed successfully ' })
 
+            case 'getFriends':
+                //get all friends of a user with their details
+                const user = await User.findById(data.userId)
+                if (!user) {
+                    return res.json({ message: 'user not found' })
+                }
+
+                //get friend details
+                const friends = await User.find({ _id: { $in: user.friends } })
+                return res.json({
+                    message: 'friends retrieved successfully',
+                    friends: friends
+                })
+
             //if command is not recognized
             default:
                 return res.json({ message: 'invalid command' })
