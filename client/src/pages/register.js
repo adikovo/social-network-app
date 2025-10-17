@@ -38,7 +38,8 @@ function Register() {
             .then(response => {
                 console.log('Register successful:', response.data);
                 alert('Registration successful! You can now login.');
-                // Clear form
+
+                //clearsthe  form
                 setName('');
                 setEmail('');
                 setPassword('');
@@ -57,7 +58,7 @@ function Register() {
             <h1>Register</h1>
             <form onSubmit={handleRegister} style={{ marginTop: '20px' }}>
                 <div className="form-group">
-                    <label htmlFor="name" style={{ textAlign: 'left', display: 'block' }}>Name</label>
+                    <label htmlFor="name" style={{ textAlign: 'left', display: 'block', marginTop: '7px' }}>Name:</label>
                     <input
                         type="text"
                         className="form-control"
@@ -68,7 +69,7 @@ function Register() {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email" style={{ textAlign: 'left', display: 'block' }}>Email</label>
+                    <label htmlFor="email" style={{ textAlign: 'left', display: 'block', marginTop: '7px' }}>Email:</label>
                     <input
                         type="email"
                         className="form-control"
@@ -79,7 +80,7 @@ function Register() {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password" style={{ textAlign: 'left', display: 'block' }}>Password</label>
+                    <label htmlFor="password" style={{ textAlign: 'left', display: 'block', marginTop: '7px' }}>Password:</label>
                     <input
                         type="password"
                         className="form-control"
@@ -90,7 +91,7 @@ function Register() {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="verifyPassword" style={{ textAlign: 'left', display: 'block' }}>Verify Password</label>
+                    <label htmlFor="verifyPassword" style={{ textAlign: 'left', display: 'block', marginTop: '7px' }}>Verify Password:</label>
                     <input
                         type="password"
                         className="form-control"
@@ -102,7 +103,7 @@ function Register() {
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Register</button>
             </form>
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <div style={{ textAlign: 'center', marginTop: '25px' }}>
                 <p>Already have an account?</p>
                 <button
                     type="button"

@@ -30,7 +30,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/feed", feedRoutes)
 
 
-const PORT = 5000
+const PORT = 3001
 server.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`)
 })

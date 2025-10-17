@@ -48,8 +48,8 @@ function Login() {
         <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
             <h1>Login</h1>
             <form onSubmit={handleLogin} style={{ marginTop: '20px' }}>
-                <div className="form-group">
-                    <label htmlFor="email" style={{ textAlign: 'left', display: 'block' }}>Email</label>
+                <div className="mb-3">
+                    <label htmlFor="email" className="form-label" style={{ textAlign: 'left', display: 'block', marginBottom: '5px' }}>Email:</label>
                     <input
                         type="email"
                         className="form-control"
@@ -59,8 +59,8 @@ function Login() {
                         placeholder="Enter your email"
                     />
                 </div>
-                <div className="form-group">
-                    <label htmlFor="password" style={{ textAlign: 'left', display: 'block' }}>Password</label>
+                <div className="mb-3">
+                    <label htmlFor="password" className="form-label" style={{ textAlign: 'left', display: 'block', marginBottom: '5px' }}>Password:</label>
                     <input
                         type="password"
                         className="form-control"
@@ -70,7 +70,7 @@ function Login() {
                         placeholder="Enter your password"
                     />
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Login</button>
+                <button type="submit" className="btn btn-primary" style={{ marginTop: '10px', width: '40%' }}>Login</button>
             </form>
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
                 <p>Don't have an account?</p>
