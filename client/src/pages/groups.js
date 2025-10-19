@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import CreateGroupForm from '../components/createGroupForm';
 
 function Groups() {
 
@@ -10,12 +11,7 @@ function Groups() {
 
     const navigate = useNavigate();
     const [groups, setGroups] = useState([]);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [privacy, setPrivacy] = useState('public');
-    const [createdBy, setCreatedBy] = useState('');
-    const [members, setMembers] = useState([]);
-    const [posts, setPosts] = useState([]);
+    const [showCreateGroup, setShowCreateGroup] = useState(false);
 
     function fetchGroups(showAll = false) {
 
@@ -58,6 +54,7 @@ function Groups() {
             })
     }
 
+
     useEffect(() => {
         fetchGroups();
     }, [userId])
@@ -86,7 +83,7 @@ function Groups() {
                                     </small>
                                     <br />
                                     <small className="text-muted">
-                                        <strong>Created by:</strong> {group.createdBy}
+                                        <strong>Created by:</strong> {group.createdByName || group.createdBy}
                                     </small>
                                 </div>
 
@@ -112,6 +109,12 @@ function Groups() {
             <div className="mt-4">
                 <button
                     className="btn btn-secondary me-2"
+                    onClick={() => setShowCreateGroup(true)}
+                >
+                    Create New Group
+                </button>
+                <button
+                    className="btn btn-secondary me-2"
                     onClick={() => navigate(`/feed/${userId}`)}
                 >
                     Back to Feed
@@ -123,6 +126,13 @@ function Groups() {
                     Show All Groups
                 </button>
             </div>
+
+            <CreateGroupForm
+                show={showCreateGroup}
+                onClose={() => setShowCreateGroup(false)}
+                userId={userId}
+                onGroupCreated={fetchGroups}
+            />
         </div>
     )
 }

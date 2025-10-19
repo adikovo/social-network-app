@@ -25,7 +25,6 @@ const handleGroupCommand = async (req, res) => {
 
             case 'list':
                 //fetch all groups from db
-                //TODO add fetch all users in a group?????
                 let query = {}
                 //if userId is given, fetch all groups the user is a member 
                 if (data.userId) {
@@ -33,7 +32,20 @@ const handleGroupCommand = async (req, res) => {
                 }
                 //otherwise fetch all groups
                 const groups = await Group.find(query)
-                return res.json({ message: 'all groups fetched successfully', groups: groups })
+
+                // Add creator names to each group
+                const groupsWithNames = await Promise.all(groups.map(async (group) => {
+                    // Get creator name only
+                    const creator = await User.findById(group.createdBy);
+                    const creatorName = creator ? creator.name : 'Unknown User';
+
+                    return {
+                        ...group.toObject(),
+                        createdByName: creatorName
+                    };
+                }));
+
+                return res.json({ message: 'all groups fetched successfully', groups: groupsWithNames })
 
             case 'search':
                 //multi parameter search for groups
