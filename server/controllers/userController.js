@@ -119,13 +119,30 @@ const handleUserCommand = async (req, res) => {
                 if (!user) {
                     return res.json({ message: 'user not found' })
                 }
-
                 //get friend details
                 const friends = await User.find({ _id: { $in: user.friends } })
                 return res.json({
                     message: 'friends retrieved successfully',
                     friends: friends
                 })
+
+            case 'getUser':
+                const getUser = await User.findById(data.userId)
+                if (!getUser) {
+                    return res.json({ message: 'user not found' })
+                }
+                return res.json({
+                    message: 'user fetched successfully',
+                    user: {
+                        id: getUser._id,
+                        name: getUser.name,
+                        email: getUser.email,
+                        role: getUser.role,
+                        friends: getUser.friends,
+                        groups: getUser.groups
+                    }
+                })
+
 
             //if command is not recognized
             default:

@@ -26,15 +26,21 @@ const handleGroupCommand = async (req, res) => {
             case 'list':
                 //fetch all groups from db
                 //TODO add fetch all users in a group?????
-                const groups = await Group.find({})
+                let query = {}
+                //if userId is given, fetch all groups the user is a member 
+                if (data.userId) {
+                    query = { members: data.userId }
+                }
+                //otherwise fetch all groups
+                const groups = await Group.find(query)
                 return res.json({ message: 'all groups fetched successfully', groups: groups })
 
             case 'search':
-                //multi-parameter search for groups
+                //multi parameter search for groups
                 const { name, description, privacy, createdBy, memberId } = data
                 const groupSearchQuery = {}
 
-                // Build search query based on provided parameters
+                //build search query based on provided parameters
                 if (name) {
                     groupSearchQuery.name = { $regex: name, $options: 'i' }
                 }
@@ -86,6 +92,7 @@ const handleGroupCommand = async (req, res) => {
                 //add user to group members
                 const joinGroup = await Group.findByIdAndUpdate(
                     data.groupId,
+                    //add user to group members array 
                     { $addToSet: { members: data.userId } },
                     { new: true }
                 )
@@ -122,6 +129,7 @@ const handleGroupCommand = async (req, res) => {
 
                 return res.json({ message: 'user left group successfully', group: leaveGroup })
 
+            //add admin to group
             case 'addAdmin':
                 //grant admin permissions to group member
                 const addAdminGroup = await Group.findByIdAndUpdate(

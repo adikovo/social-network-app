@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 
 function Login() {
@@ -22,23 +22,27 @@ function Login() {
 
         // API call using axios
         axios.post('http://localhost:3001/api/auth', userData)
-            .then(response => {
-                console.log('Login response:', response.data);
+            .then(res => {
+                console.log('Login response:', res.data);
 
                 //check if login was actually successful
-                if (response.data.message === 'login successful') {
-                    console.log('Login successful:', response.data);
+                if (res.data.message === 'login successful') {
+
+                    const userId = res.data.user.id;
+
+                    console.log('Login successful:', res.data);
                     alert('Login successful!');
+
                     // Navigate to feed only on successful login
-                    navigate('/feed');
+                    navigate(`/feed/${userId}`);
                 } else {
                     //handle login failure
-                    alert('Login failed: ' + response.data.message);
+                    alert('Login failed: ' + res.data.message);
                 }
             })
             .catch(error => {
-                console.error('Login error:', error.response?.data || error.message);
-                alert('Login failed: ' + (error.response?.data?.message || error.message));
+                console.error('Login error:', error.res?.data || error.message);
+                alert('Login failed: ' + (error.res?.data?.message || error.message));
             });
     }
 
