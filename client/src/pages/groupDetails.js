@@ -4,11 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 function GroupDetails() {
 
-    const groupID = useParams().groupID;
+    const groupId = useParams().groupID;
     const navigate = useNavigate();
 
     return (
         <div>
+            <h1>Group Details</h1>
 
         </div>
     )

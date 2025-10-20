@@ -51,8 +51,7 @@ function Groups() {
         axios.post('http://localhost:3001/api/groups', {
             command: 'search',
             data: {
-                name: trimmed,
-                createdBy: trimmed
+                name: trimmed
             }
         })
             .then(res => {
