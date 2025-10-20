@@ -33,13 +33,14 @@ const handleGroupCommand = async (req, res) => {
                 //otherwise fetch all groups
                 const groups = await Group.find(query)
 
-                // Add creator names to each group
+                //for each group fetch the creator name in paralel and wait for all async results
                 const groupsWithNames = await Promise.all(groups.map(async (group) => {
-                    // Get creator name only
+
                     const creator = await User.findById(group.createdBy);
-                    const creatorName = creator ? creator.name : 'Unknown User';
+                    const creatorName = creator ? creator.name : 'Unknown user';
 
                     return {
+                        //copy the original group and add the creator name
                         ...group.toObject(),
                         createdByName: creatorName
                     };
@@ -49,7 +50,7 @@ const handleGroupCommand = async (req, res) => {
 
             case 'search':
                 //multi parameter search for groups
-                const { name, description, privacy, createdBy, memberId } = data
+                const { name, description, createdBy } = data
                 const groupSearchQuery = {}
 
                 //build search query based on provided parameters
@@ -59,14 +60,8 @@ const handleGroupCommand = async (req, res) => {
                 if (description) {
                     groupSearchQuery.description = { $regex: description, $options: 'i' }
                 }
-                if (privacy) {
-                    groupSearchQuery.privacy = privacy
-                }
                 if (createdBy) {
                     groupSearchQuery.createdBy = createdBy
-                }
-                if (memberId) {
-                    groupSearchQuery.members = memberId
                 }
 
                 const groupSearchResults = await Group.find(groupSearchQuery)
@@ -99,6 +94,8 @@ const handleGroupCommand = async (req, res) => {
                 else {
                     return res.json({ message: 'group found & deleted successfully', group: deleteGroup })
                 }
+
+            //membership actions
 
             case 'joinGroup':
                 //add user to group members
@@ -141,7 +138,7 @@ const handleGroupCommand = async (req, res) => {
 
                 return res.json({ message: 'user left group successfully', group: leaveGroup })
 
-            //add admin to group
+            //admin operations
             case 'addAdmin':
                 //grant admin permissions to group member
                 const addAdminGroup = await Group.findByIdAndUpdate(

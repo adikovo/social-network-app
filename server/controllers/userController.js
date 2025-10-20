@@ -31,7 +31,7 @@ const handleUserCommand = async (req, res) => {
 
             case 'search':
                 //multi parameter search for users
-                const { name, email, role, groupId } = data
+                const { name, email, role } = data
                 const searchQuery = {}
 
                 //build search query based on provided parameters
@@ -44,9 +44,7 @@ const handleUserCommand = async (req, res) => {
                 if (role) {
                     searchQuery.role = role
                 }
-                if (groupId) {
-                    searchQuery.groups = groupId
-                }
+
 
                 const searchResults = await User.find(searchQuery)
                 return res.json({
