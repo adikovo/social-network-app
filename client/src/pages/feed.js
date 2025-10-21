@@ -23,7 +23,7 @@ function Feed() {
             .catch(err => {
                 console.error('User fetch error:', err);
             })
-    })
+    }, [userId])
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
             <h1>Feed</h1>
@@ -44,6 +44,13 @@ function Feed() {
                     navigate('/login')
                 }}>
                 Log Out
+            </button>
+            <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => navigate(`/profile/${userId}`)}
+                style={{ marginLeft: '10px' }}>
+                My Profile!!
             </button>
         </div >
     );

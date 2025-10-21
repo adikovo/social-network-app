@@ -220,11 +220,6 @@ function Groups() {
                     onClick={() => navigate(`/feed/${userId}`)}>
                     Back to Feed
                 </button>
-                <button
-                    className="btn btn-outline-primary"
-                    onClick={() => fetchGroups(true)}>
-                    Show All Groups
-                </button>
 
             </div>
 

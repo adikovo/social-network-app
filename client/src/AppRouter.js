@@ -5,6 +5,7 @@ import Register from './pages/register';
 import Feed from './pages/feed';
 import Groups from './pages/groups';
 import GroupDetails from './pages/groupDetails';
+import Profile from './pages/profile';
 
 //router handler for the apps
 function AppRouter() {
@@ -17,6 +18,7 @@ function AppRouter() {
             <Route path="/feed/:userId" element={<Feed />} />
             <Route path="/groups/:userId" element={<Groups />} />
             <Route path="/group/:groupId" element={<GroupDetails />} />
+            <Route path="/profile/:userId" element={<Profile />} />
 
         </Routes>
     );

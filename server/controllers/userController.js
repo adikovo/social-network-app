@@ -45,7 +45,6 @@ const handleUserCommand = async (req, res) => {
                     searchQuery.role = role
                 }
 
-
                 const searchResults = await User.find(searchQuery)
                 return res.json({
                     message: 'user search completed successfully',
@@ -74,13 +73,17 @@ const handleUserCommand = async (req, res) => {
                     return res.json({ message: 'user not found' })
                 }
                 else {
+                    //remove deleted user from all the other user friends arrays
+                    await User.updateMany(
+                        { friends: data.userId },
+                        { $pull: { friends: data.userId } }
+                    )
                     return res.json({ message: 'user deleted successfully', user: deleteUser })
                 }
 
             case 'addFriend':
-                //add a friend to the user's friends list
 
-                //add friendID to the user's friends array
+                //add a friend to the user's friends list
                 await User.findByIdAndUpdate(
                     data.userId,
                     { $addToSet: { friends: data.friendId } },
@@ -137,10 +140,36 @@ const handleUserCommand = async (req, res) => {
                         email: getUser.email,
                         role: getUser.role,
                         friends: getUser.friends,
-                        groups: getUser.groups
+                        groups: getUser.groups,
+                        bio: getUser.bio
                     }
                 })
 
+            case 'updateBio':
+                //update user's bio information
+                const updateBioUser = await User.findByIdAndUpdate(
+                    data.userId,
+                    { bio: data.bio },
+                    { new: true }
+                )
+                if (!updateBioUser) {
+                    return res.json({ message: 'user not found' })
+                }
+                return res.json({
+                    message: 'bio updated successfully',
+                    user: updateBioUser
+                })
+
+            case 'getBio':
+                //get user's bio information
+                const getBioUser = await User.findById(data.userId)
+                if (!getBioUser) {
+                    return res.json({ message: 'user not found' })
+                }
+                return res.json({
+                    message: 'bio fetched successfully',
+                    bio: getBioUser.bio
+                })
 
             //if command is not recognized
             default:
