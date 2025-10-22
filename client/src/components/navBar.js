@@ -51,8 +51,10 @@ function NavBar() {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem'
-            }}>
+                gap: '0.75rem',
+                cursor: 'pointer'
+            }} onClick={() => navigate(`/feed/${userId}`)}>
+
                 {/*app logo */}
                 <div style={{
                     width: '32px',

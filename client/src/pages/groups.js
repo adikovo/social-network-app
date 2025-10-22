@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import CreateGroupForm from '../components/createGroupForm';
 import GroupCard from '../components/GroupCard';
+import NavBar from '../components/navBar';
+import SearchSideBar from '../components/searchSideBar';
 
 function Groups() {
 
@@ -141,6 +143,8 @@ function Groups() {
 
     return (
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
+            <NavBar></NavBar>
+            <SearchSideBar />
             <h1>Groups</h1>
             <form onSubmit={handleSearch} className="mb-4" style={{ maxWidth: '500px', margin: '10px' }}>
                 <div className="input-group">
@@ -208,7 +212,7 @@ function Groups() {
                 </div>
             )}
 
-            {/* Navigation buttons */}
+            {/*navigation buttons */}
             <div className="mt-4">
                 <button
                     className="btn btn-secondary me-2"

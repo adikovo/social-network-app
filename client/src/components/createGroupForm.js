@@ -42,7 +42,6 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated }) {
             });
     }
 
-    //Don't render if show is false
     if (!show) return null;
 
     return (

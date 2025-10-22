@@ -6,7 +6,11 @@ const groupSchema = new mongoose.Schema({
     name: String,
     description: String,
     members: Array,
+    //user id
     createdBy: String,
+    //name of the creator
+    createdByName: String,
+    admins: [String],
     privacy: String,
     posts: Array
 })

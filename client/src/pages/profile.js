@@ -110,9 +110,9 @@ function Profile() {
 
     return (
         <div>
-            <h1>Profile</h1>
+            <NavBar></NavBar>
+            <h1 style={{ marginTop: '100px' }}>Profile</h1>
             <div className="mb-3">
-                <NavBar></NavBar>
                 <button className="btn btn-primary me-2" onClick={handleAddRoomie}>
                     Add Roomie
                 </button>

@@ -9,18 +9,25 @@ const handleGroupCommand = async (req, res) => {
         //determine which operation to perform based on command
         switch (command) {
             case 'create':
+                //get the creator name for easy searching
+                const creator = await User.findById(data.createdBy);
+                const creatorName = creator ? creator.name : 'Unknown';
+
                 //create new group document
                 const newGroup = new Group({
                     name: data.name,
                     description: data.description,
                     members: data.members,
                     createdBy: data.createdBy,
+                    createdByName: creatorName,
+                    admins: [data.createdBy], // Add creator as first admin
                     privacy: data.privacy,
                     posts: data.posts
                 })
 
-                //save group to db as new document
+                //save group to db
                 await newGroup.save()
+
                 return res.json({ message: 'group inserted successfully', group: newGroup })
 
             case 'list':
@@ -49,7 +56,6 @@ const handleGroupCommand = async (req, res) => {
                 return res.json({ message: 'all groups fetched successfully', groups: groupsWithNames })
 
             case 'search':
-                
                 const { name, description, createdBy } = data
                 const groupSearchQuery = {}
 
@@ -61,10 +67,11 @@ const handleGroupCommand = async (req, res) => {
                     groupSearchQuery.description = { $regex: description, $options: 'i' }
                 }
                 if (createdBy) {
-                    groupSearchQuery.createdBy = createdBy
+                    groupSearchQuery.createdByName = { $regex: createdBy, $options: 'i' }
                 }
 
                 const groupSearchResults = await Group.find(groupSearchQuery)
+
                 return res.json({
                     message: 'group search completed successfully',
                     groups: groupSearchResults,
