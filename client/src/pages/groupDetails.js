@@ -33,6 +33,10 @@ function GroupDetails() {
         fetchGroup();
     }, [groupId]);
 
+    function handleJoinGroup() {
+
+    }
+
 
 
 
@@ -40,8 +44,9 @@ function GroupDetails() {
         <div>
             <NavBar />
             <SearchSideBar />
-            <div style={{ marginLeft: '320px', padding: '20px' }}>
+            <div style={{ marginLeft: '320px', marginTop: '100px', padding: '20px' }}>
                 <h1>{group?.name || 'Loading...'}</h1>
+                <MyButton variant='success' onClick={handleJoinGroup}>Join Group</MyButton>
                 {group && (
                     <>
                         <p><strong>Description:</strong> {group.description}</p>

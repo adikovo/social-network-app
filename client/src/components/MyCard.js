@@ -1,4 +1,5 @@
 import React from 'react';
+import MyButton from './myButton';
 
 function MyCard({ type, data, onClick }) {
     const itemStyle = {
@@ -55,8 +56,22 @@ function MyCard({ type, data, onClick }) {
             case 'groups':
                 return (
                     <>
-                        <div style={{ fontWeight: '500', color: '#1f2937' }}>
-                            {data.name}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <div style={{ fontWeight: '500', color: '#1f2937' }}>
+                                {data.name}
+                            </div>
+                            <MyButton
+                                variant='success'
+                                size='small'
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    // Handle join group logic here
+                                    //TODO add join handler
+                                    console.log('Join group:', data.name);
+                                }}
+                            >
+                                Join
+                            </MyButton>
                         </div>
                         <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
                             {data.description}

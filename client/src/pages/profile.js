@@ -118,15 +118,16 @@ function Profile() {
                 <button className="btn btn-primary me-2" onClick={handleAddRoomie}>
                     Add Roomie
                 </button>
-                <button
-                    className="btn btn-primary me-2"
-                    onClick={handleGetBio}>
-                    My Bio
-                </button>
+
                 <button
                     className="btn btn-secondary me-2"
                     onClick={handleGetFriends}>
                     My Roomies
+                </button>
+                <button
+                    className="btn btn-primary me-2"
+                    onClick={handleGetBio}>
+                    My Bio
                 </button>
                 <button
                     className="btn btn-danger"
@@ -134,6 +135,7 @@ function Profile() {
                     Delete account
                 </button>
             </div>
+
 
             {/*friends list */}
             {friends.length > 0 && (
@@ -194,7 +196,7 @@ function Profile() {
                 </div>
             )}
             <br />
-            <button className="btn btn-primary" onClick={() => navigate(`/feed/${userId}`)}>back to feed</button>
+
         </div>
 
     )
