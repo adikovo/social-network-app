@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import BioForm from '../components/BioForm';
 import MyButton from '../components/myButton';
+import NavBar from '../components/navBar';
 
 
 function Profile() {
@@ -111,6 +112,7 @@ function Profile() {
         <div>
             <h1>Profile</h1>
             <div className="mb-3">
+                <NavBar></NavBar>
                 <button className="btn btn-primary me-2" onClick={handleAddRoomie}>
                     Add Roomie
                 </button>

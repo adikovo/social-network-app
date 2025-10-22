@@ -22,7 +22,9 @@ function MyButton({
         warning: 'btn-warning',
         info: 'btn-info',
         light: 'btn-light',
-        dark: 'btn-dark'
+        dark: 'btn-dark',
+        nav: 'btn-nav',
+        dropdown: 'btn-dropdown'
     };
 
     //different button sizes
@@ -51,7 +53,9 @@ function MyButton({
         warning: 'rgb(245 158 11 / 0.5)',
         info: 'rgb(59 130 246 / 0.5)',
         light: 'rgb(148 163 184 / 0.5)',
-        dark: 'rgb(15 23 42 / 0.5)'
+        dark: 'rgb(15 23 42 / 0.5)',
+        nav: 'rgb(107 114 128 / 0.3)',
+        dropdown: 'rgb(107 114 128 / 0.2)'
     };
 
     return (
@@ -101,23 +105,62 @@ function MyButton({
                     color: 'white',
                     borderColor: '#ef4444',
                     boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+                }),
+                ...(variant === 'nav' && {
+                    background: 'none',
+                    color: '#374151',
+                    border: 'none',
+                    padding: '0.5rem',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.2s ease'
+                }),
+                ...(variant === 'dropdown' && {
+                    background: 'none',
+                    color: '#374151',
+                    border: 'none',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '0',
+                    fontSize: '0.875rem',
+                    fontWeight: '400',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    gap: '0.75rem',
+                    width: '100%',
+                    textAlign: 'left',
+                    transition: 'background-color 0.2s ease'
                 })
             }}
             onMouseEnter={(e) => {
                 if (!disabled) {
-                    e.target.style.transform = 'translateY(-1px)';
-
-                    //get shadow color for this variant
-                    const shadowColor = shadowColors[variant] || 'rgb(0 0 0 / 0.3)';
-                    e.target.style.boxShadow = `0 6px 12px -2px ${shadowColor}, 0 4px 8px -4px ${shadowColor}`;
+                    if (variant === 'nav' || variant === 'dropdown') {
+                        //nav and dropdown variants hover just change background
+                        e.target.style.backgroundColor = '#f3f4f6';
+                    } else {
+                        //other variants lift and shadow effect
+                        e.target.style.transform = 'translateY(-1px)';
+                        const shadowColor = shadowColors[variant] || 'rgb(0 0 0 / 0.3)';
+                        e.target.style.boxShadow = `0 6px 12px -2px ${shadowColor}, 0 4px 8px -4px ${shadowColor}`;
+                    }
                 }
             }}
             onMouseLeave={(e) => {
                 if (!disabled) {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = variant === 'primary' || variant === 'success' || variant === 'danger'
-                        ? '0 1px 2px 0 rgb(0 0 0 / 0.05)'
-                        : 'none';
+                    if (variant === 'nav' || variant === 'dropdown') {
+                        e.target.style.backgroundColor = 'transparent';
+                    } else {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = variant === 'primary' || variant === 'success' || variant === 'danger'
+                            ? '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+                            : 'none';
+                    }
                 }
             }}
             {...props}
