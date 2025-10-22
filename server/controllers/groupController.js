@@ -49,7 +49,7 @@ const handleGroupCommand = async (req, res) => {
                 return res.json({ message: 'all groups fetched successfully', groups: groupsWithNames })
 
             case 'search':
-                //multi parameter search for groups
+                
                 const { name, description, createdBy } = data
                 const groupSearchQuery = {}
 

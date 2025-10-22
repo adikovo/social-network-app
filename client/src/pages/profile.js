@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import BioForm from '../components/BioForm';
+import MyButton from '../components/myButton';
 
 
 function Profile() {
@@ -176,7 +177,7 @@ function Profile() {
                         isEditing={isEditingBio}
                         showTitle={false}
                     />
-                    {/* save bio button - show only when editing bio*/}
+                    {/*save bio button - show only when editing bio*/}
                     {isEditingBio && (
                         <div className="mt-3">
                             <button
@@ -188,7 +189,10 @@ function Profile() {
                     )}
                 </div>
             )}
+            <br />
+            <button className="btn btn-primary" onClick={() => navigate(`/feed/${userId}`)}>back to feed</button>
         </div>
+
     )
 }
 

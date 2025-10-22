@@ -1,0 +1,130 @@
+import React from 'react';
+
+function MyButton({
+    children,
+    variant = 'primary',
+    size = 'normal',
+    disabled = false,
+    className = '',
+    onClick,
+    type = 'button',
+    ...props
+}) {
+    //base button classes
+    const baseClasses = 'btn';
+
+    const variantClasses = {
+        primary: 'btn-primary',
+        secondary: 'btn-secondary',
+        outline: 'btn-outline-primary',
+        success: 'btn-success',
+        danger: 'btn-danger',
+        warning: 'btn-warning',
+        info: 'btn-info',
+        light: 'btn-light',
+        dark: 'btn-dark'
+    };
+
+    //different button sizes
+    const sizeClasses = {
+        small: 'btn-sm',
+        normal: '',
+        large: 'btn-lg'
+    };
+
+
+    //combine all classes together
+    const allClasses = [
+        baseClasses,
+        variantClasses[variant] || variantClasses.primary,
+        sizeClasses[size] || '',
+        className
+    ].filter(Boolean).join(' ');
+
+    //shadow colors for each variant
+    const shadowColors = {
+        primary: 'rgb(99 102 241 / 0.5)',
+        secondary: 'rgb(100 116 139 / 0.5)',
+        outline: 'rgb(99 102 241 / 0.4)',
+        success: 'rgb(16 185 129 / 0.5)',
+        danger: 'rgb(239 68 68 / 0.5)',
+        warning: 'rgb(245 158 11 / 0.5)',
+        info: 'rgb(59 130 246 / 0.5)',
+        light: 'rgb(148 163 184 / 0.5)',
+        dark: 'rgb(15 23 42 / 0.5)'
+    };
+
+    return (
+        <button
+            type={type}
+            className={allClasses}
+            disabled={disabled}
+            onClick={onClick}
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: size === 'small' ? '0.375rem 0.75rem' : size === 'large' ? '0.75rem 1.5rem' : '0.5rem 1rem',
+                fontSize: size === 'small' ? '0.875rem' : size === 'large' ? '1.125rem' : '1rem',
+                fontWeight: '500',
+                lineHeight: '1',
+                textDecoration: 'none',
+                border: '1px solid transparent',
+                borderRadius: '0.5rem',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.6 : 1,
+                ...(variant === 'primary' && {
+                    background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                    color: 'white',
+                    borderColor: '#6366f1',
+                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+                }),
+                ...(variant === 'secondary' && {
+                    backgroundColor: '#f8fafc',
+                    color: '#475569',
+                    borderColor: '#e2e8f0',
+                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+                }),
+                ...(variant === 'outline' && {
+                    backgroundColor: 'transparent',
+                    color: '#6366f1',
+                    borderColor: '#6366f1'
+                }),
+                ...(variant === 'success' && {
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: 'white',
+                    borderColor: '#10b981',
+                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+                }),
+                ...(variant === 'danger' && {
+                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                    color: 'white',
+                    borderColor: '#ef4444',
+                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+                })
+            }}
+            onMouseEnter={(e) => {
+                if (!disabled) {
+                    e.target.style.transform = 'translateY(-1px)';
+
+                    //get shadow color for this variant
+                    const shadowColor = shadowColors[variant] || 'rgb(0 0 0 / 0.3)';
+                    e.target.style.boxShadow = `0 6px 12px -2px ${shadowColor}, 0 4px 8px -4px ${shadowColor}`;
+                }
+            }}
+            onMouseLeave={(e) => {
+                if (!disabled) {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = variant === 'primary' || variant === 'success' || variant === 'danger'
+                        ? '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+                        : 'none';
+                }
+            }}
+            {...props}
+        >
+            {children}
+        </button>
+    );
+}
+
+export default MyButton;
