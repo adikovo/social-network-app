@@ -5,6 +5,7 @@ import { useState } from 'react';
 import BioForm from '../components/BioForm';
 import MyButton from '../components/myButton';
 import NavBar from '../components/navBar';
+import SearchSideBar from '../components/searchSideBar';
 
 
 function Profile() {
@@ -111,6 +112,7 @@ function Profile() {
     return (
         <div>
             <NavBar></NavBar>
+            <SearchSideBar />
             <h1 style={{ marginTop: '100px' }}>Profile</h1>
             <div className="mb-3">
                 <button className="btn btn-primary me-2" onClick={handleAddRoomie}>

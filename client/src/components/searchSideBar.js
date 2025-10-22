@@ -3,9 +3,12 @@ import { useState } from 'react';
 import axios from 'axios';
 import SearchForm from './searchForm';
 import SearchResults from './searchResults';
+import { useNavigate } from 'react-router-dom';
 
 
 function SearchSideBar() {
+
+    const navigate = useNavigate()
 
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -29,7 +32,7 @@ function SearchSideBar() {
         } else {
             return {
                 type: 'users',
-                fields: ['name', 'email', ''],
+                fields: ['name', 'email', 'pets', 'budget', 'location', 'smoking'],
                 placeholder: 'Search users...'
             }
         }
@@ -60,8 +63,7 @@ function SearchSideBar() {
 
     //click handlers for different result types
     const handleUserClick = (user) => {
-        console.log('User clicked:', user);
-        // Navigate to user profile or perform other actions
+        navigate(`/profile/${user._id}`);
     };
 
     const handlePostClick = (post) => {
@@ -70,7 +72,7 @@ function SearchSideBar() {
     };
 
     const handleGroupClick = (group) => {
-        console.log('Group clicked:', group);
+        navigate(`/group/${group._id}`);
         // Navigate to group details or perform other actions
     };
 

@@ -77,7 +77,7 @@ function MyCard({ type, data, onClick }) {
             style={itemStyle}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onClick={() => onClick && onClick(data)}
+            onClick={() => onClick(data)}
         >
             {renderContent()}
         </div>
