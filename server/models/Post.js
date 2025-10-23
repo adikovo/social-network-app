@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
     content: String,
     author: String,
+    authorId: String,
     groupId: String,
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },

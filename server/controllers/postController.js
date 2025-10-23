@@ -9,7 +9,13 @@ const handlePostCommand = async (req, res) => {
         switch (command) {
             case 'create':
                 //create new post document
-                const newPost = new Post({ content: data.content, author: data.author, likes: 0, comments: [] })
+                const newPost = new Post({
+                    content: data.content,
+                    author: data.author,
+                    authorId: data.authorId,
+                    likes: 0,
+                    comments: []
+                })
 
                 //save post to db as new document
                 await newPost.save()

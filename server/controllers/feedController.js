@@ -9,11 +9,14 @@ const handleFeedCommand = async (req, res) => {
     try {
         switch (command) {
             case 'getFeed':
-                //get posts from user's friends and joined groups
+                //get posts from user's friends, joined groups, and user's own posts
                 const feedUser = await User.findById(data.userId)
                 if (!feedUser) {
                     return res.json({ message: 'user not found' })
                 }
+
+                //get user's own posts
+                const userPosts = await Post.find({ authorId: data.userId })
 
                 //get posts from friends
                 const friendPosts = await Post.find({ authorId: { $in: feedUser.friends } })
@@ -24,7 +27,7 @@ const handleFeedCommand = async (req, res) => {
                 const groupPosts = await Post.find({ groupId: { $in: groupIds } })
 
                 //combine and sort by creation date
-                const allFeedPosts = [...friendPosts, ...groupPosts]
+                const allFeedPosts = [...userPosts, ...friendPosts, ...groupPosts]
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
                 return res.json({
@@ -43,11 +46,11 @@ const handleFeedCommand = async (req, res) => {
 
             case 'getUserPosts':
                 //get all posts by current user (for profile page)
-                const userPosts = await Post.find({ authorId: data.userId })
+                const profileUserPosts = await Post.find({ authorId: data.userId })
                     .sort({ createdAt: -1 })
                 return res.json({
                     message: 'user posts retrieved successfully',
-                    posts: userPosts
+                    posts: profileUserPosts
                 })
 
             default:
