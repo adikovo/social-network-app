@@ -201,7 +201,7 @@ function NavBar() {
                         ) : (
                             (roomiesRequests || []).map((request, index) => (
                                 <RoomieRequestCard
-                                    key={request.id}
+                                    key={request._id || request.id}
                                     request={request}
                                     onAccept={handleAcceptRequest}
                                     onDecline={handleDeclineRequest}

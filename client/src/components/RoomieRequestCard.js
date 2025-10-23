@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function RoomieRequestCard({
     request,
@@ -6,9 +7,12 @@ function RoomieRequestCard({
     onDecline,
     isLast = false
 }) {
+    const navigate = useNavigate();
     const cardStyle = {
         padding: '0.75rem',
-        borderBottom: isLast ? 'none' : '1px solid #f3f4f6'
+        borderBottom: isLast ? 'none' : '1px solid #f3f4f6',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s ease'
     };
 
     const headerStyle = {
@@ -73,23 +77,42 @@ function RoomieRequestCard({
     };
 
     const handleDeclineClick = (e) => {
+        //prevent card click when clicking decline button
+        e.stopPropagation();
         e.target.style.backgroundColor = '#f9fafb';
         setTimeout(() => {
             e.target.style.backgroundColor = 'white';
         }, 150);
-        onDecline(request.id);
+        onDecline(request._id || request.id);
     };
 
     const handleAcceptClick = (e) => {
+        //prevent card click when clicking accept button
+        e.stopPropagation();
         e.target.style.backgroundColor = '#2563eb';
         setTimeout(() => {
             e.target.style.backgroundColor = '#3b82f6';
         }, 150);
-        onAccept(request.id);
+        onAccept(request._id || request.id);
+    };
+
+    const handleCardClick = () => {
+        // Navigate to the user's profile
+        const userId = request._id || request.id;
+        navigate(`/profile/${userId}`);
     };
 
     return (
-        <div style={cardStyle}>
+        <div
+            style={cardStyle}
+            onClick={handleCardClick}
+            onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#f9fafb';
+            }}
+            onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent';
+            }}
+        >
             <div style={headerStyle}>
                 <div style={avatarStyle}>
                     {request.name.charAt(0)}
@@ -99,7 +122,7 @@ function RoomieRequestCard({
                         {request.name}
                     </div>
                     <div style={messageStyle}>
-                        {request.message}
+                        {request.message || `wants to be your roommate`}
                     </div>
                 </div>
             </div>

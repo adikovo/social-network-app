@@ -127,6 +127,19 @@ const handleUserCommand = async (req, res) => {
                 );
                 return res.json({ message: 'friend request declined successfully' })
 
+            case 'cancelFriendRequest':
+                //remove from sender's pending requests array
+                await User.findByIdAndUpdate(
+                    data.userId,
+                    { $pull: { pendingRequests: data.friendId } }
+                );
+                //remove from receiver's received requests array
+                await User.findByIdAndUpdate(
+                    data.friendId,
+                    { $pull: { receivedRequests: data.userId } }
+                );
+                return res.json({ message: 'friend request cancelled successfully' })
+
             case 'getFriendRequests':
                 //get all friend requests for a user
                 const req = await User.findById(data.userId).populate('receivedRequests');
@@ -210,6 +223,30 @@ const handleUserCommand = async (req, res) => {
                 return res.json({
                     message: 'bio fetched successfully',
                     bio: getBioUser.bio
+                })
+
+            case 'checkPendingRequest':
+                //check if user has a pending request to another user
+                const checkUser = await User.findById(data.userId)
+                if (!checkUser) {
+                    return res.json({ message: 'user not found' })
+                }
+                const hasPendingRequest = checkUser.pendingRequests.includes(data.friendId)
+                return res.json({
+                    message: 'pending request check completed',
+                    hasPendingRequest: hasPendingRequest
+                })
+
+            case 'checkReceivedRequest':
+                //check if user has received a request from another user
+                const checkReceivedUser = await User.findById(data.userId)
+                if (!checkReceivedUser) {
+                    return res.json({ message: 'user not found' })
+                }
+                const hasReceivedRequest = checkReceivedUser.receivedRequests.includes(data.friendId)
+                return res.json({
+                    message: 'received request check completed',
+                    hasReceivedRequest: hasReceivedRequest
                 })
 
             //if command is not recognized

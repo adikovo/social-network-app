@@ -30,7 +30,9 @@ function NotificationBadge({
         fontWeight: 'bold',
         minWidth: size,
         padding: '0 2px',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        zIndex: 10,
+        pointerEvents: 'none'
     };
 
     return (
