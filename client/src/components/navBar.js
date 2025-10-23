@@ -1,37 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
 import MyButton from './myButton';
 import DropdownMenu from './DropdownMenu';
 import RoomieRequestCard from './RoomieRequestCard';
 import NotificationBadge from './NotificationBadge';
+import AppLogo from './AppLogo';
 import { useUserContext } from '../context/UserContext';
+import axios from 'axios';
 
 function NavBar() {
     const navigate = useNavigate();
     const { user } = useUserContext();
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [showRequestDropdown, setShowRequestDropdown] = useState(false);
+    const [roomiesRequests, setRoomiesRequests] = useState([]);
     const profileRef = useRef(null);
     const requestRef = useRef(null);
 
-    // Mock roomie requests data - replace with actual data from your backend
-    const roomieRequests = [
-        { id: 1, name: 'John Doe', avatar: null, message: 'Looking for a roommate in downtown area' },
-        { id: 2, name: 'Sarah Smith', avatar: null, message: 'Need someone to share a 2BR apartment' },
-        { id: 3, name: 'Mike Johnson', avatar: null, message: 'Student looking for housing near campus' }
-    ];
 
-    // Close dropdowns when clicking outside
+    //fetch roomie requests when user is loaded
+    useEffect(() => {
+        if (user) {
+            fetchRoomiesRequests();
+        }
+    }, [user]);
+
+    //close dropdowns when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
+            //check if click is outside profile dropdown
             if (profileRef.current && !profileRef.current.contains(event.target)) {
                 setShowProfileDropdown(false);
             }
+            //check if click is outside request dropdown
             if (requestRef.current && !requestRef.current.contains(event.target)) {
                 setShowRequestDropdown(false);
             }
         };
-
+        //listen for clicks on the page
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -65,10 +71,43 @@ function NavBar() {
         console.log('Navigate to stats');
     };
 
+    const fetchRoomiesRequests = () => {
+        axios.post('http://localhost:3001/api/users', {
+            command: 'getFriendRequests',
+            data: {
+                userId: user.id
+            }
+        })
+            .then(res => {
+                console.log('Friend requests response:', res.data);
+                setRoomiesRequests(res.data.friendRequests);
+            })
+            .catch(err => {
+                console.error('Friend requests error:', err);
+                alert('Failed to fetch friend requests');
+            })
+    }
+
     const handleAcceptRequest = (requestId) => {
         // TODO: Implement accept request logic
-        console.log('Accept request:', requestId);
+        axios.post('http://localhost:3001/api/users', {
+            command: 'acceptFriendRequest',
+            data: {
+                userId: user.id,
+                friendId: requestId
+            }
+        })
+            .then(res => {
+                console.log('Accept request response:', res.data);
+                alert('Friend request accepted successfully!');
+            })
+            .catch(err => {
+                console.error('Accept request error:', err);
+                alert('Failed to accept friend request');
+            })
         setShowRequestDropdown(false);
+        //refresh friend requests
+        fetchRoomiesRequests();
     };
 
     const handleDeclineRequest = (requestId) => {
@@ -100,18 +139,7 @@ function NavBar() {
                 cursor: 'pointer'
             }} onClick={() => navigate('/feed')}>
 
-                {/*app logo */}
-                <div style={{
-                    width: '32px',
-                    height: '32px',
-                    backgroundColor: '#1f2937',
-                    borderRadius: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <span style={{ color: 'white', fontSize: '16px', fontWeight: 'bold' }}>R</span>
-                </div>
+                <AppLogo onClick={() => navigate('/feed')} />
 
                 {/*app name */}
                 <h1 style={{
@@ -145,14 +173,14 @@ function NavBar() {
                     <MyButton variant="nav" onClick={handleStats}> Stats </MyButton>
                 </div>
 
-                {/* Roomie Requests Dropdown */}
+                {/*roomie requests dropdown */}
                 <div ref={requestRef} style={{ position: 'relative' }}>
                     <MyButton
                         variant="icon"
                         onClick={() => setShowRequestDropdown(!showRequestDropdown)}
                     >
                         R
-                        <NotificationBadge count={roomieRequests.length} />
+                        <NotificationBadge count={roomiesRequests?.length || 0} />
                     </MyButton>
 
                     <DropdownMenu
@@ -161,7 +189,7 @@ function NavBar() {
                         width="280px"
                         maxHeight="400px"
                     >
-                        {roomieRequests.length === 0 ? (
+                        {!roomiesRequests || roomiesRequests.length === 0 ? (
                             <div style={{
                                 padding: '1rem',
                                 textAlign: 'center',
@@ -171,13 +199,13 @@ function NavBar() {
                                 No roomie requests
                             </div>
                         ) : (
-                            roomieRequests.map((request, index) => (
+                            (roomiesRequests || []).map((request, index) => (
                                 <RoomieRequestCard
                                     key={request.id}
                                     request={request}
                                     onAccept={handleAcceptRequest}
                                     onDecline={handleDeclineRequest}
-                                    isLast={index === roomieRequests.length - 1}
+                                    isLast={index === (roomiesRequests?.length || 0) - 1}
                                 />
                             ))
                         )}

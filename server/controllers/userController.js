@@ -81,21 +81,62 @@ const handleUserCommand = async (req, res) => {
                     return res.json({ message: 'user deleted successfully', user: deleteUser })
                 }
 
-            case 'addFriend':
-
-                //add a friend to the user's friends list
+            case 'sendFriendRequest':
+                //add friendId to the sender's pendingRequests array
                 await User.findByIdAndUpdate(
+                    //sender
                     data.userId,
-                    { $addToSet: { friends: data.friendId } },
-                    { new: true }
+                    { $addToSet: { pendingRequests: data.friendId } }
                 )
                 //add userID to the friend's friends array
                 await User.findByIdAndUpdate(
+                    //receiver
                     data.friendId,
-                    { $addToSet: { friends: data.userId } },
-                    { new: true }
+                    { $addToSet: { receivedRequests: data.userId } }
                 )
                 return res.json({ message: 'friend added successfully' })
+
+            case 'acceptFriendRequest':
+                //remove from requests & add to friends array
+                await User.findByIdAndUpdate(
+                    //the user that accepted
+                    data.userId,
+                    {
+                        $pull: { receivedRequests: data.friendId },
+                        $addToSet: { friends: data.friendId }
+                    }
+                );
+                //remove from sender's pending array
+                await User.findByIdAndUpdate(
+                    data.friendId,
+                    { $pull: { pendingRequests: data.userId } }
+                );
+                return res.json({ message: 'friend request accepted successfully' })
+
+            case 'declineFriendRequest':
+                //remove from requests array
+                await User.findByIdAndUpdate(
+                    //user that rejected
+                    data.userId,
+                    { $pull: { receivedRequests: data.friendId } }
+                );
+                await User.findByIdAndUpdate(
+                    //user that hot rejected
+                    data.friendId,
+                    { $pull: { pendingRequests: data.userId } }
+                );
+                return res.json({ message: 'friend request declined successfully' })
+
+            case 'getFriendRequests':
+                //get all friend requests for a user
+                const req = await User.findById(data.userId).populate('receivedRequests');
+                if (!req) {
+                    return res.json({ message: 'user not found' })
+                }
+                return res.json({
+                    message: 'friend requests retrieved successfully',
+                    friendRequests: req.receivedRequests
+                })
 
             case 'removeFriend':
                 //remove a friend from the user's friends list

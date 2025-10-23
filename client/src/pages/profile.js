@@ -98,26 +98,26 @@ function Profile() {
             })
     }
 
-    function handleAddRoomie() {
+    function handleSendFriendRequest() {
         if (!currentUser) {
             console.log('User not logged in');
             return;
         }
 
         axios.post('http://localhost:3001/api/users', {
-            command: 'addFriend',
+            command: 'sendFriendRequest',
             data: {
                 userId: currentUser.id,
                 friendId: userId
             }
         })
             .then(res => {
-                console.log('Add roomie response:', res.data);
-                alert('Roomie added successfully!');
+                console.log('Friend request sent successfully', res.data);
+                alert('Friend request sent successfully!');
             })
             .catch(err => {
-                console.error('Add roomie error:', err);
-                alert('Failed to add roomie');
+                console.error('send friend request error:', err);
+                alert('Failed to send friend request');
             })
     }
 
@@ -160,7 +160,7 @@ function Profile() {
                     {!isOwnProfile && currentUser && (
                         <MyButton
                             variant='primary'
-                            onClick={handleAddRoomie}
+                            onClick={handleSendFriendRequest}
                             style={{ marginRight: '10px' }}
                         >
                             Add Roomie

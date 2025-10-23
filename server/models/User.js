@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
     role: String,
     friends: Array,
     groups: Array,
+    pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    receivedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     // Bio fields for roommates application
     bio: {
         age: Number,
