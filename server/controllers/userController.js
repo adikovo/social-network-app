@@ -106,10 +106,13 @@ const handleUserCommand = async (req, res) => {
                         $addToSet: { friends: data.friendId }
                     }
                 );
-                //remove from sender's pending array
+                //remove from sender's pending array & add to their friends list
                 await User.findByIdAndUpdate(
                     data.friendId,
-                    { $pull: { pendingRequests: data.userId } }
+                    {
+                        $pull: { pendingRequests: data.userId },
+                        $addToSet: { friends: data.userId }
+                    }
                 );
                 return res.json({ message: 'friend request accepted successfully' })
 

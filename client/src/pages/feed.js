@@ -62,7 +62,6 @@ function Feed() {
     }
 
     const handlePostCreated = (postText) => {
-
         // API call to create post on server
         axios.post('http://localhost:3001/api/posts', {
             command: 'create',
