@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MyButton from './myButton';
+import { useUserContext } from '../context/UserContext';
 
 function NavBar() {
     const navigate = useNavigate();
-    const userId = useParams().userId;
+    const { user } = useUserContext();
     const [showDropdown, setShowDropdown] = useState(false);
 
     const handleLogout = () => {
@@ -12,12 +13,14 @@ function NavBar() {
     };
 
     const handleProfile = () => {
-        navigate(`/profile/${userId}`);
+        if (user) {
+            navigate(`/profile/${user.id}`);
+        }
         setShowDropdown(false);
     };
 
     const handleGroups = () => {
-        navigate(`/groups/${userId}`);
+        navigate('/groups');
     };
 
     const handleChat = () => {
@@ -53,7 +56,7 @@ function NavBar() {
                 alignItems: 'center',
                 gap: '0.75rem',
                 cursor: 'pointer'
-            }} onClick={() => navigate(`/feed/${userId}`)}>
+            }} onClick={() => navigate('/feed')}>
 
                 {/*app logo */}
                 <div style={{

@@ -44,11 +44,13 @@ function Register() {
                 setEmail('');
                 setPassword('');
                 setVerifyPassword('');
+
+                //navigate to login page
+                navigate('/login');
             })
             .catch(error => {
                 console.error('Register error:', error.response?.data || error.message);
 
-                //TODO: remove
                 alert('Registration failed: ' + (error.response?.data?.message || error.message));
             });
     }

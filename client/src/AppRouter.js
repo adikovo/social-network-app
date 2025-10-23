@@ -15,8 +15,8 @@ function AppRouter() {
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/feed/:userId" element={<Feed />} />
-            <Route path="/groups/:userId" element={<Groups />} />
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/groups" element={<Groups />} />
             <Route path="/group/:groupId" element={<GroupDetails />} />
             <Route path="/profile/:userId" element={<Profile />} />
 

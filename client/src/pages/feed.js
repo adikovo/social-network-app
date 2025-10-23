@@ -1,32 +1,42 @@
 import React from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
+import { useUserContext } from '../context/UserContext';
 
 function Feed() {
     const navigate = useNavigate();
-    const userId = useParams().userId;
-    const [user, setUser] = useState(null);
+    const { user } = useUserContext();
+    const [userData, setUserData] = useState(null);
+
+    // If user is not loaded yet, redirect to login
+    useEffect(() => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+    }, [user, navigate]);
 
     useEffect(() => {
-
-        //fetch user data from server
-        axios.post('http://localhost:3001/api/users',
-            {
-                command: 'getUser',
-                data: { userId: userId }
-            }
-        )
-            .then(res => {
-                console.log('User response:', res.data);
-                setUser(res.data.user);
-            })
-            .catch(err => {
-                console.error('User fetch error:', err);
-            })
-    }, [userId])
+        if (user) {
+            //fetch user data from server
+            axios.post('http://localhost:3001/api/users',
+                {
+                    command: 'getUser',
+                    data: { userId: user.id }
+                }
+            )
+                .then(res => {
+                    console.log('User response:', res.data);
+                    setUserData(res.data.user);
+                })
+                .catch(err => {
+                    console.error('User fetch error:', err);
+                })
+        }
+    }, [user])
 
     return (
         <div>

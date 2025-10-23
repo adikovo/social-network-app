@@ -17,13 +17,13 @@ function SearchSideBar() {
     const getSearchType = () => {
         const path = window.location.pathname;
 
-        if (path.includes('/feed/')) {
+        if (path === '/feed') {
             return {
                 type: 'posts',
                 fields: ['content', 'author', 'date', 'group'],
                 placeholder: 'Search posts...'
             };
-        } else if (path.includes('/groups/')) {
+        } else if (path === '/groups') {
             return {
                 type: 'groups',
                 fields: ['name', 'description', 'createdBy'],
@@ -73,7 +73,7 @@ function SearchSideBar() {
 
     const handleGroupClick = (group) => {
         navigate(`/group/${group._id}`);
-        // Navigate to group details or perform other actions
+
     };
 
     return (

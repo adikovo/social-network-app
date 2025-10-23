@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useUserContext } from '../context/UserContext';
 
 
 function Login() {
 
     const navigate = useNavigate();
+    const { login } = useUserContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -28,13 +30,14 @@ function Login() {
                 //check if login was actually successful
                 if (res.data.message === 'login successful') {
 
-                    const userId = res.data.user.id;
-
                     console.log('Login successful:', res.data);
+
+                    //save user data to context
+                    login(res.data.user);
                     alert('Login successful!');
 
-                    // Navigate to feed only on successful login
-                    navigate(`/feed/${userId}`);
+                    //navigate to feed only on successful login
+                    navigate('/feed');
                 } else {
                     //handle login failure
                     alert('Login failed: ' + res.data.message);

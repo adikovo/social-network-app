@@ -1,18 +1,27 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CreateGroupForm from '../components/createGroupForm';
 import GroupCard from '../components/GroupCard';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
+import { useUserContext } from '../context/UserContext';
 
 function Groups() {
 
-    //get current user's userId from url 
-    const userId = useParams().userId;
+    //get current user from context
+    const { user: currentUser } = useUserContext();
 
     const navigate = useNavigate();
+
+    //if user is not loaded yet, redirect to login
+    useEffect(() => {
+        if (!currentUser) {
+            navigate('/login');
+            return;
+        }
+    }, [currentUser, navigate]);
     const [groups, setGroups] = useState([]);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -23,7 +32,7 @@ function Groups() {
 
         //if showAll is true, fetch all groups
         //else fetch all groups the user is a member 
-        const data = showAll ? {} : { userId: userId }
+        const data = showAll ? {} : { userId: currentUser.id }
 
         //fetch all user's groups from the server
         axios.post('http://localhost:3001/api/groups',
@@ -73,7 +82,7 @@ function Groups() {
                 command: 'joinGroup',
                 data: {
                     groupId: groupId,
-                    userId: userId
+                    userId: currentUser.id
                 }
             }
         )
@@ -95,7 +104,7 @@ function Groups() {
             {
                 command: 'leaveGroup',
                 data: {
-                    userId: userId,
+                    userId: currentUser.id,
                     groupId: groupId
                 }
             }
@@ -138,7 +147,7 @@ function Groups() {
 
     useEffect(() => {
         fetchGroups();
-    }, [userId])
+    }, [currentUser.id])
 
 
     return (
@@ -178,7 +187,7 @@ function Groups() {
                             <div key={group._id} className="col-md-4 mb-4">
                                 <GroupCard
                                     group={group}
-                                    userId={userId}
+                                    userId={currentUser.id}
                                     onJoin={handleJoinGroup}
                                     onLeave={handleLeaveGroup}
                                     showAdmin={false}
@@ -197,7 +206,7 @@ function Groups() {
                     <div key={group._id} className="col-md-4 mb-4">
                         <GroupCard
                             group={group}
-                            userId={userId}
+                            userId={currentUser.id}
                             onJoin={handleJoinGroup}
                             onLeave={handleLeaveGroup}
                             showAdmin={true}
@@ -221,7 +230,7 @@ function Groups() {
                 </button>
                 <button
                     className="btn btn-secondary me-2"
-                    onClick={() => navigate(`/feed/${userId}`)}>
+                    onClick={() => navigate('/feed')}>
                     Back to Feed
                 </button>
 
@@ -230,7 +239,7 @@ function Groups() {
             <CreateGroupForm
                 show={showCreateGroup}
                 onClose={() => setShowCreateGroup(false)}
-                userId={userId}
+                userId={currentUser.id}
                 onGroupCreated={fetchGroups}
             />
         </div>

@@ -6,16 +6,24 @@ import BioForm from '../components/BioForm';
 import MyButton from '../components/myButton';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
+import { useUserContext } from '../context/UserContext';
 
 
 function Profile() {
 
+    //user id of the viewed profile
     const userId = useParams().userId;
+    //current user from context
+    const { user: currentUser } = useUserContext();
     const [friends, setFriends] = useState([]);
     const [activeButton, setActiveButton] = useState(null);
     const [userBio, setUserBio] = useState({});
     const [isEditingBio, setIsEditingBio] = useState(false);
     const navigate = useNavigate();
+
+    //check if current user is viewing their own profile
+    const isOwnProfile = currentUser && currentUser.id === userId;
+
     function handleGetFriends() {
 
         setActiveButton('friends');
@@ -38,7 +46,7 @@ function Profile() {
     function handleDeleteUser() {
 
         axios.post('http://localhost:3001/api/users', {
-            commad: 'delete',
+            command: 'delete',
             data: {
                 userId: userId
             }
@@ -90,11 +98,16 @@ function Profile() {
     }
 
     function handleAddRoomie() {
+        if (!currentUser) {
+            console.log('User not logged in');
+            return;
+        }
 
         axios.post('http://localhost:3001/api/users', {
             command: 'addFriend',
             data: {
-                userId: userId
+                userId: currentUser.id,
+                friendId: userId
             }
         })
             .then(res => {
@@ -109,31 +122,66 @@ function Profile() {
 
 
 
+
     return (
         <div>
             <NavBar></NavBar>
             <SearchSideBar />
             <h1 style={{ marginTop: '100px' }}>Profile</h1>
             <div className="mb-3">
-                <button className="btn btn-primary me-2" onClick={handleAddRoomie}>
-                    Add Roomie
-                </button>
+                {/* Add Roomie button - only show if viewing someone else's profile */}
+                {!isOwnProfile && currentUser && (
+                    <MyButton
+                        variant='primary'
+                        onClick={handleAddRoomie}
+                        style={{ marginRight: '10px' }}
+                    >
+                        Add Roomie
+                    </MyButton>
+                )}
 
-                <button
-                    className="btn btn-secondary me-2"
-                    onClick={handleGetFriends}>
-                    My Roomies
-                </button>
-                <button
-                    className="btn btn-primary me-2"
-                    onClick={handleGetBio}>
-                    My Bio
-                </button>
-                <button
-                    className="btn btn-danger"
-                    onClick={handleDeleteUser}>
-                    Delete account
-                </button>
+                {/* Edit Bio button - only show if viewing own profile */}
+                {isOwnProfile && (
+                    <MyButton
+                        variant='outline-primary'
+                        onClick={() => setIsEditingBio(!isEditingBio)}
+                        style={{ marginRight: '10px' }}
+                    >
+                        {isEditingBio ? 'Cancel' : 'Edit Bio'}
+                    </MyButton>
+                )}
+
+                {/* My Roomies button - only show if viewing own profile */}
+                {isOwnProfile && (
+                    <MyButton
+                        variant='secondary'
+                        onClick={handleGetFriends}
+                        style={{ marginRight: '10px' }}
+                    >
+                        My Roomies
+                    </MyButton>
+                )}
+
+                {/* My Bio button - only show if viewing own profile */}
+                {isOwnProfile && (
+                    <MyButton
+                        variant='primary'
+                        onClick={handleGetBio}
+                        style={{ marginRight: '10px' }}
+                    >
+                        My Bio
+                    </MyButton>
+                )}
+
+                {/* Delete account button - only show if viewing own profile */}
+                {isOwnProfile && (
+                    <MyButton
+                        variant='danger'
+                        onClick={handleDeleteUser}
+                    >
+                        Delete account
+                    </MyButton>
+                )}
             </div>
 
 
@@ -169,12 +217,6 @@ function Profile() {
                 <div className="mt-4">
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <h3>Roommate Profile</h3>
-                        <button
-                            className="btn btn-outline-primary"
-                            onClick={() => setIsEditingBio(!isEditingBio)}
-                            style={{ marginRight: '10px' }}>
-                            {isEditingBio ? 'Cancel' : 'Edit Bio'}
-                        </button>
                     </div>
 
                     <BioForm
