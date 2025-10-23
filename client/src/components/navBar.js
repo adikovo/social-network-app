@@ -1,12 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyButton from './myButton';
+import DropdownMenu from './DropdownMenu';
+import RoomieRequestCard from './RoomieRequestCard';
+import NotificationBadge from './NotificationBadge';
 import { useUserContext } from '../context/UserContext';
 
 function NavBar() {
     const navigate = useNavigate();
     const { user } = useUserContext();
-    const [showDropdown, setShowDropdown] = useState(false);
+    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+    const [showRequestDropdown, setShowRequestDropdown] = useState(false);
+    const profileRef = useRef(null);
+    const requestRef = useRef(null);
+
+    // Mock roomie requests data - replace with actual data from your backend
+    const roomieRequests = [
+        { id: 1, name: 'John Doe', avatar: null, message: 'Looking for a roommate in downtown area' },
+        { id: 2, name: 'Sarah Smith', avatar: null, message: 'Need someone to share a 2BR apartment' },
+        { id: 3, name: 'Mike Johnson', avatar: null, message: 'Student looking for housing near campus' }
+    ];
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (profileRef.current && !profileRef.current.contains(event.target)) {
+                setShowProfileDropdown(false);
+            }
+            if (requestRef.current && !requestRef.current.contains(event.target)) {
+                setShowRequestDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleLogout = () => {
         navigate('/login');
@@ -16,7 +46,7 @@ function NavBar() {
         if (user) {
             navigate(`/profile/${user.id}`);
         }
-        setShowDropdown(false);
+        setShowProfileDropdown(false);
     };
 
     const handleGroups = () => {
@@ -33,6 +63,18 @@ function NavBar() {
         //TODO:
         // Add stats navigation logic here
         console.log('Navigate to stats');
+    };
+
+    const handleAcceptRequest = (requestId) => {
+        // TODO: Implement accept request logic
+        console.log('Accept request:', requestId);
+        setShowRequestDropdown(false);
+    };
+
+    const handleDeclineRequest = (requestId) => {
+        // TODO: Implement decline request logic
+        console.log('Decline request:', requestId);
+        setShowRequestDropdown(false);
     };
 
     return (
@@ -95,6 +137,7 @@ function NavBar() {
                     alignItems: 'center',
                     gap: '1.5rem'
                 }}>
+
                     <MyButton variant="nav" onClick={handleGroups}> Groups </MyButton>
 
                     <MyButton variant="nav" onClick={handleChat}> Chat </MyButton>
@@ -102,12 +145,51 @@ function NavBar() {
                     <MyButton variant="nav" onClick={handleStats}> Stats </MyButton>
                 </div>
 
+                {/* Roomie Requests Dropdown */}
+                <div ref={requestRef} style={{ position: 'relative' }}>
+                    <MyButton
+                        variant="icon"
+                        onClick={() => setShowRequestDropdown(!showRequestDropdown)}
+                    >
+                        R
+                        <NotificationBadge count={roomieRequests.length} />
+                    </MyButton>
+
+                    <DropdownMenu
+                        isOpen={showRequestDropdown}
+                        onClose={() => setShowRequestDropdown(false)}
+                        width="280px"
+                        maxHeight="400px"
+                    >
+                        {roomieRequests.length === 0 ? (
+                            <div style={{
+                                padding: '1rem',
+                                textAlign: 'center',
+                                color: '#6b7280',
+                                fontSize: '14px'
+                            }}>
+                                No roomie requests
+                            </div>
+                        ) : (
+                            roomieRequests.map((request, index) => (
+                                <RoomieRequestCard
+                                    key={request.id}
+                                    request={request}
+                                    onAccept={handleAcceptRequest}
+                                    onDecline={handleDeclineRequest}
+                                    isLast={index === roomieRequests.length - 1}
+                                />
+                            ))
+                        )}
+                    </DropdownMenu>
+                </div>
+
                 {/*user profile dropdown */}
-                <div style={{ position: 'relative' }}>
+                <div ref={profileRef} style={{ position: 'relative' }}>
 
                     {/* profile picture button */}
                     <button
-                        onClick={() => setShowDropdown(!showDropdown)}
+                        onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                         style={{
                             width: '40px',
                             height: '40px',
@@ -129,53 +211,42 @@ function NavBar() {
                     >
                     </button>
 
-                    {/*dropdown menu */}
-                    {showDropdown && (
-                        <div style={{
-                            position: 'absolute',
-                            top: '100%',
-                            right: 0,
-                            marginTop: '0.5rem',
-                            backgroundColor: 'white',
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '0.5rem',
-                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-                            minWidth: '160px',
-                            zIndex: 101
-                        }}>
-                            {/*show profile button*/}
-                            <MyButton
-                                variant="nav"
-                                onClick={handleProfile}
-                                style={{
-                                    width: '100%',
-                                    justifyContent: 'flex-start',
-                                    borderTopLeftRadius: '0.5rem',
-                                    borderTopRightRadius: '0.5rem',
-                                    borderBottomLeftRadius: '0',
-                                    borderBottomRightRadius: '0'
-                                }}
-                            >
-                                Profile
-                            </MyButton>
+                    <DropdownMenu
+                        isOpen={showProfileDropdown}
+                        onClose={() => setShowProfileDropdown(false)}
+                    >
+                        {/*show profile button*/}
+                        <MyButton
+                            variant="nav"
+                            onClick={handleProfile}
+                            style={{
+                                width: '100%',
+                                justifyContent: 'flex-start',
+                                borderTopLeftRadius: '0.5rem',
+                                borderTopRightRadius: '0.5rem',
+                                borderBottomLeftRadius: '0',
+                                borderBottomRightRadius: '0'
+                            }}
+                        >
+                            Profile
+                        </MyButton>
 
-                            {/*logout button */}
-                            <MyButton
-                                variant="nav"
-                                onClick={handleLogout}
-                                style={{
-                                    width: '100%',
-                                    justifyContent: 'flex-start',
-                                    borderTopLeftRadius: '0',
-                                    borderTopRightRadius: '0',
-                                    borderBottomLeftRadius: '0.5rem',
-                                    borderBottomRightRadius: '0.5rem'
-                                }}
-                            >
-                                Log out
-                            </MyButton>
-                        </div>
-                    )}
+                        {/*logout button */}
+                        <MyButton
+                            variant="nav"
+                            onClick={handleLogout}
+                            style={{
+                                width: '100%',
+                                justifyContent: 'flex-start',
+                                borderTopLeftRadius: '0',
+                                borderTopRightRadius: '0',
+                                borderBottomLeftRadius: '0.5rem',
+                                borderBottomRightRadius: '0.5rem'
+                            }}
+                        >
+                            Log out
+                        </MyButton>
+                    </DropdownMenu>
                 </div>
             </div>
         </nav>

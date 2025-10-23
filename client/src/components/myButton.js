@@ -24,7 +24,8 @@ function MyButton({
         light: 'btn-light',
         dark: 'btn-dark',
         nav: 'btn-nav',
-        dropdown: 'btn-dropdown'
+        dropdown: 'btn-dropdown',
+        icon: 'btn-icon'
     };
 
     //different button sizes
@@ -55,7 +56,8 @@ function MyButton({
         light: 'rgb(148 163 184 / 0.5)',
         dark: 'rgb(15 23 42 / 0.5)',
         nav: 'rgb(107 114 128 / 0.3)',
-        dropdown: 'rgb(107 114 128 / 0.2)'
+        dropdown: 'rgb(107 114 128 / 0.2)',
+        icon: 'rgb(107 114 128 / 0.2)'
     };
 
     return (
@@ -136,6 +138,23 @@ function MyButton({
                     width: '100%',
                     textAlign: 'left',
                     transition: 'background-color 0.2s ease'
+                }),
+                ...(variant === 'icon' && {
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: '#e5e7eb',
+                    color: '#374151',
+                    padding: '0',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s ease',
+                    position: 'relative'
                 })
             }}
             onMouseEnter={(e) => {
@@ -143,6 +162,9 @@ function MyButton({
                     if (variant === 'nav' || variant === 'dropdown') {
                         //nav and dropdown variants hover just change background
                         e.target.style.backgroundColor = '#f3f4f6';
+                    } else if (variant === 'icon') {
+                        //icon variant hover changes background color
+                        e.target.style.backgroundColor = '#d1d5db';
                     } else {
                         //other variants lift and shadow effect
                         e.target.style.transform = 'translateY(-1px)';
@@ -155,6 +177,8 @@ function MyButton({
                 if (!disabled) {
                     if (variant === 'nav' || variant === 'dropdown') {
                         e.target.style.backgroundColor = 'transparent';
+                    } else if (variant === 'icon') {
+                        e.target.style.backgroundColor = '#e5e7eb';
                     } else {
                         e.target.style.transform = 'translateY(0)';
                         e.target.style.boxShadow = variant === 'primary' || variant === 'success' || variant === 'danger'

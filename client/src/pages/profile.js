@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import BioForm from '../components/BioForm';
 import MyButton from '../components/myButton';
+import MyCard from '../components/MyCard';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
 import { useUserContext } from '../context/UserContext';
@@ -120,6 +121,27 @@ function Profile() {
             })
     }
 
+    function handleRemoveFriend(friendId) {
+
+        axios.post('http://localhost:3001/api/users', {
+            command: 'removeFriend',
+            data: {
+                userId: currentUser.id,
+                friendId: friendId
+            }
+        })
+            .then(res => {
+                console.log('Remove friend response:', res.data);
+                alert('Friend removed successfully!');
+                //refresh the friends list
+                handleGetFriends();
+            })
+            .catch(err => {
+                console.error('Remove friend error:', err);
+                alert('Failed to remove friend');
+            })
+    }
+
 
 
 
@@ -127,118 +149,131 @@ function Profile() {
         <div>
             <NavBar></NavBar>
             <SearchSideBar />
-            <h1 style={{ marginTop: '100px' }}>Profile</h1>
-            <div className="mb-3">
-                {/* Add Roomie button - only show if viewing someone else's profile */}
-                {!isOwnProfile && currentUser && (
-                    <MyButton
-                        variant='primary'
-                        onClick={handleAddRoomie}
-                        style={{ marginRight: '10px' }}
-                    >
-                        Add Roomie
-                    </MyButton>
-                )}
+            <div style={{
+                marginLeft: '320px',
+                padding: '20px',
+                marginTop: '100px'
+            }}>
+                <h1>Profile</h1>
+                <div className="mb-3">
+                    {/*ddd roomie button only show if viewing someone else profile */}
+                    {!isOwnProfile && currentUser && (
+                        <MyButton
+                            variant='primary'
+                            onClick={handleAddRoomie}
+                            style={{ marginRight: '10px' }}
+                        >
+                            Add Roomie
+                        </MyButton>
+                    )}
 
-                {/* Edit Bio button - only show if viewing own profile */}
-                {isOwnProfile && (
-                    <MyButton
-                        variant='outline-primary'
-                        onClick={() => setIsEditingBio(!isEditingBio)}
-                        style={{ marginRight: '10px' }}
-                    >
-                        {isEditingBio ? 'Cancel' : 'Edit Bio'}
-                    </MyButton>
-                )}
+                    {/*edit bio button only show if viewing own profile */}
+                    {isOwnProfile && (
+                        <MyButton
+                            variant='outline-primary'
+                            onClick={() => setIsEditingBio(!isEditingBio)}
+                            style={{ marginRight: '10px' }}
+                        >
+                            {isEditingBio ? 'Cancel' : 'Edit Bio'}
+                        </MyButton>
+                    )}
 
-                {/* My Roomies button - only show if viewing own profile */}
-                {isOwnProfile && (
-                    <MyButton
-                        variant='secondary'
-                        onClick={handleGetFriends}
-                        style={{ marginRight: '10px' }}
-                    >
-                        My Roomies
-                    </MyButton>
-                )}
+                    {/*my roomies button only show if viewing own profile */}
+                    {isOwnProfile && (
+                        <MyButton
+                            variant='secondary'
+                            onClick={handleGetFriends}
+                            style={{ marginRight: '10px' }}
+                        >
+                            My Roomies
+                        </MyButton>
+                    )}
 
-                {/* My Bio button - only show if viewing own profile */}
-                {isOwnProfile && (
-                    <MyButton
-                        variant='primary'
-                        onClick={handleGetBio}
-                        style={{ marginRight: '10px' }}
-                    >
-                        My Bio
-                    </MyButton>
-                )}
+                    {/*my bio button only show if viewing own profile */}
+                    {isOwnProfile && (
+                        <MyButton
+                            variant='primary'
+                            onClick={handleGetBio}
+                            style={{ marginRight: '10px' }}
+                        >
+                            My Bio
+                        </MyButton>
+                    )}
 
-                {/* Delete account button - only show if viewing own profile */}
-                {isOwnProfile && (
-                    <MyButton
-                        variant='danger'
-                        onClick={handleDeleteUser}
-                    >
-                        Delete account
-                    </MyButton>
-                )}
-            </div>
-
-
-            {/*friends list */}
-            {friends.length > 0 && (
-                <div className="mt-4">
-                    <h3>My Friends ({friends.length})</h3>
-                    <div className="list-group">
-                        {friends.map((friend) => (
-                            <div key={friend._id} className="list-group-item">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 className="mb-1">{friend.name}</h5>
-                                        <p className="mb-1 text-muted">{friend.email}</p>
-                                        <small className="text-muted">Role: {friend.role}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/*show message when no friends */}
-            {activeButton === 'friends' && friends.length === 0 && (
-                <div className="mt-4">
-                    <p className="text-muted">No friends found.</p>
-                </div>
-            )}
-
-            {/*bio section */}
-            {activeButton === 'bio' && (
-                <div className="mt-4">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h3>Roommate Profile</h3>
-                    </div>
-
-                    <BioForm
-                        bio={userBio}
-                        onBioChange={setUserBio}
-                        isEditing={isEditingBio}
-                        showTitle={false}
-                    />
-                    {/*save bio button - show only when editing bio*/}
-                    {isEditingBio && (
-                        <div className="mt-3">
-                            <button
-                                className="btn btn-success"
-                                onClick={handleUpdateBio}>
-                                Save Bio
-                            </button>
-                        </div>
+                    {/*delete account button only show if viewing own profile */}
+                    {isOwnProfile && (
+                        <MyButton
+                            variant='danger'
+                            onClick={handleDeleteUser}
+                        >
+                            Delete account
+                        </MyButton>
                     )}
                 </div>
-            )}
-            <br />
 
+
+                {/*friends list */}
+                {friends.length > 0 && (
+                    <div className="mt-4">
+                        <h3>My Friends ({friends.length})</h3>
+                        <div>
+                            {friends.map((friend) => (
+                                <MyCard
+                                    key={friend._id}
+                                    type="users"
+                                    data={friend}
+                                    onClick={(friendData) => {
+                                        // Navigate to friend's profile
+                                        navigate(`/profile/${friendData._id}`);
+                                    }}
+                                    button={
+                                        <MyButton
+                                            variant='danger'
+                                            onClick={() => handleRemoveFriend(friend._id)}
+                                        >
+                                            Remove Roomie
+                                        </MyButton>
+                                    }
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/*show message when no friends */}
+                {activeButton === 'friends' && friends.length === 0 && (
+                    <div className="mt-4">
+                        <p className="text-muted">No friends found.</p>
+                    </div>
+                )}
+
+                {/*bio section */}
+                {activeButton === 'bio' && (
+                    <div className="mt-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h3>Roommate Profile</h3>
+                        </div>
+
+                        <BioForm
+                            bio={userBio}
+                            onBioChange={setUserBio}
+                            isEditing={isEditingBio}
+                            showTitle={false}
+                        />
+                        {/*save bio button - show only when editing bio*/}
+                        {isEditingBio && (
+                            <div className="mt-3">
+                                <button
+                                    className="btn btn-success"
+                                    onClick={handleUpdateBio}>
+                                    Save Bio
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
+                <br />
+            </div>
         </div>
 
     )

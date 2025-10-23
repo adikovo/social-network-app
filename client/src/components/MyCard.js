@@ -1,7 +1,7 @@
 import React from 'react';
 import MyButton from './myButton';
 
-function MyCard({ type, data, onClick }) {
+function MyCard({ type, data, onClick, button }) {
     const itemStyle = {
         padding: '12px',
         backgroundColor: 'white',
@@ -26,14 +26,23 @@ function MyCard({ type, data, onClick }) {
             case 'users':
                 return (
                     <>
-                        <div style={{ fontWeight: '500', color: '#1f2937' }}>
-                            {data.name}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
-                            {data.email}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                            Roomies: {data.friends.length}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <div>
+                                <div style={{ fontWeight: '500', color: '#1f2937' }}>
+                                    {data.name}
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
+                                    {data.email}
+                                </div>
+                                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                    Roomies: {data.friends ? data.friends.length : 0}
+                                </div>
+                            </div>
+                            {button && (
+                                <div onClick={(e) => e.stopPropagation()}>
+                                    {button}
+                                </div>
+                            )}
                         </div>
                     </>
                 );
