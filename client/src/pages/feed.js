@@ -84,12 +84,19 @@ function Feed() {
             });
     };
 
-    const handlePostUpdated = (deletedPostId) => {
+    const handlePostUpdated = (deletedPostId, updatedPost) => {
         if (deletedPostId) {
             // Remove the deleted post from local state
             setPosts(prevPosts => prevPosts.filter(post => post._id !== deletedPostId));
+        } else if (updatedPost) {
+            // Update the specific post in local state
+            setPosts(prevPosts =>
+                prevPosts.map(post =>
+                    post._id === updatedPost._id ? updatedPost : post
+                )
+            );
         } else {
-            // For edits or other updates, refresh from server
+            // For other updates, refresh from server
             getPosts();
         }
     };

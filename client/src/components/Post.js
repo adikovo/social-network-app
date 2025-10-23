@@ -11,6 +11,8 @@ const Post = ({ post, onPostUpdated }) => {
     const [commentCount, setCommentCount] = useState(post.comments ? post.comments.length : 0);
     const [showCommentInput, setShowCommentInput] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(post.content || '');
     const dropdownRef = useRef(null);
 
     // Close dropdown when clicking outside
@@ -73,13 +75,35 @@ const Post = ({ post, onPostUpdated }) => {
 
     const handleEditPost = () => {
         setShowDropdown(false);
-        // TODO: Implement edit post functionality
-        console.log('Edit post:', post._id);
+        setIsEditing(true);
+        setEditText(post.content || '');
+    };
 
-        // When edit is implemented, call onPostUpdated() after successful edit
-        // if (onPostUpdated) {
-        //     onPostUpdated();
-        // }
+    const handleSaveEdit = () => {
+        axios.post('http://localhost:3001/api/posts', {
+            command: 'update',
+            data: {
+                postId: post._id,
+                newContent: editText
+            }
+        })
+            .then(res => {
+                console.log('Edit post response:', res.data);
+                setIsEditing(false);
+                if (onPostUpdated) {
+                    onPostUpdated(null, res.data.post);
+                }
+            })
+            .catch(err => {
+                console.error('Edit post error:', err);
+                // Still exit edit mode even if there's an error
+                setIsEditing(false);
+            });
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditText(post.content || '');
     };
 
     const handleDeletePost = () => {
@@ -240,15 +264,90 @@ const Post = ({ post, onPostUpdated }) => {
             </div>
 
             {/* Content */}
-            <div style={{
-                fontSize: '16px',
-                lineHeight: '1.5',
-                color: '#333',
-                marginBottom: '16px',
-                wordWrap: 'break-word'
-            }}>
-                {post.content}
-            </div>
+            {isEditing ? (
+                <div style={{ marginBottom: '16px' }}>
+                    <textarea
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        style={{
+                            width: '100%',
+                            minHeight: '80px',
+                            padding: '12px',
+                            border: '1px solid #e0e0e0',
+                            borderRadius: '8px',
+                            fontSize: '16px',
+                            lineHeight: '1.5',
+                            color: '#333',
+                            backgroundColor: '#f8f9fa',
+                            fontFamily: 'inherit',
+                            resize: 'vertical',
+                            outline: 'none',
+                            boxSizing: 'border-box'
+                        }}
+                        placeholder="What's on your mind?"
+                    />
+                    <div style={{
+                        display: 'flex',
+                        gap: '12px',
+                        marginTop: '12px'
+                    }}>
+                        <button
+                            onClick={handleSaveEdit}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '8px 16px',
+                                backgroundColor: '#333',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#555'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = '#333'}
+                        >
+                            <span>✓</span>
+                            Save
+                        </button>
+                        <button
+                            onClick={handleCancelEdit}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                padding: '8px 16px',
+                                backgroundColor: 'white',
+                                color: '#666',
+                                border: '1px solid #e0e0e0',
+                                borderRadius: '6px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                transition: 'background-color 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                        >
+                            <span>✕</span>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div style={{
+                    fontSize: '16px',
+                    lineHeight: '1.5',
+                    color: '#333',
+                    marginBottom: '16px',
+                    wordWrap: 'break-word'
+                }}>
+                    {post.content}
+                </div>
+            )}
 
             {/* Footer */}
             <div style={{
