@@ -97,23 +97,31 @@ const handleUserCommand = async (req, res) => {
                 return res.json({ message: 'friend added successfully' })
 
             case 'acceptFriendRequest':
+                console.log('Accepting friend request:', data);
+
                 //remove from requests & add to friends array
-                await User.findByIdAndUpdate(
+                const acceptor = await User.findByIdAndUpdate(
                     //the user that accepted
                     data.userId,
                     {
                         $pull: { receivedRequests: data.friendId },
                         $addToSet: { friends: data.friendId }
-                    }
+                    },
+                    { new: true }
                 );
+                console.log('Acceptor updated:', acceptor?.friends);
+
                 //remove from sender's pending array & add to their friends list
-                await User.findByIdAndUpdate(
+                const sender = await User.findByIdAndUpdate(
                     data.friendId,
                     {
                         $pull: { pendingRequests: data.userId },
                         $addToSet: { friends: data.userId }
-                    }
+                    },
+                    { new: true }
                 );
+                console.log('Sender updated:', sender?.friends);
+
                 return res.json({ message: 'friend request accepted successfully' })
 
             case 'declineFriendRequest':
@@ -173,12 +181,15 @@ const handleUserCommand = async (req, res) => {
 
             case 'getFriends':
                 //get all friends of a user with their details
+                console.log('Getting friends for user:', data.userId);
                 const user = await User.findById(data.userId)
                 if (!user) {
                     return res.json({ message: 'user not found' })
                 }
+                console.log('User found, friends array:', user.friends);
                 //get friend details
                 const friends = await User.find({ _id: { $in: user.friends } })
+                console.log('Friends found:', friends.length, friends.map(f => f.name));
                 return res.json({
                     message: 'friends retrieved successfully',
                     friends: friends

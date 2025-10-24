@@ -3,6 +3,7 @@ import CommentInput from './CommentInput';
 import CommentsModel from './CommentsModel';
 import ThreeDotMenu from './ThreeDotMenu';
 import MyButton from './myButton';
+import ClickableAuthor from './ClickableAuthor';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -275,9 +276,14 @@ const Post = ({ post, onPostUpdated }) => {
                             </div>
                         )}
                         {!currentPost.groupName && <div style={{ marginBottom: '6px' }}></div>}
-                        <div style={{ fontSize: '16px' }}>
-                            {currentPost.authorName || currentPost.author || 'Unknown User'}
-                        </div>
+                        <ClickableAuthor
+                            authorId={currentPost.authorId}
+                            authorName={currentPost.authorName}
+                            author={currentPost.author}
+                            fallbackText="Unknown User"
+                            color="inherit"
+                            hoverColor="#1877f2"
+                        />
                     </div>
                     <div style={{
                         fontSize: '14px',

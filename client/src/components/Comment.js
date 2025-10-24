@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ThreeDotMenu from './ThreeDotMenu';
+import ClickableAuthor from './ClickableAuthor';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -108,18 +109,29 @@ const Comment = ({ comment, onEdit, onDelete, post }) => {
                 }}>
                     {comment.author ? comment.author[0].toUpperCase() : '?'}
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, textAlign: 'left' }}>
                     <div style={{
                         fontSize: '14px',
                         fontWeight: '600',
                         color: '#333',
-                        marginBottom: '2px'
+                        marginBottom: '2px',
+                        textAlign: 'left'
                     }}>
-                        {comment.author || 'Unknown User'}
+                        <ClickableAuthor
+                            authorId={comment.authorId}
+                            authorName={comment.authorName}
+                            author={comment.author}
+                            fallbackText="Unknown User"
+                            fontSize="14px"
+                            fontWeight="600"
+                            color="#333"
+                            hoverColor="#1877f2"
+                        />
                     </div>
                     <div style={{
                         fontSize: '12px',
-                        color: '#666'
+                        color: '#666',
+                        textAlign: 'left'
                     }}>
                         {comment.createdAt ? formatDate(comment.createdAt) : 'Unknown date'}
                     </div>
@@ -226,7 +238,8 @@ const Comment = ({ comment, onEdit, onDelete, post }) => {
                     fontSize: '14px',
                     color: '#333',
                     lineHeight: '1.4',
-                    marginLeft: '44px'
+                    marginLeft: '44px',
+                    textAlign: 'left'
                 }}>
                     {comment.content}
                 </div>
