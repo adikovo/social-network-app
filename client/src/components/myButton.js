@@ -25,7 +25,9 @@ function MyButton({
         dark: 'btn-dark',
         nav: 'btn-nav',
         dropdown: 'btn-dropdown',
-        icon: 'btn-icon'
+        icon: 'btn-icon',
+        like: 'btn-like',
+        comment: 'btn-comment'
     };
 
     //different button sizes
@@ -57,7 +59,9 @@ function MyButton({
         dark: 'rgb(15 23 42 / 0.5)',
         nav: 'rgb(107 114 128 / 0.3)',
         dropdown: 'rgb(107 114 128 / 0.2)',
-        icon: 'rgb(107 114 128 / 0.2)'
+        icon: 'rgb(107 114 128 / 0.2)',
+        like: 'rgb(231 76 60 / 0.3)',
+        comment: 'rgb(107 114 128 / 0.3)'
     };
 
     return (
@@ -155,6 +159,36 @@ function MyButton({
                     justifyContent: 'center',
                     transition: 'all 0.2s ease',
                     position: 'relative'
+                }),
+                ...(variant === 'like' && {
+                    background: 'transparent',
+                    color: '#666',
+                    border: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'background-color 0.2s ease',
+                    cursor: 'pointer'
+                }),
+                ...(variant === 'comment' && {
+                    background: 'transparent',
+                    color: '#666',
+                    border: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'background-color 0.2s ease',
+                    cursor: 'pointer'
                 })
             }}
             onMouseEnter={(e) => {
@@ -165,6 +199,11 @@ function MyButton({
                     } else if (variant === 'icon') {
                         //icon variant hover changes background color
                         e.target.style.backgroundColor = '#d1d5db';
+                    } else if (variant === 'comment') {
+                        //comment variant hover changes background color and adds blue shadow
+                        e.target.style.backgroundColor = '#f5f5f5';
+                        e.target.style.transform = 'translateY(-1px)';
+                        e.target.style.boxShadow = '0 6px 12px -2px rgb(59 130 246 / 0.3), 0 4px 8px -4px rgb(59 130 246 / 0.3)';
                     } else {
                         //other variants lift and shadow effect
                         e.target.style.transform = 'translateY(-1px)';
@@ -179,6 +218,10 @@ function MyButton({
                         e.target.style.backgroundColor = 'transparent';
                     } else if (variant === 'icon') {
                         e.target.style.backgroundColor = '#e5e7eb';
+                    } else if (variant === 'comment') {
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = 'none';
                     } else {
                         e.target.style.transform = 'translateY(0)';
                         e.target.style.boxShadow = variant === 'primary' || variant === 'success' || variant === 'danger'

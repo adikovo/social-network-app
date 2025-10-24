@@ -76,6 +76,39 @@ const handlePostCommand = async (req, res) => {
                     return res.json({ message: 'post deleted successfully', post: deletePost })
                 }
 
+            case 'like':
+                //handle like or unlike
+                const post = await Post.findById(data.postId);
+                if (!post) {
+                    return res.json({ message: 'post not found' })
+                }
+
+                let updatedLikedBy = [...(post.likedBy || [])];
+                let newLikeCount = post.likes;
+
+                if (data.isLiked) {
+                    //like on post - add user to likedBy array 
+                    if (!updatedLikedBy.includes(data.userId)) {
+                        updatedLikedBy.push(data.userId);
+                        newLikeCount = post.likes + 1;
+                    }
+                } else {
+                    // unlike post -  remove user from likedBy array
+                    updatedLikedBy = updatedLikedBy.filter(id => id !== data.userId);
+                    newLikeCount = Math.max(0, post.likes - 1);
+                }
+
+                //update post with new likes count and likedBy array
+                const updatedPost = await Post.findByIdAndUpdate(
+                    data.postId,
+                    {
+                        likes: newLikeCount,
+                        likedBy: updatedLikedBy
+                    },
+                    { new: true }
+                );
+                return res.json({ message: 'post like updated', post: updatedPost })
+
             //if command is not recognized
             default:
                 return res.json({ message: 'invalid command' })

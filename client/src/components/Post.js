@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CommentInput from './CommentInput';
 import ThreeDotMenu from './ThreeDotMenu';
+import MyButton from './myButton';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
 const Post = ({ post, onPostUpdated }) => {
     const { user } = useUserContext();
-    const [isLiked, setIsLiked] = useState(false);
+    const [isLiked, setIsLiked] = useState(post.likedBy && post.likedBy.includes(user?.id));
     const [likeCount, setLikeCount] = useState(post.likes || 0);
     const [commentCount, setCommentCount] = useState(post.comments ? post.comments.length : 0);
     const [showCommentInput, setShowCommentInput] = useState(false);
@@ -15,19 +16,33 @@ const Post = ({ post, onPostUpdated }) => {
 
 
     const handleLike = () => {
-        const newLikedState = !isLiked;
-        setIsLiked(newLikedState);
-        setLikeCount(prev => newLikedState ? prev + 1 : prev - 1);
+        const likedState = !isLiked;
+        setIsLiked(likedState);
+        setLikeCount(prev => likedState ? prev + 1 : prev - 1);
 
-        // TODO: Implement like functionality with backend
-        console.log('Like post:', post._id, newLikedState);
+        axios.post('http://localhost:3001/api/posts', {
+            command: 'like',
+            data: {
+                postId: post._id,
+                isLiked: likedState,
+                userId: user.id
+            }
+        })
+            .then(res => {
+                console.log('Like post response:', res.data);
 
-        // In the future, this will send the like to the server
-        // axios.post('http://localhost:3001/api/posts/like', {
-        //     postId: post._id,
-        //     isLiked: newLikedState,
-        //     userId: user.id
-        // })
+                if (res.data.post) {
+                    setLikeCount(res.data.post.likes);
+                    // Update the liked state based on server response
+                    setIsLiked(likedState);
+                }
+            })
+            .catch(err => {
+                console.error('Like post error:', err);
+                //back to original state
+                setIsLiked(!likedState);
+                setLikeCount(prev => likedState ? prev - 1 : prev + 1)
+            });
     };
 
     const handleComment = () => {
@@ -294,26 +309,14 @@ const Post = ({ post, onPostUpdated }) => {
                 </div>
             )}
 
-            {/* Footer */}
+            {/*footer */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '20px'
             }}>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        transition: 'background-color 0.2s ease'
-                    }}
-                    onClick={handleLike}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                >
+                {/*like button */}
+                <MyButton variant="like" onClick={handleLike}>
                     <span style={{
                         fontSize: '18px',
                         display: 'flex',
@@ -329,21 +332,8 @@ const Post = ({ post, onPostUpdated }) => {
                     }}>
                         {likeCount}
                     </span>
-                </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        transition: 'background-color 0.2s ease'
-                    }}
-                    onClick={handleComment}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                >
+                </MyButton>
+                <MyButton variant="comment" onClick={handleComment}>
                     <span style={{
                         fontSize: '18px',
                         display: 'flex',
@@ -358,10 +348,10 @@ const Post = ({ post, onPostUpdated }) => {
                     }}>
                         {commentCount}
                     </span>
-                </div>
+                </MyButton>
             </div>
 
-            {/* Comment Input */}
+            {/*comment input */}
             {showCommentInput && (
                 <CommentInput
                     onSubmit={handleCommentSubmit}

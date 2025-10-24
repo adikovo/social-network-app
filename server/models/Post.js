@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema({
     groupId: String,
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
+    likedBy: [String],
     comments: Array
 });
 

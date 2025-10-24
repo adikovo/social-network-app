@@ -92,10 +92,10 @@ function Feed() {
             <SearchSideBar />
             <div style={{
                 marginLeft: '320px',
+                marginTop: '55px',
                 padding: '20px',
                 maxWidth: '800px'
             }}>
-                <p style={{ marginTop: '20px' }}>Welcome to your feed! This is where you'll see posts from your friends and groups.</p>
 
                 {/* Create Post Component */}
                 <CreatePost onPostCreated={handlePostCreated} />
