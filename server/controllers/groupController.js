@@ -5,6 +5,8 @@ const Group = require("../models/Group");
 const handleGroupCommand = async (req, res) => {
     const { command, data } = req.body
 
+    console.log('Group command received:', command, 'Data:', data);
+
     try {
         //determine which operation to perform based on command
         switch (command) {
@@ -82,8 +84,13 @@ const handleGroupCommand = async (req, res) => {
                 //find group by id and update their details
                 const updateGroup = await Group.findByIdAndUpdate(
                     data.groupId,
-                    { name: data.newName },
-                    { description: data.newDescription },
+                    {
+                        $set: {
+                            name: data.newName,
+                            description: data.newDescription,
+                            privacy: data.newPrivacy
+                        }
+                    },
                     { new: true }
                 )
                 if (!updateGroup) {
@@ -170,6 +177,43 @@ const handleGroupCommand = async (req, res) => {
                     return res.json({ message: 'group not found' })
                 }
                 return res.json({ message: 'admin removed successfully', group: removeAdminGroup })
+
+            case 'getGroup':
+                //get a specific group with member names
+                const singleGroup = await Group.findById(data.groupId)
+
+                if (!singleGroup) {
+                    return res.json({ message: 'group not found' })
+                }
+
+                // Check if group is private and user is not a member
+                if (singleGroup.privacy === 'private' && !singleGroup.members.includes(data.userId)) {
+                    return res.json({ message: 'Permission denied: Private group access required' })
+                }
+
+                // Get creator name
+                const groupCreator = await User.findById(singleGroup.createdBy);
+                const groupCreatorName = groupCreator ? groupCreator.name : 'Unknown';
+
+                // Get member names
+                const memberNames = await Promise.all(
+                    singleGroup.members.map(async (memberId) => {
+                        const member = await User.findById(memberId);
+                        return {
+                            id: memberId,
+                            name: member ? member.name : 'Unknown'
+                        };
+                    })
+                );
+
+                return res.json({
+                    message: 'group fetched successfully',
+                    group: {
+                        ...singleGroup.toObject(),
+                        createdByName: groupCreatorName,
+                        membersWithNames: memberNames
+                    }
+                })
 
             case 'getGroupPosts':
                 //get all posts in a specific group with privacy check

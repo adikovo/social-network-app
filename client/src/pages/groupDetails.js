@@ -16,19 +16,20 @@ function GroupDetails() {
 
     const [group, setGroup] = useState(null);
     const [showEditForm, setShowEditForm] = useState(false);
+    const [showMembersModal, setShowMembersModal] = useState(false);
 
     const fetchGroup = async () => {
         try {
             console.log('Fetching group with ID:', groupId);
             const res = await axios.post('http://localhost:3001/api/groups', {
-                command: 'list',
-                data: {}
+                command: 'getGroup',
+                data: {
+                    groupId: groupId,
+                    userId: user?.id
+                }
             });
             console.log('API Response:', res.data);
-            console.log('Groups array:', res.data.groups);
-            const foundGroup = res.data.groups?.find(group => group._id === groupId);
-            console.log('Found group:', foundGroup);
-            setGroup(foundGroup);
+            setGroup(res.data.group);
         } catch (error) {
             console.error('Error fetching group:', error);
             setGroup(null);
@@ -36,8 +37,10 @@ function GroupDetails() {
     };
 
     useEffect(() => {
-        fetchGroup();
-    }, [groupId]);
+        if (user?.id) {
+            fetchGroup();
+        }
+    }, [groupId, user?.id]);
 
     function handleJoinGroup() {
         if (!user) {
@@ -128,7 +131,14 @@ function GroupDetails() {
             <SearchSideBar />
             <div style={{ marginLeft: '320px', marginTop: '100px', padding: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h1 style={{ margin: 0 }}>{group?.name || 'Loading...'}</h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                        <h1 style={{ margin: 0 }}>{group?.name || 'Loading...'}</h1>
+                        {group && (
+                            <MyButton onClick={() => setShowMembersModal(true)}>
+                                View Members ({group.members ? group.members.length : 0})
+                            </MyButton>
+                        )}
+                    </div>
 
                     {/*show different buttons based on user role */}
                     {isCreator ? (
@@ -180,6 +190,54 @@ function GroupDetails() {
                 editMode={true}
                 groupToEdit={group}
             />
+
+            {/* Members Modal */}
+            {showMembersModal && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Group Members</h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowMembersModal(false)}
+                                ></button>
+                            </div>
+                            <div className="modal-body">
+                                {group?.membersWithNames && group.membersWithNames.length > 0 ? (
+                                    <div className="list-group">
+                                        {group.membersWithNames.map((member, index) => (
+                                            <div key={member.id || index} className="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>{member.name}</strong>
+                                                    {member.id === group.createdBy && (
+                                                        <span className="badge bg-primary ms-2">Creator</span>
+                                                    )}
+                                                    {group.admins?.includes(member.id) && member.id !== group.createdBy && (
+                                                        <span className="badge bg-secondary ms-2">Admin</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p>No members found.</p>
+                                )}
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => setShowMembersModal(false)}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 

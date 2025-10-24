@@ -31,9 +31,11 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
                 data: {
                     groupId: groupToEdit._id,
                     newName: name,
-                    newDescription: description
+                    newDescription: description,
+                    newPrivacy: privacy
                 }
             };
+
 
             axios.post('http://localhost:3001/api/groups', groupData)
                 .then(res => {
