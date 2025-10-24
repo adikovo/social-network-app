@@ -1,9 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-//GroupCard component to display a group card
+
+
+//GroupCard component to display full info of a group in a card
 function GroupCard({ group, userId, onJoin, onLeave, showAdmin }) {
+
+    const navigate = useNavigate();
+
+    const handleCardClick = () => {
+        navigate(`/group/${group._id}`);
+    };
+
+
     return (
-        <div className="card h-100">
+        <div className="card h-100" style={{ cursor: 'pointer' }} onClick={handleCardClick}>
             <div className="card-body d-flex flex-column">
                 <h5 className="card-title">{group.name}</h5>
                 <p className="card-text flex-grow-1">{group.description}</p>
@@ -27,13 +38,19 @@ function GroupCard({ group, userId, onJoin, onLeave, showAdmin }) {
                 {group.members?.includes(userId) ? (
                     <button
                         className="btn btn-secondary me-2"
-                        onClick={() => onLeave(group._id)}>
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onLeave(group._id);
+                        }}>
                         Leave Group
                     </button>
                 ) : (
                     <button
                         className="btn btn-primary mt-auto"
-                        onClick={() => onJoin(group._id)}>
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onJoin(group._id);
+                        }}>
                         Join Group
                     </button>
                 )}

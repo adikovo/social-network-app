@@ -1,6 +1,8 @@
 import React from 'react';
 import MyButton from './myButton';
 
+
+//dynamic card component for displaying different types of search results
 function MyCard({ type, data, onClick, button }) {
     const itemStyle = {
         padding: '12px',

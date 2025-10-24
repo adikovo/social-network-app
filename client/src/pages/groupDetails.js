@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
 import MyButton from '../components/myButton';
+import ThreeDotMenu from '../components/ThreeDotMenu';
 import { useUserContext } from '../context/UserContext';
 
 function GroupDetails() {
@@ -55,6 +56,34 @@ function GroupDetails() {
         });
     }
 
+    function handleEditGroup() {
+        // TODO: Implement edit group functionality
+        console.log('Edit group:', groupId);
+        // You can navigate to an edit page or show a modal
+        // navigate(`/group/${groupId}/edit`);
+    }
+
+    function handleDeleteGroup() {
+        if (window.confirm('Are you sure you want to delete this group? This action cannot be undone.')) {
+            axios.post('http://localhost:3001/api/groups', {
+                command: 'delete',
+                data: {
+                    groupId: groupId
+                }
+            }).then(response => {
+                console.log('Group deleted successfully:', response.data);
+                alert('Group deleted successfully!');
+                navigate('/groups');
+            }).catch(error => {
+                console.error('Error deleting group:', error);
+                alert('Failed to delete group: ' + (error.message));
+            });
+        }
+    }
+
+    //check if current user is the creator of the group
+    const isCreator = user && group && user.id === group.createdBy;
+
 
 
 
@@ -63,7 +92,27 @@ function GroupDetails() {
             <NavBar />
             <SearchSideBar />
             <div style={{ marginLeft: '320px', marginTop: '100px', padding: '20px' }}>
-                <h1>{group?.name || 'Loading...'}</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <h1 style={{ margin: 0 }}>{group?.name || 'Loading...'}</h1>
+
+                    {/* 3 dot menu - only show if user is creator */}
+                    {isCreator && (
+                        <ThreeDotMenu
+                            menuItems={[
+                                { id: 'edit', label: 'Edit Group', action: 'edit' },
+                                { id: 'delete', label: 'Delete Group', action: 'delete', danger: true }
+                            ]}
+                            onItemClick={(item) => {
+                                if (item.action === 'edit') {
+                                    handleEditGroup();
+                                } else if (item.action === 'delete') {
+                                    handleDeleteGroup();
+                                }
+                            }}
+                        />
+                    )}
+                </div>
+
                 {user && group && !group.members?.includes(user.id) && (
                     <MyButton variant='success' onClick={handleJoinGroup}>Join Group</MyButton>
                 )}

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CommentInput from './CommentInput';
-import DropdownMenu from './DropdownMenu';
+import ThreeDotMenu from './ThreeDotMenu';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -10,24 +10,9 @@ const Post = ({ post, onPostUpdated }) => {
     const [likeCount, setLikeCount] = useState(post.likes || 0);
     const [commentCount, setCommentCount] = useState(post.comments ? post.comments.length : 0);
     const [showCommentInput, setShowCommentInput] = useState(false);
-    const [showDropdown, setShowDropdown] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(post.content || '');
-    const dropdownRef = useRef(null);
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowDropdown(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
 
     const handleLike = () => {
         const newLikedState = !isLiked;
@@ -69,12 +54,8 @@ const Post = ({ post, onPostUpdated }) => {
         setShowCommentInput(false);
     };
 
-    const toggleDropdown = () => {
-        setShowDropdown(!showDropdown);
-    };
 
     const handleEditPost = () => {
-        setShowDropdown(false);
         setIsEditing(true);
         setEditText(post.content || '');
     };
@@ -107,8 +88,6 @@ const Post = ({ post, onPostUpdated }) => {
     };
 
     const handleDeletePost = () => {
-        setShowDropdown(false);
-
         axios.post('http://localhost:3001/api/posts', {
             command: 'delete',
             data: {
@@ -192,74 +171,19 @@ const Post = ({ post, onPostUpdated }) => {
 
                 {/*3 dot menu button - only show if user is author */}
                 {isAuthor && (
-                    <div ref={dropdownRef} style={{ position: 'relative' }}>
-                        <button
-                            onClick={toggleDropdown}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '4px',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#666',
-                                fontSize: '18px',
-                                width: '32px',
-                                height: '32px',
-                                transition: 'background-color 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                            title="More options"
-                        >
-                            ⋯
-                        </button>
-
-                        <DropdownMenu
-                            isOpen={showDropdown}
-                            onClose={() => setShowDropdown(false)}
-                            position="right"
-                            width="140px"
-                        >
-                            <button
-                                onClick={handleEditPost}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 12px',
-                                    border: 'none',
-                                    background: 'none',
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    color: '#333',
-                                    borderBottom: '1px solid #e5e7eb'
-                                }}
-                                onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                            >
-                                Edit Post
-                            </button>
-                            <button
-                                onClick={handleDeletePost}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px 12px',
-                                    border: 'none',
-                                    background: 'none',
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    color: '#dc2626'
-                                }}
-                                onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
-                                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                            >
-                                Delete Post
-                            </button>
-                        </DropdownMenu>
-                    </div>
+                    <ThreeDotMenu
+                        menuItems={[
+                            { id: 'edit', label: 'Edit Post', action: 'edit' },
+                            { id: 'delete', label: 'Delete Post', action: 'delete', danger: true }
+                        ]}
+                        onItemClick={(item) => {
+                            if (item.action === 'edit') {
+                                handleEditPost();
+                            } else if (item.action === 'delete') {
+                                handleDeletePost();
+                            }
+                        }}
+                    />
                 )}
             </div>
 

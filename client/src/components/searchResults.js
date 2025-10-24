@@ -38,7 +38,6 @@ function SearchResults({
         });
     };
 
-    //dont render anything if no results
     if (!results || results.length === 0) {
         return null;
     }

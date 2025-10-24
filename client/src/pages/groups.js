@@ -122,6 +122,13 @@ function Groups() {
             })
     }
 
+
+    const handleEditGroup = (groupId) => {
+        //TODO: Implement edit group functionality
+        console.log('Edit group:', groupId);
+    }
+
+
     function handleDeleteGroup(groupId) {
         //send delete request to group controller
         axios.post('http://localhost:3001/api/groups',
@@ -145,13 +152,16 @@ function Groups() {
     }
 
 
+
+
+
     useEffect(() => {
         fetchGroups();
     }, [currentUser.id])
 
 
     return (
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
+        <div style={{ marginLeft: '320px', padding: '20px', maxWidth: '800px' }}>
             <NavBar></NavBar>
             <SearchSideBar />
             <h1>Groups</h1>
