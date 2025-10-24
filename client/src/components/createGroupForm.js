@@ -1,45 +1,77 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function CreateGroupForm({ show, onClose, userId, onGroupCreated }) {
+function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = false, groupToEdit = null }) {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [privacy, setPrivacy] = useState('public');
 
-    function handleCreateGroup(event) {
+    // form with existing group data when editing
+    useEffect(() => {
+        if (editMode && groupToEdit) {
+            setName(groupToEdit.name || '');
+            setDescription(groupToEdit.description || '');
+            setPrivacy(groupToEdit.privacy || 'public');
+        } else {
+            // Reset form for create mode
+            setName('');
+            setDescription('');
+            setPrivacy('public');
+        }
+    }, [editMode, groupToEdit]);
+
+    function handleSubmit(event) {
         event.preventDefault();
 
-        const groupData = {
-            command: 'create',
-            data: {
-                name: name,
-                description: description,
-                members: [userId],
-                createdBy: userId,
-                privacy: privacy,
-                posts: []
-            }
-        };
+        if (editMode) {
+            //edit existing group
+            const groupData = {
+                command: 'update',
+                data: {
+                    groupId: groupToEdit._id,
+                    newName: name,
+                    newDescription: description
+                }
+            };
 
-        axios.post('http://localhost:3001/api/groups', groupData)
-            .then(res => {
-                console.log('Create group response:', res.data);
-                alert('Group created successfully!');
+            axios.post('http://localhost:3001/api/groups', groupData)
+                .then(res => {
+                    console.log('Update group response:', res.data);
+                    alert('Group updated successfully!');
+                    onClose();
+                    onGroupCreated();
+                })
+                .catch(err => {
+                    console.error('Update group error:', err);
+                    alert('Failed to update group: ' + (err.response?.data?.message || err.message));
+                });
+        } else {
+            // Create new group
+            const groupData = {
+                command: 'create',
+                data: {
+                    name: name,
+                    description: description,
+                    members: [userId],
+                    createdBy: userId,
+                    privacy: privacy,
+                    posts: []
+                }
+            };
 
-                //reset form
-                setName('');
-                setDescription('');
-                setPrivacy('public');
-
-                //close modal and refresh groups list
-                onClose();
-                onGroupCreated();
-            })
-            .catch(err => {
-                console.error('Create group error:', err);
-                alert('Failed to create group: ' + (err.response?.data?.message || err.message));
-            });
+            axios.post('http://localhost:3001/api/groups', groupData)
+                .then(res => {
+                    console.log('Create group response:', res.data);
+                    alert('Group created successfully!');
+                    onClose();
+                    onGroupCreated();
+                })
+                .catch(err => {
+                    console.error('Create group error:', err);
+                    alert('Failed to create group: ' + (err.response?.data?.message || err.message));
+                });
+        }
     }
 
     if (!show) return null;
@@ -49,14 +81,14 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated }) {
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title">Create New Group</h5>
+                        <h5 className="modal-title">{editMode ? 'Edit Group' : 'Create New Group'}</h5>
                         <button
                             type="button"
                             className="btn-close"
                             onClick={onClose}
                         ></button>
                     </div>
-                    <form onSubmit={handleCreateGroup}>
+                    <form onSubmit={handleSubmit}>
                         <div className="modal-body">
                             <div className="mb-3">
                                 <label htmlFor="groupName" className="form-label">Group Name</label>
@@ -106,7 +138,7 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated }) {
                                 Cancel
                             </button>
                             <button type="submit" className="btn btn-primary">
-                                Create Group
+                                {editMode ? 'Save Changes' : 'Create Group'}
                             </button>
                         </div>
                     </form>

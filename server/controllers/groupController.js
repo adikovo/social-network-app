@@ -20,7 +20,7 @@ const handleGroupCommand = async (req, res) => {
                     members: data.members,
                     createdBy: data.createdBy,
                     createdByName: creatorName,
-                    admins: [data.createdBy], // Add creator as first admin
+                    admins: [data.createdBy],
                     privacy: data.privacy,
                     posts: data.posts
                 })
@@ -82,6 +82,7 @@ const handleGroupCommand = async (req, res) => {
                 //find group by id and update their details
                 const updateGroup = await Group.findByIdAndUpdate(
                     data.groupId,
+                    { name: data.newName },
                     { description: data.newDescription },
                     { new: true }
                 )
