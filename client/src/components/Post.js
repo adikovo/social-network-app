@@ -151,19 +151,39 @@ const Post = ({ post, onPostUpdated }) => {
                 }}>
                     {getInitials(post.authorName || post.author)}
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, textAlign: 'left' }}>
                     <div style={{
                         fontWeight: '600',
                         fontSize: '16px',
                         color: '#333',
-                        marginBottom: '2px'
+                        marginBottom: '2px',
+                        textAlign: 'left'
                     }}>
-                        {post.authorName || post.author || 'Unknown User'}
+                        {post.groupName && (
+                            <div style={{
+                                display: 'inline-block',
+                                backgroundColor: '#f0f2f5',
+                                borderRadius: '16px',
+                                padding: '4px 8px',
+                                marginBottom: '6px',
+                                fontSize: '14px',
+                                color: '#65676b',
+                                fontWeight: '500'
+                            }}>
+                                <span style={{ marginRight: '4px' }}>👥</span>
+                                {post.groupName}
+                            </div>
+                        )}
+                        {!post.groupName && <div style={{ marginBottom: '6px' }}></div>}
+                        <div style={{ fontSize: '16px' }}>
+                            {post.authorName || post.author || 'Unknown User'}
+                        </div>
                     </div>
                     <div style={{
                         fontSize: '14px',
                         color: '#666',
-                        fontWeight: '400'
+                        fontWeight: '400',
+                        textAlign: 'left'
                     }}>
                         {formatDate(post.createdAt)}
                     </div>
@@ -267,7 +287,8 @@ const Post = ({ post, onPostUpdated }) => {
                     lineHeight: '1.5',
                     color: '#333',
                     marginBottom: '16px',
-                    wordWrap: 'break-word'
+                    wordWrap: 'break-word',
+                    textAlign: 'left'
                 }}>
                     {post.content}
                 </div>

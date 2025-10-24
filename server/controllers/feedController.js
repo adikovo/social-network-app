@@ -30,9 +30,21 @@ const handleFeedCommand = async (req, res) => {
                 const allFeedPosts = [...userPosts, ...friendPosts, ...groupPosts]
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
+                //add group names to posts that have group id
+                const postsWithGroupNames = await Promise.all(allFeedPosts.map(async (post) => {
+                    if (post.groupId) {
+                        const group = await Group.findById(post.groupId);
+                        return {
+                            ...post.toObject(),
+                            groupName: group ? group.name : 'Unknown Group'
+                        };
+                    }
+                    return post.toObject();
+                }));
+
                 return res.json({
                     message: 'feed retrieved successfully',
-                    posts: allFeedPosts
+                    posts: postsWithGroupNames
                 })
 
             case 'getPostsByAuthor':

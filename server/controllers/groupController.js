@@ -155,10 +155,15 @@ const handleGroupCommand = async (req, res) => {
 
             //admin operations
             case 'addAdmin':
-                //grant admin permissions to group member
+                //grant admin permissions to group member and ensure they're also a member
                 const addAdminGroup = await Group.findByIdAndUpdate(
                     data.groupId,
-                    { $addToSet: { admins: data.userId } },
+                    {
+                        $addToSet: {
+                            admins: data.userId,
+                            members: data.userId
+                        }
+                    },
                     { new: true }
                 )
                 if (!addAdminGroup) {

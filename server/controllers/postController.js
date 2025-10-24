@@ -13,6 +13,7 @@ const handlePostCommand = async (req, res) => {
                     content: data.content,
                     author: data.author,
                     authorId: data.authorId,
+                    groupId: data.groupId,
                     likes: 0,
                     comments: []
                 })

@@ -61,34 +61,20 @@ function Feed() {
             })
     }
 
-    const handlePostCreated = (postText) => {
-        // API call to create post on server
-        axios.post('http://localhost:3001/api/posts', {
-            command: 'create',
-            data: {
-                content: postText,
-                author: user?.username || user?.name || 'You',
-                authorId: user?.id
-            }
-        })
-            .then(res => {
-                console.log('Post created successfully:', res.data);
-                // Add the new post to the beginning of the posts array
-                const newPost = res.data.post;
-                setPosts(prevPosts => [newPost, ...prevPosts]);
-            })
-            .catch(err => {
-                console.error('Error creating post:', err);
-                // TODO: Show error message to user
-            });
+    const handlePostCreated = (newPost) => {
+
+        //add the new post to the beginning of the posts array
+        setPosts(prevPosts => [newPost, ...prevPosts]);
     };
 
     const handlePostUpdated = (deletedPostId, updatedPost) => {
         if (deletedPostId) {
-            // Remove the deleted post from local state
+
+            //remove the deleted post from array
             setPosts(prevPosts => prevPosts.filter(post => post._id !== deletedPostId));
         } else if (updatedPost) {
-            // Update the specific post in local state
+
+            //update the specific post in local state
             setPosts(prevPosts =>
                 prevPosts.map(post =>
                     post._id === updatedPost._id ? updatedPost : post
