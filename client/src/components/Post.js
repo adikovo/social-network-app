@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CommentInput from './CommentInput';
+import CommentsModel from './CommentsModel';
 import ThreeDotMenu from './ThreeDotMenu';
 import MyButton from './myButton';
 import { useUserContext } from '../context/UserContext';
@@ -7,23 +8,30 @@ import axios from 'axios';
 
 const Post = ({ post, onPostUpdated }) => {
     const { user } = useUserContext();
+    const [currentPost, setCurrentPost] = useState(post);
     const [isLiked, setIsLiked] = useState(post.likedBy && post.likedBy.includes(user?.id));
     const [likeCount, setLikeCount] = useState(post.likes || 0);
     const [commentCount, setCommentCount] = useState(post.comments ? post.comments.length : 0);
     const [showCommentInput, setShowCommentInput] = useState(false);
+    const [showCommentsModal, setShowCommentsModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(post.content || '');
 
+    // update currentPost when post prop changes
+    useEffect(() => {
+        setCurrentPost(post);
+        setCommentCount(post.comments ? post.comments.length : 0);
+    }, [post]);
+
 
     const handleLike = () => {
+
         const likedState = !isLiked;
-        setIsLiked(likedState);
-        setLikeCount(prev => likedState ? prev + 1 : prev - 1);
 
         axios.post('http://localhost:3001/api/posts', {
             command: 'like',
             data: {
-                postId: post._id,
+                postId: currentPost._id,
                 isLiked: likedState,
                 userId: user.id
             }
@@ -33,7 +41,7 @@ const Post = ({ post, onPostUpdated }) => {
 
                 if (res.data.post) {
                     setLikeCount(res.data.post.likes);
-                    // Update the liked state based on server response
+                    // update the liked state 
                     setIsLiked(likedState);
                 }
             })
@@ -46,23 +54,100 @@ const Post = ({ post, onPostUpdated }) => {
     };
 
     const handleComment = () => {
-        setShowCommentInput(true);
+        setShowCommentsModal(true);
+    };
+
+    const submitComment = (commentText, closeInput = false) => {
+        //API call to add comment
+        axios.post('http://localhost:3001/api/posts', {
+            command: 'comment',
+            data: {
+                postId: currentPost._id,
+                commentText: commentText,
+                author: user?.username || user?.name || 'You',
+                userId: user.id
+            }
+        })
+            .then(res => {
+                //update comment count based on actual comments array
+                if (res.data.post && res.data.post.comments) {
+                    setCommentCount(res.data.post.comments.length);
+                }
+
+                //close input if specified (for inline comment input)
+                if (closeInput) {
+                    setShowCommentInput(false);
+                }
+
+                //update the post with the new comment
+                if (onPostUpdated && res.data.post) {
+                    onPostUpdated(null, res.data.post);
+                    setCurrentPost(res.data.post);
+                }
+            })
+            .catch(err => {
+                console.error('Error adding comment:', err);
+                //show error message to user
+                alert('Failed to add comment. Please try again.');
+            });
     };
 
     const handleCommentSubmit = (commentText) => {
-        setCommentCount(prev => prev + 1);
-        setShowCommentInput(false);
+        submitComment(commentText, true); // true = close the input
+    };
 
-        // TODO: Implement comment functionality with backend
-        console.log('Comment on post:', post._id, 'Comment:', commentText);
+    const handleModalCommentSubmit = (commentText) => {
+        submitComment(commentText, false); // false = don't close input (modal handles its own state)
+    };
 
-        // For now, just log the comment
-        // In the future, this will send the comment to the server
-        // axios.post('http://localhost:3001/api/posts/comment', {
-        //     postId: post._id,
-        //     comment: commentText,
-        //     userId: user.id
-        // })
+    const handleCommentEdit = (comment, newText) => {
+        // API call to edit comment
+        axios.post('http://localhost:3001/api/posts', {
+            command: 'edit comment',
+            data: {
+                postId: currentPost._id,
+                commentId: comment._id || comment.createdAt,
+                newContent: newText
+            }
+        })
+            .then(res => {
+                // Update the post with the edited comment
+                if (onPostUpdated && res.data.post) {
+                    onPostUpdated(null, res.data.post);
+                    setCurrentPost(res.data.post);
+                }
+            })
+            .catch(err => {
+                console.error('Edit comment error:', err);
+                alert('Failed to edit comment. Please try again.');
+            });
+    };
+
+    const handleCommentDelete = (comment) => {
+        // API call to delete comment
+        axios.post('http://localhost:3001/api/posts', {
+            command: 'delete comment',
+            data: {
+                postId: currentPost._id,
+                commentId: comment._id || comment.createdAt // Use createdAt as fallback ID
+            }
+        })
+            .then(res => {
+                // Update comment count
+                if (res.data.post && res.data.post.comments) {
+                    setCommentCount(res.data.post.comments.length);
+                }
+
+                // Update the post with the deleted comment
+                if (onPostUpdated && res.data.post) {
+                    onPostUpdated(null, res.data.post);
+                    setCurrentPost(res.data.post);
+                }
+            })
+            .catch(err => {
+                console.error('Delete comment error:', err);
+                alert('Failed to delete comment. Please try again.');
+            });
     };
 
     const handleCommentCancel = () => {
@@ -79,7 +164,7 @@ const Post = ({ post, onPostUpdated }) => {
         axios.post('http://localhost:3001/api/posts', {
             command: 'update',
             data: {
-                postId: post._id,
+                postId: currentPost._id,
                 newContent: editText
             }
         })
@@ -122,11 +207,11 @@ const Post = ({ post, onPostUpdated }) => {
     };
 
     // Check if current user is the author of the post
-    const isAuthor = user && (user.id === post.authorId || user.username === post.author || user.name === post.author);
+    const isAuthor = user && (user.id === currentPost.authorId || user.username === currentPost.author || user.name === currentPost.author);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+        return date.toISOString().split('T')[0];
     };
 
     const getInitials = (name) => {
@@ -164,7 +249,7 @@ const Post = ({ post, onPostUpdated }) => {
                     marginRight: '12px',
                     flexShrink: 0
                 }}>
-                    {getInitials(post.authorName || post.author)}
+                    {getInitials(currentPost.authorName || currentPost.author)}
                 </div>
                 <div style={{ flex: 1, textAlign: 'left' }}>
                     <div style={{
@@ -174,7 +259,7 @@ const Post = ({ post, onPostUpdated }) => {
                         marginBottom: '2px',
                         textAlign: 'left'
                     }}>
-                        {post.groupName && (
+                        {currentPost.groupName && (
                             <div style={{
                                 display: 'inline-block',
                                 backgroundColor: '#f0f2f5',
@@ -186,12 +271,12 @@ const Post = ({ post, onPostUpdated }) => {
                                 fontWeight: '500'
                             }}>
                                 <span style={{ marginRight: '4px' }}>👥</span>
-                                {post.groupName}
+                                {currentPost.groupName}
                             </div>
                         )}
-                        {!post.groupName && <div style={{ marginBottom: '6px' }}></div>}
+                        {!currentPost.groupName && <div style={{ marginBottom: '6px' }}></div>}
                         <div style={{ fontSize: '16px' }}>
-                            {post.authorName || post.author || 'Unknown User'}
+                            {currentPost.authorName || currentPost.author || 'Unknown User'}
                         </div>
                     </div>
                     <div style={{
@@ -200,7 +285,7 @@ const Post = ({ post, onPostUpdated }) => {
                         fontWeight: '400',
                         textAlign: 'left'
                     }}>
-                        {formatDate(post.createdAt)}
+                        {formatDate(currentPost.createdAt)}
                     </div>
                 </div>
 
@@ -305,7 +390,7 @@ const Post = ({ post, onPostUpdated }) => {
                     wordWrap: 'break-word',
                     textAlign: 'left'
                 }}>
-                    {post.content}
+                    {currentPost.content}
                 </div>
             )}
 
@@ -359,6 +444,17 @@ const Post = ({ post, onPostUpdated }) => {
                     placeholder="Write a comment..."
                 />
             )}
+
+            {/*comments list */}
+            <CommentsModel
+                key={`${currentPost._id}-${currentPost.comments ? currentPost.comments.length : 0}`}
+                post={currentPost}
+                isOpen={showCommentsModal}
+                onClose={() => setShowCommentsModal(false)}
+                onCommentSubmit={handleModalCommentSubmit}
+                onCommentEdit={handleCommentEdit}
+                onCommentDelete={handleCommentDelete}
+            />
         </div>
     );
 };

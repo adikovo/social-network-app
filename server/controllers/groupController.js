@@ -241,6 +241,19 @@ const handleGroupCommand = async (req, res) => {
                     posts: groupPosts
                 })
 
+            case 'checkAdmin':
+                //check if user is admin of the group
+                const checkGroup = await Group.findById(data.groupId);
+                if (!checkGroup) {
+                    return res.json({ message: 'group not found', isAdmin: false })
+                }
+
+                const isAdmin = checkGroup.admins && checkGroup.admins.includes(data.userId);
+                return res.json({
+                    message: 'admin check completed',
+                    isAdmin: isAdmin
+                })
+
             //if command is not recognized
             default:
                 return res.json({ message: 'invalid command' })

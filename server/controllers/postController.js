@@ -109,6 +109,88 @@ const handlePostCommand = async (req, res) => {
                 );
                 return res.json({ message: 'post like updated', post: updatedPost })
 
+            case 'comment':
+                //handle adding a comment to a post
+                const commentPost = await Post.findById(data.postId);
+                if (!commentPost) {
+                    return res.json({ message: 'post not found' })
+                }
+
+                //create new comment object
+                const newComment = {
+                    content: data.commentText,
+                    author: data.author,
+                    authorId: data.userId,
+                    createdAt: new Date()
+                };
+
+                //add comment to post comments array
+                const updatedCommentPost = await Post.findByIdAndUpdate(
+                    data.postId,
+                    { $push: { comments: newComment } },
+                    { new: true }
+                );
+
+                return res.json({
+                    message: 'comment added successfully',
+                    post: updatedCommentPost
+                })
+
+            case 'edit comment':
+                //handle editing a comment
+                const editPost = await Post.findById(data.postId);
+                if (!editPost) {
+                    return res.json({ message: 'post not found' })
+                }
+
+                //find and update the comment
+                const commentIndex = editPost.comments.findIndex(comment =>
+                    comment.createdAt && comment.createdAt.toISOString() === data.commentId
+                );
+
+                if (commentIndex === -1) {
+                    return res.json({ message: 'comment not found' })
+                }
+
+                //update the comment content
+                editPost.comments[commentIndex].content = data.newContent;
+                editPost.comments[commentIndex].updatedAt = new Date();
+
+                //save the updated post
+                const updatedEditPost = await editPost.save();
+
+                return res.json({
+                    message: 'comment edited successfully',
+                    post: updatedEditPost
+                })
+
+            case 'delete comment':
+                //handle deleting a comment
+                const deleteCommentPost = await Post.findById(data.postId);
+                if (!deleteCommentPost) {
+                    return res.json({ message: 'post not found' })
+                }
+
+                //find and remove the comment
+                const deleteCommentIndex = deleteCommentPost.comments.findIndex(comment =>
+                    comment.createdAt && comment.createdAt.toISOString() === data.commentId
+                );
+
+                if (deleteCommentIndex === -1) {
+                    return res.json({ message: 'comment not found' })
+                }
+
+                //remove the comment from the array
+                deleteCommentPost.comments.splice(deleteCommentIndex, 1);
+
+                //save the updated post
+                const updatedDeletePost = await deleteCommentPost.save();
+
+                return res.json({
+                    message: 'comment deleted successfully',
+                    post: updatedDeletePost
+                })
+
             //if command is not recognized
             default:
                 return res.json({ message: 'invalid command' })
