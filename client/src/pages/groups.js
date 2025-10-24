@@ -6,6 +6,7 @@ import CreateGroupForm from '../components/createGroupForm';
 import GroupCard from '../components/GroupCard';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
+import MyButton from '../components/myButton';
 import { useUserContext } from '../context/UserContext';
 
 function Groups() {
@@ -49,15 +50,16 @@ function Groups() {
             })
     }
 
-    function handleSearch(e) {
-
-        e.preventDefault();
+    function handleSearch(searchTerm) {
         const trimmed = searchTerm.trim();
         if (!trimmed) {
             //hide results section if submitting with empty input
             setSearchResults(null);
+            setSearchTerm('');
             return;
         }
+
+        setSearchTerm(trimmed);
         setIsSearching(true);
         axios.post('http://localhost:3001/api/groups', {
             command: 'search',
@@ -123,35 +125,6 @@ function Groups() {
     }
 
 
-    const handleEditGroup = (groupId) => {
-        //TODO: Implement edit group functionality
-        console.log('Edit group:', groupId);
-    }
-
-
-    function handleDeleteGroup(groupId) {
-        //send delete request to group controller
-        axios.post('http://localhost:3001/api/groups',
-            {
-                command: 'delete',
-                data: {
-                    groupId: groupId
-                }
-            }
-        )
-            .then(res => {
-                console.log('delete group response:', res.data);
-                alert('Group deleted successfully!');
-                //refresh the groups list
-                fetchGroups();
-            })
-            .catch(err => {
-                console.error('Delete group error:', err);
-                alert('Failed to delete group: ' + (err.message));
-            })
-    }
-
-
 
 
 
@@ -164,51 +137,8 @@ function Groups() {
         <div style={{ marginLeft: '320px', padding: '20px', maxWidth: '800px' }}>
             <NavBar></NavBar>
             <SearchSideBar />
-            <h1>Groups</h1>
-            <form onSubmit={handleSearch} className="mb-4" style={{ maxWidth: '500px', margin: '10px' }}>
-                <div className="input-group">
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Search groups by name..."
-                        value={searchTerm}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setSearchTerm(val);
-                            if (val.trim() === '') {
-                                //clear previous results when input is cleared
-                                setSearchResults(null);
-                            }
-                        }}
-                    />
-                    <button className="btn btn-primary" type="submit" disabled={isSearching}>
-                        {isSearching ? 'Searching...' : 'Search'}
-                    </button>
-                </div>
-            </form>
-            {Array.isArray(searchResults) && (
-                <div className="mb-4">
-                    <h5>{searchTerm ? `${searchTerm} in Groups` : 'Search Results in Groups'}</h5>
-                    <div className="row">
-                        {searchResults.length === 0 && (
-                            <div className="col-12"><p className="text-muted">No groups found.</p></div>
-                        )}
-                        {searchResults.map((group) => (
-                            <div key={group._id} className="col-md-4 mb-4">
-                                <GroupCard
-                                    group={group}
-                                    userId={currentUser.id}
-                                    onJoin={handleJoinGroup}
-                                    onLeave={handleLeaveGroup}
-                                    showAdmin={false}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
 
-            <p>Your Groups:</p>
+            <p style={{ marginTop: '70px' }}>Your Groups:</p>
 
             <div className="row">
                 {/* map through groups and display each group */}
@@ -233,17 +163,12 @@ function Groups() {
 
             {/*navigation buttons */}
             <div className="mt-4">
-                <button
-                    className="btn btn-secondary me-2"
+                <MyButton
+                    variant="primary"
+                    className="me-2"
                     onClick={() => setShowCreateGroup(true)}>
                     Create New Group
-                </button>
-                <button
-                    className="btn btn-secondary me-2"
-                    onClick={() => navigate('/feed')}>
-                    Back to Feed
-                </button>
-
+                </MyButton>
             </div>
 
             <CreateGroupForm

@@ -51,7 +51,8 @@ function SearchSideBar() {
                     [searchData.field]: searchData.term
                 }
             });
-            setSearchResults(res.data[searchData.type]);
+            //create an array even if the response dont match expected structure
+            setSearchResults(res.data[searchData.type] || []);
         }
         catch (error) {
             console.error('search error:', error);
@@ -110,7 +111,7 @@ function SearchSideBar() {
                 searchTerm={searchTerm}
             />
 
-            {searchTerm && searchResults.length === 0 && !isSearching && (
+            {searchTerm && searchResults && searchResults.length === 0 && !isSearching && (
                 <div style={{ textAlign: 'center', color: '#6b7280', marginTop: '20px' }}>
                     No results found for "{searchTerm}"
                 </div>
