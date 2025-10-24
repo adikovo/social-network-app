@@ -15,12 +15,20 @@ function GroupDetails() {
 
     const groupId = useParams().groupId;
     const navigate = useNavigate();
-    const { user } = useUserContext();
+    const { user, isLoading } = useUserContext();
 
     const [group, setGroup] = useState(null);
     const [showEditForm, setShowEditForm] = useState(false);
     const [showMembersModal, setShowMembersModal] = useState(false);
     const [groupPosts, setGroupPosts] = useState([]);
+
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!isLoading && !user) {
+            navigate('/login');
+            return;
+        }
+    }, [user, isLoading, navigate]);
 
     const fetchGroup = async () => {
         try {
@@ -170,8 +178,10 @@ function GroupDetails() {
         group.admins?.includes(user.id)
     );
 
-
-
+    // Show loading while checking for stored user
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>

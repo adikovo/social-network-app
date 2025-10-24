@@ -10,18 +10,17 @@ import { useUserContext } from '../context/UserContext';
 
 function Feed() {
     const navigate = useNavigate();
-    const { user } = useUserContext();
+    const { user, isLoading } = useUserContext();
     const [userData, setUserData] = useState(null);
     const [posts, setPosts] = useState([]);
 
-
     // if user is not loaded yet, redirect to login
     useEffect(() => {
-        if (!user) {
+        if (!isLoading && !user) {
             navigate('/login');
             return;
         }
-    }, [user, navigate]);
+    }, [user, isLoading, navigate]);
 
     useEffect(() => {
         if (user) {
@@ -85,6 +84,11 @@ function Feed() {
             getPosts();
         }
     };
+
+    // Show loading while checking for stored user
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>

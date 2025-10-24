@@ -26,12 +26,20 @@ const handleFeedCommand = async (req, res) => {
                 const groupIds = userGroups.map(group => group._id.toString())
                 const groupPosts = await Post.find({ groupId: { $in: groupIds } })
 
-                //combine and sort by creation date
+                //combine and deduplicate posts 
                 const allFeedPosts = [...userPosts, ...friendPosts, ...groupPosts]
+
+                // remove duplicates based on post ID
+                const uniquePosts = allFeedPosts.filter((post, index, self) =>
+                    index === self.findIndex(p => p._id.toString() === post._id.toString())
+                )
+
+                // by creation date
+                const sortedPosts = uniquePosts
                     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
                 //add group names to posts that have group id
-                const postsWithGroupNames = await Promise.all(allFeedPosts.map(async (post) => {
+                const postsWithGroupNames = await Promise.all(sortedPosts.map(async (post) => {
                     if (post.groupId) {
                         const group = await Group.findById(post.groupId);
                         return {

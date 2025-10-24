@@ -15,9 +15,9 @@ function Profile() {
     //user id of the viewed profile
     const userId = useParams().userId;
     //current user from context
-    const { user: currentUser } = useUserContext();
+    const { user: currentUser, isLoading } = useUserContext();
     const [friends, setFriends] = useState([]);
-    const [activeButton, setActiveButton] = useState(null);
+    const [currentMode, setCurrentMode] = useState('bio');
     const [userBio, setUserBio] = useState({});
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [hasPendingRequest, setHasPendingRequest] = useState(false);
@@ -25,6 +25,14 @@ function Profile() {
     const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
     const [profileUser, setProfileUser] = useState(null);
     const navigate = useNavigate();
+
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (!isLoading && !currentUser) {
+            navigate('/login');
+            return;
+        }
+    }, [currentUser, isLoading, navigate]);
 
     //check if current user is viewing their own profile
     const isOwnProfile = currentUser && currentUser.id === userId;
@@ -104,7 +112,7 @@ function Profile() {
 
     function handleGetFriends() {
 
-        setActiveButton('friends');
+        setCurrentMode('friends');
 
         axios.post('http://localhost:3001/api/users', {
             command: 'getFriends',
@@ -139,6 +147,7 @@ function Profile() {
     }
 
     function handleGetBio() {
+        setCurrentMode('bio');
         axios.post('http://localhost:3001/api/users', {
             command: 'getBio',
             data: {
@@ -307,8 +316,10 @@ function Profile() {
             })
     }
 
-
-
+    // Show loading while checking for stored user
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
@@ -359,16 +370,14 @@ function Profile() {
                         </>
                     )}
 
-                    {/*edit bio button only show if viewing own profile */}
-                    {isOwnProfile && (
-                        <MyButton
-                            variant='outline-primary'
-                            onClick={() => setIsEditingBio(!isEditingBio)}
-                            style={{ marginRight: '10px' }}
-                        >
-                            {isEditingBio ? 'Cancel' : 'Edit Bio'}
-                        </MyButton>
-                    )}
+                    <MyButton
+                        variant='secondary'
+                        onClick={handleGetBio}
+                        style={{ marginRight: '10px' }}
+                    >
+                        Bio
+                    </MyButton>
+
 
                     {/*my roomies button only show if viewing own profile */}
                     {isOwnProfile && (
@@ -399,7 +408,7 @@ function Profile() {
 
 
                 {/*friends list */}
-                {friends.length > 0 && (
+                {currentMode === 'friends' && friends.length > 0 && (
                     <div className="mt-4">
                         <h3>My Friends ({friends.length})</h3>
                         <div>
@@ -427,32 +436,44 @@ function Profile() {
                 )}
 
                 {/*show message when no friends */}
-                {activeButton === 'friends' && friends.length === 0 && (
+                {currentMode === 'friends' && friends.length === 0 && (
                     <div className="mt-4">
                         <p className="text-muted">No friends found.</p>
                     </div>
                 )}
 
                 {/*bio section - always show */}
-                <div className="mt-4">
+                {currentMode === 'bio' && <div className="mt-4">
+                    <div>
+                        {/*edit bio button only show if viewing own profile */}
+                        {isOwnProfile && (
+                            <MyButton
+                                variant='outline-primary'
+                                onClick={() => setIsEditingBio(!isEditingBio)}
+                                style={{ marginRight: '10px' }}
+                            >
+                                {isEditingBio ? 'Cancel' : 'Edit Bio'}
+                            </MyButton>
+                        )}
 
-                    <BioForm
-                        bio={userBio}
-                        onBioChange={setUserBio}
-                        isEditing={isEditingBio}
-                        showTitle={false}
-                    />
-                    {/*save bio button - show only when editing bio*/}
-                    {isEditingBio && (
-                        <div className="mt-3">
-                            <button
-                                className="btn btn-success"
-                                onClick={handleUpdateBio}>
-                                Save Bio
-                            </button>
-                        </div>
-                    )}
-                </div>
+                        <BioForm
+                            bio={userBio}
+                            onBioChange={setUserBio}
+                            isEditing={isEditingBio}
+                            showTitle={false}
+                        />
+                        {/*save bio button - show only when editing bio*/}
+                        {isEditingBio && (
+                            <div className="mt-3">
+                                <button
+                                    className="btn btn-success"
+                                    onClick={handleUpdateBio}>
+                                    Save Bio
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>}
                 <br />
             </div>
         </div>

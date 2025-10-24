@@ -10,7 +10,7 @@ import axios from 'axios';
 
 function NavBar() {
     const navigate = useNavigate();
-    const { user } = useUserContext();
+    const { user, logout } = useUserContext();
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [showRequestDropdown, setShowRequestDropdown] = useState(false);
     const [roomiesRequests, setRoomiesRequests] = useState([]);
@@ -45,6 +45,7 @@ function NavBar() {
     }, []);
 
     const handleLogout = () => {
+        logout(); // This will clear localStorage and set user to null
         navigate('/login');
     };
 

@@ -12,25 +12,24 @@ import { useUserContext } from '../context/UserContext';
 function Groups() {
 
     //get current user from context
-    const { user: currentUser } = useUserContext();
+    const { user: currentUser, isLoading } = useUserContext();
 
     const navigate = useNavigate();
-
-    //if user is not loaded yet, redirect to login
-    useEffect(() => {
-        if (!currentUser) {
-            navigate('/login');
-            return;
-        }
-    }, [currentUser, navigate]);
     const [groups, setGroups] = useState([]);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState(null);
     const [isSearching, setIsSearching] = useState(false);
 
-    function fetchGroups(showAll = false) {
+    //if user is not loaded yet, redirect to login
+    useEffect(() => {
+        if (!isLoading && !currentUser) {
+            navigate('/login');
+            return;
+        }
+    }, [currentUser, isLoading, navigate]);
 
+    function fetchGroups(showAll = false) {
         //if showAll is true, fetch all groups
         //else fetch all groups the user is a member 
         const data = showAll ? {} : { userId: currentUser.id }
@@ -78,7 +77,6 @@ function Groups() {
     }
 
     function handleJoinGroup(groupId) {
-
         axios.post('http://localhost:3001/api/groups',
             {
                 command: 'joinGroup',
@@ -101,7 +99,6 @@ function Groups() {
     }
 
     function handleLeaveGroup(groupId) {
-
         axios.post('http://localhost:3001/api/groups',
             {
                 command: 'leaveGroup',
@@ -129,9 +126,15 @@ function Groups() {
 
 
     useEffect(() => {
-        fetchGroups();
-    }, [currentUser.id])
+        if (currentUser) {
+            fetchGroups();
+        }
+    }, [currentUser])
 
+    // Show loading while checking for stored user
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div style={{ marginLeft: '320px', padding: '20px', maxWidth: '800px' }}>
