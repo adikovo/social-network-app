@@ -9,6 +9,7 @@ import CreateGroupForm from '../components/createGroupForm';
 import GroupInfo from '../components/GroupInfo';
 import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
+import UserInfo from '../components/UserInfo';
 import { useUserContext } from '../context/UserContext';
 
 function GroupDetails() {
@@ -285,16 +286,50 @@ function GroupDetails() {
                             </div>
                             <div className="modal-body">
                                 {group?.membersWithNames && group.membersWithNames.length > 0 ? (
-                                    <div className="list-group">
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                         {group.membersWithNames.map((member, index) => (
-                                            <div key={member.id || index} className="list-group-item d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <strong>{member.name}</strong>
+                                            <div key={member.id || index} style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                padding: '12px',
+                                                backgroundColor: '#f8f9fa',
+                                                borderRadius: '8px',
+                                                border: '1px solid #e9ecef'
+                                            }}>
+                                                <div style={{ flex: 1 }}>
+                                                    <UserInfo
+                                                        userId={member.id}
+                                                        userName={member.name}
+                                                        profilePicture={member.profilePicture}
+                                                        size="small"
+                                                        email={member.email}
+                                                    />
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '8px' }}>
                                                     {member.id === group.createdBy && (
-                                                        <span className="badge bg-primary ms-2">Creator</span>
+                                                        <span style={{
+                                                            backgroundColor: '#007bff',
+                                                            color: 'white',
+                                                            padding: '4px 8px',
+                                                            borderRadius: '12px',
+                                                            fontSize: '12px',
+                                                            fontWeight: '500'
+                                                        }}>
+                                                            Creator
+                                                        </span>
                                                     )}
                                                     {group.admins?.includes(member.id) && member.id !== group.createdBy && (
-                                                        <span className="badge bg-secondary ms-2">Admin</span>
+                                                        <span style={{
+                                                            backgroundColor: '#6c757d',
+                                                            color: 'white',
+                                                            padding: '4px 8px',
+                                                            borderRadius: '12px',
+                                                            fontSize: '12px',
+                                                            fontWeight: '500'
+                                                        }}>
+                                                            Admin
+                                                        </span>
                                                     )}
                                                 </div>
                                             </div>

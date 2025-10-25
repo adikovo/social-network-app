@@ -4,7 +4,7 @@ import UserInfo from './UserInfo';
 
 
 //dynamic card component for displaying different types of search results
-function MyCard({ type, data, onClick, button }) {
+function MyCard({ type, data, onClick, button, compact = false }) {
     const itemStyle = {
         padding: '12px',
         backgroundColor: 'white',
@@ -12,7 +12,8 @@ function MyCard({ type, data, onClick, button }) {
         borderRadius: '6px',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        marginBottom: '10px'
+        marginBottom: '10px',
+        maxWidth: compact ? '50%' : '100%'
     };
 
     const handleMouseEnter = (e) => {
@@ -35,14 +36,10 @@ function MyCard({ type, data, onClick, button }) {
                                     userId={data._id}
                                     userName={data.name}
                                     profilePicture={data.profilePicture}
-                                    size="small"
+                                    size="medium"
+                                    email={data.email}
+                                    roomiesCount={data.friends ? data.friends.length : 0}
                                 />
-                                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginLeft: '52px' }}>
-                                    {data.email}
-                                </div>
-                                <div style={{ fontSize: '12px', color: '#6b7280', marginLeft: '52px' }}>
-                                    Roomies: {data.friends ? data.friends.length : 0}
-                                </div>
                             </div>
                             {button && (
                                 <div onClick={(e) => e.stopPropagation()}>

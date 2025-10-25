@@ -200,13 +200,15 @@ const handleGroupCommand = async (req, res) => {
                 const groupCreator = await User.findById(singleGroup.createdBy);
                 const groupCreatorName = groupCreator ? groupCreator.name : 'Unknown';
 
-                // Get member names
+                // Get member names with profile pictures and emails
                 const memberNames = await Promise.all(
                     singleGroup.members.map(async (memberId) => {
                         const member = await User.findById(memberId);
                         return {
                             id: memberId,
-                            name: member ? member.name : 'Unknown'
+                            name: member ? member.name : 'Unknown',
+                            email: member ? member.email : '',
+                            profilePicture: member ? member.profilePicture : null
                         };
                     })
                 );

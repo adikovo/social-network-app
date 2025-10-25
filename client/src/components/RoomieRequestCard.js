@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import UserInfo from './UserInfo';
 
 function RoomieRequestCard({
     request,
@@ -20,27 +21,6 @@ function RoomieRequestCard({
         alignItems: 'center',
         gap: '0.75rem',
         marginBottom: '0.5rem'
-    };
-
-    const avatarStyle = {
-        width: '32px',
-        height: '32px',
-        borderRadius: '50%',
-        backgroundColor: '#e5e7eb',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '14px',
-        fontWeight: 'bold'
-    };
-
-    const infoStyle = {
-        flex: 1
-    };
-
-    const nameStyle = {
-        fontWeight: '600',
-        fontSize: '14px'
     };
 
     const messageStyle = {
@@ -114,16 +94,14 @@ function RoomieRequestCard({
             }}
         >
             <div style={headerStyle}>
-                <div style={avatarStyle}>
-                    {request.name.charAt(0)}
-                </div>
-                <div style={infoStyle}>
-                    <div style={nameStyle}>
-                        {request.name}
-                    </div>
-                    <div style={messageStyle}>
-                        {request.message || `wants to be your roommate`}
-                    </div>
+                <UserInfo
+                    userId={request._id || request.id}
+                    userName={request.name}
+                    profilePicture={request.profilePicture}
+                    size="small"
+                />
+                <div style={messageStyle}>
+                    {request.message || `wants to be your roommate`}
                 </div>
             </div>
             <div style={actionsStyle}>

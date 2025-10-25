@@ -514,15 +514,16 @@ function Profile() {
                 {/*friends list */}
                 {currentMode === 'friends' && friends.length > 0 && (
                     <div className="mt-4">
-                        <h3>My Friends ({friends.length})</h3>
+                        <h3>My Roomies ({friends.length})</h3>
                         <div>
                             {friends.map((friend) => (
                                 <MyCard
                                     key={friend._id}
                                     type="users"
                                     data={friend}
+                                    compact={true}
                                     onClick={(friendData) => {
-                                        // Navigate to friend's profile
+                                        //navigate to friend's profile
                                         navigate(`/profile/${friendData._id}`);
                                     }}
                                     button={

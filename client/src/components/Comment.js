@@ -75,10 +75,6 @@ const Comment = ({ comment, onEdit, onDelete, post }) => {
         return date.toISOString().split('T')[0];
     };
 
-    const getInitials = (name) => {
-        if (!name) return '?';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
-    };
 
     return (
         <div style={{

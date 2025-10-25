@@ -10,7 +10,9 @@ function UserInfo({
     showGroupName = false,
     groupName = null,
     groupId = null,
-    date = null
+    date = null,
+    email = null,
+    roomiesCount = null
 }) {
     return (
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -49,7 +51,7 @@ function UserInfo({
                 {/* User name */}
                 <div style={{
                     fontWeight: '600',
-                    fontSize: size === 'small' ? '16px' : '18px',
+                    fontSize: size === 'small' ? '18px' : size === 'medium' ? '20px' : '22px',
                     color: '#1c1e21',
                     textAlign: 'left'
                 }}>
@@ -71,6 +73,32 @@ function UserInfo({
                         marginTop: '2px'
                     }}>
                         {date}
+                    </div>
+                )}
+
+                {/* Email - show under user name if provided */}
+                {email && (
+                    <div style={{
+                        fontSize: '14px',
+                        color: '#6b7280',
+                        fontWeight: '400',
+                        textAlign: 'left',
+                        marginTop: '2px'
+                    }}>
+                        {email}
+                    </div>
+                )}
+
+                {/* Roomies count - show under email if provided */}
+                {roomiesCount !== null && (
+                    <div style={{
+                        fontSize: '14px',
+                        color: '#6b7280',
+                        fontWeight: '400',
+                        textAlign: 'left',
+                        marginTop: '2px'
+                    }}>
+                        Roomies: {roomiesCount}
                     </div>
                 )}
             </div>

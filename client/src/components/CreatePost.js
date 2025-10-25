@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
+import ProfilePicture from './ProfilePicture';
 
 const CreatePost = ({ onPostCreated, groupId = null }) => {
     const { user } = useUserContext();
@@ -46,10 +47,6 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
         }
     };
 
-    const getInitials = (name) => {
-        if (!name) return '?';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
-    };
 
     return (
         <div style={{
@@ -65,22 +62,13 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
                 alignItems: 'center',
                 gap: '12px'
             }}>
-                {/* User Avatar */}
-                <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    backgroundColor: '#e0e0e0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    color: '#666',
-                    fontSize: '16px',
-                    flexShrink: 0
-                }}>
-                    {getInitials(user?.username || user?.name || 'Y')}
-                </div>
+                {/* User Profile Picture */}
+                <ProfilePicture
+                    currentImage={user?.profilePicture}
+                    size="small"
+                    editMode={false}
+                    userId={user?.id}
+                />
 
                 {/* Text Input */}
                 <div style={{ flex: 1 }}>

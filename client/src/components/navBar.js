@@ -5,6 +5,7 @@ import DropdownMenu from './DropdownMenu';
 import RoomieRequestCard from './RoomieRequestCard';
 import NotificationBadge from './NotificationBadge';
 import AppLogo from './AppLogo';
+import ProfilePicture from './ProfilePicture';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -217,28 +218,17 @@ function NavBar() {
                 <div ref={profileRef} style={{ position: 'relative' }}>
 
                     {/* profile picture button */}
-                    <button
+                    <div
                         onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                        style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            border: 'none',
-                            backgroundColor: '#e5e7eb',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = '#d1d5db';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = '#e5e7eb';
-                        }}
+                        style={{ cursor: 'pointer' }}
                     >
-                    </button>
+                        <ProfilePicture
+                            currentImage={user?.profilePicture}
+                            size="small"
+                            editMode={false}
+                            userId={user?.id}
+                        />
+                    </div>
 
                     <DropdownMenu
                         isOpen={showProfileDropdown}
