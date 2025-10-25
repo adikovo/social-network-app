@@ -333,14 +333,46 @@ function NavBar() {
                     <MyButton variant="nav" onClick={handleStats}> Stats </MyButton>
                 </div>
 
-                {/*roomie requests dropdown */}
+                {/*notifications dropdown */}
                 <div ref={requestRef} style={{ position: 'relative' }}>
                     <MyButton
-                        variant="icon"
+                        variant="notification"
                         onClick={() => setShowRequestDropdown(!showRequestDropdown)}
                     >
-                        N
-                        <NotificationBadge count={(roomiesRequests?.length || 0) + (groupJoinRequests?.length || 0) + (notifications?.length || 0)} />
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        {(roomiesRequests?.length || 0) + (groupJoinRequests?.length || 0) + (notifications?.length || 0) > 0 && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '-4px',
+                                right: '-4px',
+                                height: '20px',
+                                minWidth: '20px',
+                                backgroundColor: '#ef4444',
+                                color: 'white',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                padding: '0 6px',
+                                boxSizing: 'border-box'
+                            }}>
+                                {(roomiesRequests?.length || 0) + (groupJoinRequests?.length || 0) + (notifications?.length || 0)}
+                            </div>
+                        )}
                     </MyButton>
 
                     <DropdownMenu

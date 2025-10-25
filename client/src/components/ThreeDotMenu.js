@@ -45,7 +45,8 @@ function ThreeDotMenu({
         alignItems: 'center',
         justifyContent: 'center',
         color: '#666',
-        fontSize: '18px',
+        fontSize: '20px',
+        fontWeight: 'bold',
         width: '32px',
         height: '32px',
         transition: 'background-color 0.2s ease'

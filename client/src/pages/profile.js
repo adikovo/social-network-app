@@ -454,13 +454,16 @@ function Profile() {
                         </>
                     )}
 
-                    <MyButton
-                        variant='secondary'
-                        onClick={handleGetBio}
-                        style={{ marginRight: '10px' }}
-                    >
-                        Bio
-                    </MyButton>
+                    {/* bio button - only show when viewing own profile */}
+                    {isOwnProfile && (
+                        <MyButton
+                            variant='secondary'
+                            onClick={handleGetBio}
+                            style={{ marginRight: '10px' }}
+                        >
+                            Bio
+                        </MyButton>
+                    )}
 
                     {/*my roomies button only show if viewing own profile */}
                     {isOwnProfile && (

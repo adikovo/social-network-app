@@ -32,7 +32,7 @@ function SearchSideBar() {
         } else {
             return {
                 type: 'users',
-                fields: ['name', 'email', 'pets', 'budget', 'location', 'smoking'],
+                fields: ['name', 'age', 'pets', 'budget', 'location', 'smoking', 'cleanliness'],
                 placeholder: 'Search users...'
             }
         }

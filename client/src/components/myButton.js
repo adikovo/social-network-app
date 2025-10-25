@@ -30,7 +30,8 @@ function MyButton({
         comment: 'btn-comment',
         close: 'btn-close',
         navPrev: 'btn-nav-prev',
-        navNext: 'btn-nav-next'
+        navNext: 'btn-nav-next',
+        notification: 'btn-notification'
     };
 
     //different button sizes
@@ -67,7 +68,8 @@ function MyButton({
         comment: 'rgb(107 114 128 / 0.3)',
         close: 'rgb(255 255 255 / 0.3)',
         navPrev: 'rgb(255 255 255 / 0.3)',
-        navNext: 'rgb(255 255 255 / 0.3)'
+        navNext: 'rgb(255 255 255 / 0.3)',
+        notification: 'rgb(99 102 241 / 0.3)'
     };
 
     return (
@@ -254,12 +256,32 @@ function MyButton({
                     zIndex: 10000,
                     fontFamily: 'system-ui, -apple-system, sans-serif',
                     transition: 'all 0.2s ease'
+                }),
+                ...(variant === 'notification' && {
+                    position: 'relative',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    borderColor: 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s ease',
+                    fontSize: '20px',
+                    color: '#374151',
+                    padding: '0',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    boxShadow: 'none',
+                    lineHeight: '1'
                 })
             }}
             onMouseEnter={(e) => {
                 if (!disabled) {
-                    if (variant === 'nav' || variant === 'dropdown') {
-                        //nav and dropdown variants hover just change background
+                    if (variant === 'nav' || variant === 'dropdown' || variant === 'notification') {
+                        //nav, dropdown, and notification variants hover just change background
                         e.target.style.backgroundColor = '#f3f4f6';
                     } else if (variant === 'icon') {
                         //icon variant hover changes background color
@@ -287,7 +309,7 @@ function MyButton({
             }}
             onMouseLeave={(e) => {
                 if (!disabled) {
-                    if (variant === 'nav' || variant === 'dropdown') {
+                    if (variant === 'nav' || variant === 'dropdown' || variant === 'notification') {
                         e.target.style.backgroundColor = 'transparent';
                     } else if (variant === 'icon') {
                         e.target.style.backgroundColor = '#e5e7eb';
