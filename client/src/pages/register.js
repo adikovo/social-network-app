@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import MyAlert from '../components/MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 function Register() {
     const navigate = useNavigate();
@@ -8,19 +10,20 @@ function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [verifyPassword, setVerifyPassword] = useState('');
+    const { alert, showSuccess, showError, showWarning, hideAlert } = useMyAlert();
 
     function handleRegister(event) {
         event.preventDefault();
 
         //check if passwords match
         if (password !== verifyPassword) {
-            alert('Passwords do not match!');
+            showError('Passwords do not match!');
             return;
         }
 
         //check if all fields are filled
         if (!name || !email || !password) {
-            alert('Please fill in all fields!');
+            showWarning('Please fill in all fields!');
             return;
         }
 
@@ -37,7 +40,7 @@ function Register() {
         axios.post('http://localhost:3001/api/auth', userData)
             .then(response => {
                 console.log('Register successful:', response.data);
-                alert('Registration successful! You can now login.');
+                showSuccess('Registration successful! You can now login.');
 
                 //clearsthe  form
                 setName('');
@@ -51,7 +54,7 @@ function Register() {
             .catch(error => {
                 console.error('Register error:', error.response?.data || error.message);
 
-                alert('Registration failed: ' + (error.response?.data?.message || error.message));
+                showError('Registration failed: ' + (error.response?.data?.message || error.message));
             });
     }
 
@@ -117,6 +120,15 @@ function Register() {
                     Back to Login
                 </button>
             </div>
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
         </div>
     )
 }

@@ -9,6 +9,8 @@ import AppLogo from './AppLogo';
 import ProfilePicture from './ProfilePicture';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
+import MyAlert from './MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 function NavBar() {
     const navigate = useNavigate();
@@ -18,6 +20,7 @@ function NavBar() {
     const [roomiesRequests, setRoomiesRequests] = useState([]);
     const [groupJoinRequests, setGroupJoinRequests] = useState([]);
     const [notifications, setNotifications] = useState([]);
+    const { alert, showSuccess, showError, hideAlert } = useMyAlert();
     const profileRef = useRef(null);
     const requestRef = useRef(null);
 
@@ -109,7 +112,7 @@ function NavBar() {
                 console.error('Friend requests error:', err);
 
                 if (user) {
-                    alert('Failed to fetch friend requests');
+                    showError('Failed to fetch friend requests');
                 }
             })
     }
@@ -131,7 +134,7 @@ function NavBar() {
                 console.error('Group join requests error:', err);
                 // Only show alert if user is still logged in
                 if (user) {
-                    alert('Failed to fetch group join requests');
+                    showError('Failed to fetch group join requests');
                 }
             })
     }
@@ -153,7 +156,7 @@ function NavBar() {
             .catch(err => {
                 console.error('Notifications error:', err);
                 if (user) {
-                    alert('Failed to fetch notifications');
+                    showError('Failed to fetch notifications');
                 }
             })
     }
@@ -175,7 +178,7 @@ function NavBar() {
             })
             .catch(err => {
                 console.error('Dismiss notification error:', err);
-                alert('Failed to dismiss notification');
+                showError('Failed to dismiss notification');
             })
     }
 
@@ -192,11 +195,11 @@ function NavBar() {
         })
             .then(res => {
                 console.log('Accept request response:', res.data);
-                alert('Friend request accepted successfully!');
+                showSuccess('Friend request accepted successfully!');
             })
             .catch(err => {
                 console.error('Accept request error:', err);
-                alert('Failed to accept friend request');
+                showError('Failed to accept friend request');
             })
         setShowRequestDropdown(false);
         //refresh friend requests and notifications
@@ -228,7 +231,7 @@ function NavBar() {
         })
             .then(res => {
                 console.log('Accept group join request response:', res.data);
-                alert('Group join request accepted successfully!');
+                showSuccess('Group join request accepted successfully!');
                 setShowRequestDropdown(false);
                 //refresh both request lists and notifications
                 fetchRoomiesRequests();
@@ -240,7 +243,7 @@ function NavBar() {
             })
             .catch(err => {
                 console.error('Accept group join request error:', err);
-                alert('Failed to accept group join request');
+                showError('Failed to accept group join request');
             })
     };
 
@@ -257,7 +260,7 @@ function NavBar() {
         })
             .then(res => {
                 console.log('Decline group join request response:', res.data);
-                alert('Group join request declined successfully!');
+                showSuccess('Group join request declined successfully!');
                 setShowRequestDropdown(false);
                 //refresh both request lists and notifications
                 fetchRoomiesRequests();
@@ -269,7 +272,7 @@ function NavBar() {
             })
             .catch(err => {
                 console.error('Decline group join request error:', err);
-                alert('Failed to decline group join request');
+                showError('Failed to decline group join request');
             })
     };
 
@@ -447,6 +450,15 @@ function NavBar() {
                     </DropdownMenu>
                 </div>
             </div>
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
         </nav>
     );
 }

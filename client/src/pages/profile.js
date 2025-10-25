@@ -10,6 +10,8 @@ import ProfilePicture from '../components/ProfilePicture';
 import ThreeDotMenu from '../components/ThreeDotMenu';
 import FriendsList from '../components/FriendsList';
 import { useUserContext } from '../context/UserContext';
+import MyAlert from '../components/MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 
 function Profile() {
@@ -26,6 +28,7 @@ function Profile() {
     const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
     const [profileUser, setProfileUser] = useState(null);
     const navigate = useNavigate();
+    const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -173,11 +176,11 @@ function Profile() {
             .then(res => {
                 console.log('Bio update response:', res.data);
                 setIsEditingBio(false);
-                alert('Bio updated successfully!');
+                showSuccess('Bio updated successfully!');
             })
             .catch(err => {
                 console.error('Bio update error:', err);
-                alert('Failed to update bio');
+                showError('Failed to update bio');
             })
     }
 
@@ -196,12 +199,12 @@ function Profile() {
         })
             .then(res => {
                 console.log('Friend request sent successfully', res.data);
-                alert('Friend request sent successfully!');
+                showSuccess('Friend request sent successfully!');
                 setHasPendingRequest(true);
             })
             .catch(err => {
                 console.error('send friend request error:', err);
-                alert('Failed to send friend request');
+                showError('Failed to send friend request');
             })
     }
 
@@ -220,12 +223,12 @@ function Profile() {
         })
             .then(res => {
                 console.log('Friend request cancelled successfully', res.data);
-                alert('Friend request cancelled successfully!');
+                showSuccess('Friend request cancelled successfully!');
                 setHasPendingRequest(false);
             })
             .catch(err => {
                 console.error('cancel friend request error:', err);
-                alert('Failed to cancel friend request');
+                showError('Failed to cancel friend request');
             })
     }
 
@@ -244,13 +247,13 @@ function Profile() {
         })
             .then(res => {
                 console.log('Friend request accepted successfully', res.data);
-                alert('Friend request accepted successfully!');
+                showSuccess('Friend request accepted successfully!');
                 setHasReceivedRequest(false);
                 setIsAlreadyFriend(true);
             })
             .catch(err => {
                 console.error('accept friend request error:', err);
-                alert('Failed to accept friend request');
+                showError('Failed to accept friend request');
             })
     }
 
@@ -269,12 +272,12 @@ function Profile() {
         })
             .then(res => {
                 console.log('Friend request rejected successfully', res.data);
-                alert('Friend request rejected successfully!');
+                showSuccess('Friend request rejected successfully!');
                 setHasReceivedRequest(false);
             })
             .catch(err => {
                 console.error('reject friend request error:', err);
-                alert('Failed to reject friend request');
+                showError('Failed to reject friend request');
             })
     }
 
@@ -303,11 +306,11 @@ function Profile() {
                     ...prevUser,
                     profilePicture: res.data.user.profilePicture
                 }));
-                alert('Profile picture updated successfully!');
+                showSuccess('Profile picture updated successfully!');
             }
         } catch (error) {
             console.error('Profile picture upload error:', error);
-            alert('Failed to update profile picture');
+            showError('Failed to update profile picture');
         }
     }
 
@@ -331,11 +334,11 @@ function Profile() {
                     ...prevUser,
                     profilePicture: null
                 }));
-                alert('Profile picture deleted successfully!');
+                showSuccess('Profile picture deleted successfully!');
             }
         } catch (error) {
             console.error('Profile picture delete error:', error);
-            alert('Failed to delete profile picture');
+            showError('Failed to delete profile picture');
         }
     }
 
@@ -515,8 +518,16 @@ function Profile() {
                 </div>}
                 <br />
             </div>
-        </div>
 
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
+        </div>
     )
 }
 

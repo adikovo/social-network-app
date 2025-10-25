@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
 import ProfilePicture from './ProfilePicture';
+import MyAlert from './MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 const CreatePost = ({ onPostCreated, groupId = null }) => {
     const { user } = useUserContext();
     const [postText, setPostText] = useState('');
+    const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     const handleSubmit = () => {
         if (postText.trim()) {
@@ -27,6 +30,7 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
             })
                 .then(res => {
                     console.log('Post created successfully:', res.data);
+                    showSuccess('Post created successfully!');
                     // Call parent component with the created post
                     if (onPostCreated) {
                         onPostCreated(res.data.post);
@@ -35,7 +39,7 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
                 })
                 .catch(err => {
                     console.error('Error creating post:', err);
-                    // TODO: Show error message to user
+                    showError('Failed to create post. Please try again.');
                 });
         }
     };
@@ -123,6 +127,15 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
                     Post
                 </button>
             </div>
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
         </div>
     );
 };

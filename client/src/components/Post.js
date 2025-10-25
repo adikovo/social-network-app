@@ -6,6 +6,8 @@ import MyButton from './myButton';
 import UserInfo from './UserInfo';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
+import MyAlert from './MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 const Post = ({ post, onPostUpdated }) => {
     const { user } = useUserContext();
@@ -17,6 +19,7 @@ const Post = ({ post, onPostUpdated }) => {
     const [showCommentsModal, setShowCommentsModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(post.content || '');
+    const { alert, showError, hideAlert } = useMyAlert();
 
     // update currentPost when post prop changes
     useEffect(() => {
@@ -90,7 +93,7 @@ const Post = ({ post, onPostUpdated }) => {
             .catch(err => {
                 console.error('Error adding comment:', err);
                 //show error message to user
-                alert('Failed to add comment. Please try again.');
+                showError('Failed to add comment. Please try again.');
             });
     };
 
@@ -121,7 +124,7 @@ const Post = ({ post, onPostUpdated }) => {
             })
             .catch(err => {
                 console.error('Edit comment error:', err);
-                alert('Failed to edit comment. Please try again.');
+                showError('Failed to edit comment. Please try again.');
             });
     };
 
@@ -148,7 +151,7 @@ const Post = ({ post, onPostUpdated }) => {
             })
             .catch(err => {
                 console.error('Delete comment error:', err);
-                alert('Failed to delete comment. Please try again.');
+                showError('Failed to delete comment. Please try again.');
             });
     };
 
@@ -206,7 +209,7 @@ const Post = ({ post, onPostUpdated }) => {
             })
             .catch(err => {
                 console.error('Delete post error:', err);
-                alert('Failed to delete post. You may not have permission to delete this post.');
+                showError('Failed to delete post. You may not have permission to delete this post.');
             });
     };
 
@@ -412,6 +415,15 @@ const Post = ({ post, onPostUpdated }) => {
                 onCommentSubmit={handleModalCommentSubmit}
                 onCommentEdit={handleCommentEdit}
                 onCommentDelete={handleCommentDelete}
+            />
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
             />
         </div>
     );

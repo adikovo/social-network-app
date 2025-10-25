@@ -4,6 +4,8 @@ import axios from 'axios';
 import MyCard from './MyCard';
 import MyButton from './myButton';
 import { useUserContext } from '../context/UserContext';
+import MyAlert from './MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 function FriendsList({
     userId,
@@ -20,6 +22,7 @@ function FriendsList({
     const { user: currentUser } = useUserContext();
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     // Check if current user is viewing their own profile
     const isOwnProfile = currentUser && currentUser.id === userId;
@@ -83,13 +86,13 @@ function FriendsList({
         })
             .then(res => {
                 console.log('Remove friend response:', res.data);
-                alert('Friend removed successfully!');
+                showSuccess('Friend removed successfully!');
                 //refresh the friends list
                 handleGetFriends();
             })
             .catch(err => {
                 console.error('Remove friend error:', err);
-                alert('Failed to remove friend');
+                showError('Failed to remove friend');
             })
     }
 
@@ -181,6 +184,15 @@ function FriendsList({
             ) : (
                 <p className="text-muted">{getEmptyMessage()}</p>
             )}
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
         </div>
     );
 }

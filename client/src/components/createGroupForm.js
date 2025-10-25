@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import MyAlert from './MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = false, groupToEdit = null }) {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [privacy, setPrivacy] = useState('public');
+    const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     // form with existing group data when editing
     useEffect(() => {
@@ -41,13 +44,13 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
             axios.post('http://localhost:3001/api/groups', groupData)
                 .then(res => {
                     console.log('Update group response:', res.data);
-                    alert('Group updated successfully!');
+                    showSuccess('Group updated successfully!');
                     onClose();
                     onGroupCreated();
                 })
                 .catch(err => {
                     console.error('Update group error:', err);
-                    alert('Failed to update group: ' + (err.response?.data?.message || err.message));
+                    showError('Failed to update group: ' + (err.response?.data?.message || err.message));
                 });
         } else {
             // Create new group
@@ -66,13 +69,13 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
             axios.post('http://localhost:3001/api/groups', groupData)
                 .then(res => {
                     console.log('Create group response:', res.data);
-                    alert('Group created successfully!');
+                    showSuccess('Group created successfully!');
                     onClose();
                     onGroupCreated();
                 })
                 .catch(err => {
                     console.error('Create group error:', err);
-                    alert('Failed to create group: ' + (err.response?.data?.message || err.message));
+                    showError('Failed to create group: ' + (err.response?.data?.message || err.message));
                 });
         }
     }
@@ -147,6 +150,15 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
                     </form>
                 </div>
             </div>
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
         </div>
     );
 }

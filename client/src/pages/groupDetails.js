@@ -11,6 +11,8 @@ import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
 import FriendsList from '../components/FriendsList';
 import { useUserContext } from '../context/UserContext';
+import MyAlert from '../components/MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 function GroupDetails() {
 
@@ -23,6 +25,7 @@ function GroupDetails() {
     const [showMembers, setShowMembers] = useState(false);
     const [groupPosts, setGroupPosts] = useState([]);
     const [hasPendingJoinRequest, setHasPendingJoinRequest] = useState(false);
+    const { alert, showSuccess, showError, showInfo, hideAlert } = useMyAlert();
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -109,18 +112,18 @@ function GroupDetails() {
             if (response.data.message === 'join request sent successfully') {
                 // For private groups, show pending state
                 setHasPendingJoinRequest(true);
-                alert('Join request sent! Waiting for admin approval.');
+                showInfo('Join request sent! Waiting for admin approval.');
             } else if (response.data.message === 'user joined group successfully') {
                 // For public groups, add to members immediately
                 setGroup(prevGroup => ({
                     ...prevGroup,
                     members: [...(prevGroup.members || []), user.id]
                 }));
-                alert('Successfully joined the group!');
+                showSuccess('Successfully joined the group!');
             }
         }).catch(error => {
             console.error('Error joining group:', error);
-            alert('Failed to join group');
+            showError('Failed to join group');
         });
     }
 
@@ -166,11 +169,11 @@ function GroupDetails() {
                 }
             }).then(response => {
                 console.log('Group deleted successfully:', response.data);
-                alert('Group deleted successfully!');
+                showSuccess('Group deleted successfully!');
                 navigate('/groups');
             }).catch(error => {
                 console.error('Error deleting group:', error);
-                alert('Failed to delete group: ' + (error.response?.data?.message || error.message));
+                showError('Failed to delete group: ' + (error.response?.data?.message || error.message));
             });
         }
     }
@@ -190,11 +193,11 @@ function GroupDetails() {
                     ...prevGroup,
                     members: prevGroup.members?.filter(memberId => memberId !== user.id) || []
                 }));
-                alert('You have left the group successfully!');
+                showSuccess('You have left the group successfully!');
                 navigate('/groups');
             }).catch(error => {
                 console.error('Error leaving group:', error);
-                alert('Failed to leave group: ' + (error.message));
+                showError('Failed to leave group: ' + (error.message));
             });
         }
     }
@@ -339,6 +342,15 @@ function GroupDetails() {
                 onGroupCreated={handleGroupUpdated}
                 editMode={true}
                 groupToEdit={group}
+            />
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
             />
 
         </div>

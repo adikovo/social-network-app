@@ -8,6 +8,8 @@ import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
 import MyButton from '../components/myButton';
 import { useUserContext } from '../context/UserContext';
+import MyAlert from '../components/MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 function Groups() {
 
@@ -20,6 +22,7 @@ function Groups() {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState(null);
     const [isSearching, setIsSearching] = useState(false);
+    const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     //if user is not loaded yet, redirect to login
     useEffect(() => {
@@ -88,13 +91,13 @@ function Groups() {
         )
             .then(res => {
                 console.log('join group response:', res.data);
-                alert('Successfully joined the group!');
+                showSuccess('Successfully joined the group!');
                 //refresh the groups list
                 fetchGroups();
             })
             .catch(err => {
                 console.error('Join group error:', err);
-                alert('Failed to join group: ' + (err.message));
+                showError('Failed to join group: ' + (err.message));
             })
     }
 
@@ -110,14 +113,14 @@ function Groups() {
         )
             .then(res => {
                 console.log('leave group response:', res.data);
-                alert('Successfully left the group!');
+                showSuccess('Successfully left the group!');
 
                 //refresh the groups list
                 fetchGroups();
             })
             .catch(err => {
                 console.error('Leave group error:', err);
-                alert('Failed to leave group: ' + (err.message));
+                showError('Failed to leave group: ' + (err.message));
             })
     }
 
@@ -179,6 +182,15 @@ function Groups() {
                 onClose={() => setShowCreateGroup(false)}
                 userId={currentUser.id}
                 onGroupCreated={fetchGroups}
+            />
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
             />
         </div>
     )

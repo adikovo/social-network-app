@@ -2,6 +2,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserContext } from '../context/UserContext';
+import MyAlert from '../components/MyAlert';
+import useMyAlert from '../hooks/useMyAlert';
 
 
 function Login() {
@@ -10,6 +12,7 @@ function Login() {
     const { login } = useUserContext();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     function handleLogin(event) {
         event.preventDefault();
@@ -34,18 +37,18 @@ function Login() {
 
                     //save user data to context
                     login(res.data.user);
-                    alert('Login successful!');
+                    showSuccess('Login successful!');
 
                     //navigate to feed only on successful login
                     navigate('/feed');
                 } else {
                     //handle login failure
-                    alert('Login failed: ' + res.data.message);
+                    showError('Login failed: ' + res.data.message);
                 }
             })
             .catch(error => {
                 console.error('Login error:', error.res?.data || error.message);
-                alert('Login failed: ' + (error.res?.data?.message || error.message));
+                showError('Login failed: ' + (error.res?.data?.message || error.message));
             });
     }
 
@@ -90,6 +93,15 @@ function Login() {
                     Sign Up
                 </button>
             </div>
+
+            {/* MyAlert Component */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
         </div>
     )
 }
