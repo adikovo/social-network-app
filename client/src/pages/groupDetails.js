@@ -22,6 +22,7 @@ function GroupDetails() {
     const [showEditForm, setShowEditForm] = useState(false);
     const [showMembers, setShowMembers] = useState(false);
     const [groupPosts, setGroupPosts] = useState([]);
+    const [hasPendingJoinRequest, setHasPendingJoinRequest] = useState(false);
 
     // Redirect to login if not authenticated
     useEffect(() => {
@@ -66,10 +67,28 @@ function GroupDetails() {
         }
     };
 
+    const checkJoinRequestStatus = async () => {
+        try {
+            const res = await axios.post('http://localhost:3001/api/groups', {
+                command: 'checkJoinRequestStatus',
+                data: {
+                    groupId: groupId,
+                    userId: user?.id
+                }
+            });
+            console.log('Join request status response:', res.data);
+            setHasPendingJoinRequest(res.data.hasPendingRequest);
+        } catch (error) {
+            console.error('Error checking join request status:', error);
+            setHasPendingJoinRequest(false);
+        }
+    };
+
     useEffect(() => {
         if (user?.id) {
             fetchGroup();
             fetchGroupPosts();
+            checkJoinRequestStatus();
         }
     }, [groupId, user?.id]);
 
@@ -86,14 +105,22 @@ function GroupDetails() {
                 userId: user.id
             }
         }).then(response => {
-            console.log('Joined group successfully:', response.data);
-            //update the group members array 
-            setGroup(prevGroup => ({
-                ...prevGroup,
-                members: [...(prevGroup.members || []), user.id]
-            }));
+            console.log('Join group response:', response.data);
+            if (response.data.message === 'join request sent successfully') {
+                // For private groups, show pending state
+                setHasPendingJoinRequest(true);
+                alert('Join request sent! Waiting for admin approval.');
+            } else if (response.data.message === 'user joined group successfully') {
+                // For public groups, add to members immediately
+                setGroup(prevGroup => ({
+                    ...prevGroup,
+                    members: [...(prevGroup.members || []), user.id]
+                }));
+                alert('Successfully joined the group!');
+            }
         }).catch(error => {
             console.error('Error joining group:', error);
+            alert('Failed to join group');
         });
     }
 
@@ -184,6 +211,18 @@ function GroupDetails() {
         return <div>Loading...</div>;
     }
 
+    if (!group) {
+        return (
+            <div>
+                <NavBar />
+                <SearchSideBar />
+                <div style={{ marginLeft: '320px', marginTop: '100px', padding: '20px' }}>
+                    <div>Group not found or you don't have permission to view it.</div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div>
             <NavBar />
@@ -227,7 +266,13 @@ function GroupDetails() {
                 </div>
 
                 {user && group && !isMember && (
-                    <MyButton variant='success' onClick={handleJoinGroup}>Join Group</MyButton>
+                    <MyButton
+                        variant={hasPendingJoinRequest ? 'secondary' : 'success'}
+                        onClick={hasPendingJoinRequest ? null : handleJoinGroup}
+                        disabled={hasPendingJoinRequest}
+                    >
+                        {hasPendingJoinRequest ? 'Pending' : 'Join Group'}
+                    </MyButton>
                 )}
                 {group && <GroupInfo group={group} />}
 
@@ -248,36 +293,40 @@ function GroupDetails() {
                                 ← Back to Feed
                             </MyButton>
                         </div>
-                        <FriendsList
-                            type="groupMembers"
-                            groupId={groupId}
-                            showInModal={false}
-                        />
+                        {group.privacy === 'private' && !isMember ? null : (
+                            <FriendsList
+                                type="groupMembers"
+                                groupId={groupId}
+                                showInModal={false}
+                            />
+                        )}
                     </div>
                 ) : (
                     /*show posts based on group privacy */
-                    (group?.privacy === 'public' || isMember) && (
-                        <div style={{ marginTop: '20px' }}>
-                            {groupPosts.length > 0 ? (
-                                groupPosts.map((post) => (
-                                    <Post
-                                        key={post._id}
-                                        post={post}
-                                        onPostUpdated={handlePostUpdated}
-                                    />
-                                ))
-                            ) : (
-                                <div style={{
-                                    textAlign: 'center',
-                                    padding: '40px',
-                                    color: '#666'
-                                }}>
-                                    <p>No posts in this group yet.</p>
-                                    {isMember && <p>Be the first to share something!</p>}
-                                </div>
-                            )}
-                        </div>
-                    )
+                    <div style={{ marginTop: '20px' }}>
+                        {group?.privacy === 'private' && !isMember ? null : (
+                            <>
+                                {groupPosts.length > 0 ? (
+                                    groupPosts.map((post) => (
+                                        <Post
+                                            key={post._id}
+                                            post={post}
+                                            onPostUpdated={handlePostUpdated}
+                                        />
+                                    ))
+                                ) : (
+                                    <div style={{
+                                        textAlign: 'center',
+                                        padding: '40px',
+                                        color: '#666'
+                                    }}>
+                                        <p>No posts in this group yet.</p>
+                                        {isMember && <p>Be the first to share something!</p>}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
                 )}
             </div>
 

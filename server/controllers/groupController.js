@@ -113,25 +113,38 @@ const handleGroupCommand = async (req, res) => {
             //membership actions
 
             case 'joinGroup':
-                //add user to group members
-                const joinGroup = await Group.findByIdAndUpdate(
-                    data.groupId,
-                    //add user to group members array 
-                    { $addToSet: { members: data.userId } },
-                    { new: true }
-                )
-                if (!joinGroup) {
+                //get the group to check privacy
+                const groupToJoin = await Group.findById(data.groupId)
+                if (!groupToJoin) {
                     return res.json({ message: 'group not found' })
                 }
 
-                //add group to user's groups array
-                await User.findByIdAndUpdate(
-                    data.userId,
-                    { $addToSet: { groups: data.groupId } },
-                    { new: true }
-                )
+                //check if group is private
+                if (groupToJoin.privacy === 'private') {
+                    //for private groups, add to join requests instead of members
+                    const updatedGroup = await Group.findByIdAndUpdate(
+                        data.groupId,
+                        { $addToSet: { joinRequests: data.userId } },
+                        { new: true }
+                    )
+                    return res.json({ message: 'join request sent successfully', group: updatedGroup })
+                } else {
+                    //for public groups, add user to group members directly
+                    const joinGroup = await Group.findByIdAndUpdate(
+                        data.groupId,
+                        { $addToSet: { members: data.userId } },
+                        { new: true }
+                    )
 
-                return res.json({ message: 'user joined group successfully', group: joinGroup })
+                    //add group to user's groups array
+                    await User.findByIdAndUpdate(
+                        data.userId,
+                        { $addToSet: { groups: data.groupId } },
+                        { new: true }
+                    )
+
+                    return res.json({ message: 'user joined group successfully', group: joinGroup })
+                }
 
             case 'leaveGroup':
                 //remove user from group members
@@ -192,35 +205,53 @@ const handleGroupCommand = async (req, res) => {
                 }
 
                 // Check if group is private and user is not a member
-                if (singleGroup.privacy === 'private' && !singleGroup.members.includes(data.userId)) {
-                    return res.json({ message: 'Permission denied: Private group access required' })
-                }
+                const isPrivateAndNotMember = singleGroup.privacy === 'private' && !singleGroup.members.includes(data.userId);
 
                 // Get creator name
                 const groupCreator = await User.findById(singleGroup.createdBy);
                 const groupCreatorName = groupCreator ? groupCreator.name : 'Unknown';
 
-                // Get member names with profile pictures and emails
-                const memberNames = await Promise.all(
-                    singleGroup.members.map(async (memberId) => {
-                        const member = await User.findById(memberId);
-                        return {
-                            id: memberId,
-                            name: member ? member.name : 'Unknown',
-                            email: member ? member.email : '',
-                            profilePicture: member ? member.profilePicture : null
-                        };
-                    })
-                );
+                if (isPrivateAndNotMember) {
+                    // For private groups where user is not a member, return basic info only
+                    return res.json({
+                        message: 'group fetched successfully',
+                        group: {
+                            _id: singleGroup._id,
+                            name: singleGroup.name,
+                            description: singleGroup.description,
+                            privacy: singleGroup.privacy,
+                            createdBy: singleGroup.createdBy,
+                            createdByName: groupCreatorName,
+                            members: singleGroup.members,
+                            membersCount: singleGroup.members.length,
+                            admins: singleGroup.admins,
+                            isPrivateAndNotMember: true
+                        }
+                    });
+                } else {
+                    // For public groups or private groups where user is a member, return full info
+                    const memberNames = await Promise.all(
+                        singleGroup.members.map(async (memberId) => {
+                            const member = await User.findById(memberId);
+                            return {
+                                id: memberId,
+                                name: member ? member.name : 'Unknown',
+                                email: member ? member.email : '',
+                                profilePicture: member ? member.profilePicture : null
+                            };
+                        })
+                    );
 
-                return res.json({
-                    message: 'group fetched successfully',
-                    group: {
-                        ...singleGroup.toObject(),
-                        createdByName: groupCreatorName,
-                        membersWithNames: memberNames
-                    }
-                })
+                    return res.json({
+                        message: 'group fetched successfully',
+                        group: {
+                            ...singleGroup.toObject(),
+                            createdByName: groupCreatorName,
+                            membersWithNames: memberNames,
+                            isPrivateAndNotMember: false
+                        }
+                    });
+                }
 
             case 'getGroupPosts':
                 //get all posts in a specific group with privacy check
@@ -233,7 +264,7 @@ const handleGroupCommand = async (req, res) => {
 
                 //check if group is private and user is not a member
                 if (group.privacy === 'private' && !group.members.includes(data.userId)) {
-                    return res.json({ message: 'Permission denied: Private group access required' })
+                    return res.json({ message: 'group posts fetched successfully', posts: [] })
                 }
 
                 const groupPosts = await Post.find({ groupId: data.groupId })
@@ -255,6 +286,88 @@ const handleGroupCommand = async (req, res) => {
                     message: 'admin check completed',
                     isAdmin: isAdmin
                 })
+
+            case 'getJoinRequests':
+                //get all join requests for groups where user is admin
+                const userGroups = await Group.find({
+                    $or: [
+                        { createdBy: data.userId },
+                        { admins: data.userId }
+                    ]
+                }).populate('joinRequests', 'name email profilePicture');
+
+                const allJoinRequests = [];
+                userGroups.forEach(group => {
+                    if (group.joinRequests && group.joinRequests.length > 0) {
+                        group.joinRequests.forEach(user => {
+                            allJoinRequests.push({
+                                _id: user._id,
+                                id: user._id,
+                                name: user.name,
+                                email: user.email,
+                                profilePicture: user.profilePicture,
+                                groupId: group._id,
+                                groupName: group.name,
+                                message: `wants to join ${group.name}`
+                            });
+                        });
+                    }
+                });
+
+                return res.json({
+                    message: 'join requests retrieved successfully',
+                    joinRequests: allJoinRequests
+                });
+
+            case 'acceptJoinRequest':
+                //accept a join request - add user to group members
+                const acceptGroup = await Group.findByIdAndUpdate(
+                    data.groupId,
+                    {
+                        $pull: { joinRequests: data.requestUserId },
+                        $addToSet: { members: data.requestUserId }
+                    },
+                    { new: true }
+                );
+
+                if (!acceptGroup) {
+                    return res.json({ message: 'group not found' });
+                }
+
+                //add group to user's groups array
+                await User.findByIdAndUpdate(
+                    data.requestUserId,
+                    { $addToSet: { groups: data.groupId } },
+                    { new: true }
+                );
+
+                return res.json({ message: 'join request accepted successfully', group: acceptGroup });
+
+            case 'declineJoinRequest':
+                //decline a join request - remove from join requests
+                const declineGroup = await Group.findByIdAndUpdate(
+                    data.groupId,
+                    { $pull: { joinRequests: data.requestUserId } },
+                    { new: true }
+                );
+
+                if (!declineGroup) {
+                    return res.json({ message: 'group not found' });
+                }
+
+                return res.json({ message: 'join request declined successfully', group: declineGroup });
+
+            case 'checkJoinRequestStatus':
+                //check if user has pending join request for a group
+                const checkJoinRequestGroup = await Group.findOne({
+                    _id: data.groupId,
+                    joinRequests: data.userId
+                });
+
+                return res.json({
+                    message: 'join request status checked',
+                    hasPendingRequest: !!checkJoinRequestGroup
+                });
 
             //if command is not recognized
             default:

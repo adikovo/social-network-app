@@ -15,14 +15,20 @@ function NavBar() {
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [showRequestDropdown, setShowRequestDropdown] = useState(false);
     const [roomiesRequests, setRoomiesRequests] = useState([]);
+    const [groupJoinRequests, setGroupJoinRequests] = useState([]);
     const profileRef = useRef(null);
     const requestRef = useRef(null);
 
 
-    //fetch roomie requests when user is loaded
+    //fetch roomie requests and group join requests when user is loaded
     useEffect(() => {
         if (user) {
             fetchRoomiesRequests();
+            fetchGroupJoinRequests();
+        } else {
+            // Clear requests when user logs out
+            setRoomiesRequests([]);
+            setGroupJoinRequests([]);
         }
     }, [user]);
 
@@ -45,7 +51,15 @@ function NavBar() {
         };
     }, []);
 
+
     const handleLogout = () => {
+        // Clear all local state first
+        setRoomiesRequests([]);
+        setGroupJoinRequests([]);
+        setShowProfileDropdown(false);
+        setShowRequestDropdown(false);
+
+        // Then logout and navigate
         logout(); // This will clear localStorage and set user to null
         navigate('/login');
     };
@@ -74,6 +88,8 @@ function NavBar() {
     };
 
     const fetchRoomiesRequests = () => {
+        if (!user) return;
+
         axios.post('http://localhost:3001/api/users', {
             command: 'getFriendRequests',
             data: {
@@ -86,11 +102,38 @@ function NavBar() {
             })
             .catch(err => {
                 console.error('Friend requests error:', err);
-                alert('Failed to fetch friend requests');
+
+                if (user) {
+                    alert('Failed to fetch friend requests');
+                }
+            })
+    }
+
+    const fetchGroupJoinRequests = () => {
+        if (!user) return;
+
+        axios.post('http://localhost:3001/api/groups', {
+            command: 'getJoinRequests',
+            data: {
+                userId: user.id
+            }
+        })
+            .then(res => {
+                console.log('Group join requests response:', res.data);
+                setGroupJoinRequests(res.data.joinRequests);
+            })
+            .catch(err => {
+                console.error('Group join requests error:', err);
+                // Only show alert if user is still logged in
+                if (user) {
+                    alert('Failed to fetch group join requests');
+                }
             })
     }
 
     const handleAcceptRequest = (requestId) => {
+        if (!user) return;
+
         // TODO: Implement accept request logic
         axios.post('http://localhost:3001/api/users', {
             command: 'acceptFriendRequest',
@@ -113,9 +156,61 @@ function NavBar() {
     };
 
     const handleDeclineRequest = (requestId) => {
+        if (!user) return;
+
         // TODO: Implement decline request logic
         console.log('Decline request:', requestId);
         setShowRequestDropdown(false);
+    };
+
+    const handleAcceptGroupJoinRequest = (request) => {
+        if (!user) return;
+
+        axios.post('http://localhost:3001/api/groups', {
+            command: 'acceptJoinRequest',
+            data: {
+                userId: user.id,
+                groupId: request.groupId,
+                requestUserId: request.id
+            }
+        })
+            .then(res => {
+                console.log('Accept group join request response:', res.data);
+                alert('Group join request accepted successfully!');
+                setShowRequestDropdown(false);
+                //refresh both request lists
+                fetchRoomiesRequests();
+                fetchGroupJoinRequests();
+            })
+            .catch(err => {
+                console.error('Accept group join request error:', err);
+                alert('Failed to accept group join request');
+            })
+    };
+
+    const handleDeclineGroupJoinRequest = (request) => {
+        if (!user) return;
+
+        axios.post('http://localhost:3001/api/groups', {
+            command: 'declineJoinRequest',
+            data: {
+                userId: user.id,
+                groupId: request.groupId,
+                requestUserId: request.id
+            }
+        })
+            .then(res => {
+                console.log('Decline group join request response:', res.data);
+                alert('Group join request declined successfully!');
+                setShowRequestDropdown(false);
+                //refresh both request lists
+                fetchRoomiesRequests();
+                fetchGroupJoinRequests();
+            })
+            .catch(err => {
+                console.error('Decline group join request error:', err);
+                alert('Failed to decline group join request');
+            })
     };
 
     return (
@@ -182,7 +277,7 @@ function NavBar() {
                         onClick={() => setShowRequestDropdown(!showRequestDropdown)}
                     >
                         R
-                        <NotificationBadge count={roomiesRequests?.length || 0} />
+                        <NotificationBadge count={(roomiesRequests?.length || 0) + (groupJoinRequests?.length || 0)} />
                     </MyButton>
 
                     <DropdownMenu
@@ -191,25 +286,39 @@ function NavBar() {
                         width="280px"
                         maxHeight="400px"
                     >
-                        {!roomiesRequests || roomiesRequests.length === 0 ? (
+                        {(!roomiesRequests || roomiesRequests.length === 0) && (!groupJoinRequests || groupJoinRequests.length === 0) ? (
                             <div style={{
                                 padding: '1rem',
                                 textAlign: 'center',
                                 color: '#6b7280',
                                 fontSize: '14px'
                             }}>
-                                No roomie requests
+                                No requests
                             </div>
                         ) : (
-                            (roomiesRequests || []).map((request, index) => (
-                                <RoomieRequestCard
-                                    key={request._id || request.id}
-                                    request={request}
-                                    onAccept={handleAcceptRequest}
-                                    onDecline={handleDeclineRequest}
-                                    isLast={index === (roomiesRequests?.length || 0) - 1}
-                                />
-                            ))
+                            <>
+                                {/* Friend Requests */}
+                                {(roomiesRequests || []).map((request, index) => (
+                                    <RoomieRequestCard
+                                        key={`friend-${request._id || request.id}`}
+                                        request={request}
+                                        onAccept={handleAcceptRequest}
+                                        onDecline={handleDeclineRequest}
+                                        isLast={index === (roomiesRequests?.length || 0) - 1 && (!groupJoinRequests || groupJoinRequests.length === 0)}
+                                    />
+                                ))}
+
+                                {/* Group Join Requests */}
+                                {(groupJoinRequests || []).map((request, index) => (
+                                    <RoomieRequestCard
+                                        key={`group-${request._id || request.id}`}
+                                        request={request}
+                                        onAccept={() => handleAcceptGroupJoinRequest(request)}
+                                        onDecline={() => handleDeclineGroupJoinRequest(request)}
+                                        isLast={index === (groupJoinRequests?.length || 0) - 1}
+                                    />
+                                ))}
+                            </>
                         )}
                     </DropdownMenu>
                 </div>
