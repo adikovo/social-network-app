@@ -161,7 +161,8 @@ function GroupDetails() {
             axios.post('http://localhost:3001/api/groups', {
                 command: 'delete',
                 data: {
-                    groupId: groupId
+                    groupId: groupId,
+                    userId: user.id
                 }
             }).then(response => {
                 console.log('Group deleted successfully:', response.data);
@@ -169,7 +170,7 @@ function GroupDetails() {
                 navigate('/groups');
             }).catch(error => {
                 console.error('Error deleting group:', error);
-                alert('Failed to delete group: ' + (error.message));
+                alert('Failed to delete group: ' + (error.response?.data?.message || error.message));
             });
         }
     }

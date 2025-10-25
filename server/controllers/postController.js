@@ -68,14 +68,20 @@ const handlePostCommand = async (req, res) => {
                     return res.json({ message: 'post found & updated successfully', post: updatePost })
                 }
             case 'delete':
-                //find post by id and delete it
-                const deletePost = await (Post.findByIdAndDelete(data.postId))
-                if (!deletePost) {
+                //find post by id first to check if user is authorized to delete it
+                const postToDelete = await Post.findById(data.postId)
+                if (!postToDelete) {
                     return res.json({ message: 'post not found' })
                 }
-                else {
-                    return res.json({ message: 'post deleted successfully', post: deletePost })
+
+                //check if the user is the author of the post
+                if (postToDelete.authorId !== data.userId) {
+                    return res.status(403).json({ message: 'unauthorized: you can only delete your own posts' })
                 }
+
+                //delete the post if user is authorized
+                const deletePost = await Post.findByIdAndDelete(data.postId)
+                return res.json({ message: 'post deleted successfully', post: deletePost })
 
             case 'like':
                 //handle like or unlike

@@ -80,27 +80,15 @@ function MyCard({ type, data, onClick, button, compact = false, profilePictureSi
             case 'groups':
                 return (
                     <>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                             <div style={{ fontWeight: '500', color: '#1f2937' }}>
                                 {data.name}
                             </div>
-                            <MyButton
-                                variant='success'
-                                size='small'
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    // Handle join group logic here
-                                    //TODO add join handler
-                                    console.log('Join group:', data.name);
-                                }}
-                            >
-                                Join
-                            </MyButton>
                         </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
+                        <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px', lineHeight: '1.4' }}>
                             {data.description}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                        <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
                             {data.members ? data.members.length : 0} members • {data.privacy}
                         </div>
                     </>

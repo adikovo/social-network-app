@@ -32,7 +32,8 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
                     groupId: groupToEdit._id,
                     newName: name,
                     newDescription: description,
-                    newPrivacy: privacy
+                    newPrivacy: privacy,
+                    userId: userId
                 }
             };
 

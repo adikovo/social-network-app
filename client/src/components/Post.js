@@ -193,7 +193,8 @@ const Post = ({ post, onPostUpdated }) => {
         axios.post('http://localhost:3001/api/posts', {
             command: 'delete',
             data: {
-                postId: post._id
+                postId: post._id,
+                userId: user.id
             }
         })
             .then(res => {
@@ -205,6 +206,7 @@ const Post = ({ post, onPostUpdated }) => {
             })
             .catch(err => {
                 console.error('Delete post error:', err);
+                alert('Failed to delete post. You may not have permission to delete this post.');
             });
     };
 

@@ -81,7 +81,18 @@ const handleGroupCommand = async (req, res) => {
                 })
 
             case 'update':
-                //find group by id and update their details
+                //find group first to check if user is authorized to update it
+                const groupToUpdate = await Group.findById(data.groupId)
+                if (!groupToUpdate) {
+                    return res.json({ message: 'group not found' })
+                }
+
+                //check if the user is the creator or an admin of the group
+                if (groupToUpdate.createdBy !== data.userId && !groupToUpdate.admins.includes(data.userId)) {
+                    return res.status(403).json({ message: 'unauthorized: only group creators and admins can update groups' })
+                }
+
+                //update the group if user is authorized
                 const updateGroup = await Group.findByIdAndUpdate(
                     data.groupId,
                     {
@@ -93,22 +104,23 @@ const handleGroupCommand = async (req, res) => {
                     },
                     { new: true }
                 )
-                if (!updateGroup) {
-                    return res.json({ message: 'group not found' })
-                }
-                else {
-                    return res.json({ message: 'group found & updated successfully', group: updateGroup })
-                }
+                return res.json({ message: 'group found & updated successfully', group: updateGroup })
 
             case 'delete':
-                //find group by id and delete them
-                const deleteGroup = await (Group.findByIdAndDelete(data.groupId))
-                if (!deleteGroup) {
+                //find group first to check if user is authorized to delete it
+                const groupToDelete = await Group.findById(data.groupId)
+                if (!groupToDelete) {
                     return res.json({ message: 'group not found' })
                 }
-                else {
-                    return res.json({ message: 'group found & deleted successfully', group: deleteGroup })
+
+                //check if the user is the creator of the group
+                if (groupToDelete.createdBy !== data.userId) {
+                    return res.status(403).json({ message: 'unauthorized: only group creators can delete groups' })
                 }
+
+                //delete the group if user is authorized
+                const deleteGroup = await Group.findByIdAndDelete(data.groupId)
+                return res.json({ message: 'group found & deleted successfully', group: deleteGroup })
 
             //membership actions
 
@@ -168,6 +180,17 @@ const handleGroupCommand = async (req, res) => {
 
             //admin operations
             case 'addAdmin':
+                //find group first to check if requesting user is authorized
+                const groupToAddAdmin = await Group.findById(data.groupId)
+                if (!groupToAddAdmin) {
+                    return res.json({ message: 'group not found' })
+                }
+
+                //check if the requesting user is the creator or an admin
+                if (groupToAddAdmin.createdBy !== data.requestingUserId && !groupToAddAdmin.admins.includes(data.requestingUserId)) {
+                    return res.status(403).json({ message: 'unauthorized: only group creators and admins can add admins' })
+                }
+
                 //grant admin permissions to group member and ensure they're also a member
                 const addAdminGroup = await Group.findByIdAndUpdate(
                     data.groupId,
@@ -179,21 +202,26 @@ const handleGroupCommand = async (req, res) => {
                     },
                     { new: true }
                 )
-                if (!addAdminGroup) {
-                    return res.json({ message: 'group not found' })
-                }
                 return res.json({ message: 'admin added successfully', group: addAdminGroup })
 
             case 'removeAdmin':
+                //find group first to check if requesting user is authorized
+                const groupToRemoveAdmin = await Group.findById(data.groupId)
+                if (!groupToRemoveAdmin) {
+                    return res.json({ message: 'group not found' })
+                }
+
+                //check if the requesting user is the creator or an admin
+                if (groupToRemoveAdmin.createdBy !== data.requestingUserId && !groupToRemoveAdmin.admins.includes(data.requestingUserId)) {
+                    return res.status(403).json({ message: 'unauthorized: only group creators and admins can remove admins' })
+                }
+
                 //revoke admin permissions from group member
                 const removeAdminGroup = await Group.findByIdAndUpdate(
                     data.groupId,
                     { $pull: { admins: data.userId } },
                     { new: true }
                 )
-                if (!removeAdminGroup) {
-                    return res.json({ message: 'group not found' })
-                }
                 return res.json({ message: 'admin removed successfully', group: removeAdminGroup })
 
             case 'getGroup':
