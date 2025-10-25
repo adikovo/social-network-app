@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ThreeDotMenu from './ThreeDotMenu';
-import ClickableAuthor from './ClickableAuthor';
+import ClickableText from './ClickableText';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -117,10 +117,10 @@ const Comment = ({ comment, onEdit, onDelete, post }) => {
                         marginBottom: '2px',
                         textAlign: 'left'
                     }}>
-                        <ClickableAuthor
-                            authorId={comment.authorId}
-                            authorName={comment.authorName}
-                            author={comment.author}
+                        <ClickableText
+                            id={comment.authorId}
+                            text={comment.authorName || comment.author}
+                            type="author"
                             fallbackText="Unknown User"
                             fontSize="14px"
                             fontWeight="600"

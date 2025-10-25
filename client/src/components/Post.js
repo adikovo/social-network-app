@@ -3,7 +3,7 @@ import CommentInput from './CommentInput';
 import CommentsModel from './CommentsModel';
 import ThreeDotMenu from './ThreeDotMenu';
 import MyButton from './myButton';
-import ClickableAuthor from './ClickableAuthor';
+import ClickableText from './ClickableText';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -253,6 +253,33 @@ const Post = ({ post, onPostUpdated }) => {
                     {getInitials(currentPost.authorName || currentPost.author)}
                 </div>
                 <div style={{ flex: 1, textAlign: 'left' }}>
+                    {/*group name - if exist*/}
+                    {currentPost.groupName && (
+                        <div style={{
+                            display: 'inline-block',
+                            backgroundColor: '#f0f2f5',
+                            borderRadius: '16px',
+                            padding: '4px 8px',
+                            marginBottom: '4px',
+                            fontSize: '14px',
+                            color: '#65676b',
+                            fontWeight: '500'
+                        }}>
+                            <span style={{ marginRight: '4px' }}>👥</span>
+                            <ClickableText
+                                id={currentPost.groupId}
+                                text={currentPost.groupName}
+                                type="group"
+                                fallbackText="Unknown Group"
+                                fontSize="14px"
+                                fontWeight="500"
+                                color="#65676b"
+                                hoverColor="#1877f2"
+                            />
+                        </div>
+                    )}
+
+                    {/*author name*/}
                     <div style={{
                         fontWeight: '600',
                         fontSize: '16px',
@@ -260,27 +287,13 @@ const Post = ({ post, onPostUpdated }) => {
                         marginBottom: '2px',
                         textAlign: 'left'
                     }}>
-                        {currentPost.groupName && (
-                            <div style={{
-                                display: 'inline-block',
-                                backgroundColor: '#f0f2f5',
-                                borderRadius: '16px',
-                                padding: '4px 8px',
-                                marginBottom: '6px',
-                                fontSize: '14px',
-                                color: '#65676b',
-                                fontWeight: '500'
-                            }}>
-                                <span style={{ marginRight: '4px' }}>👥</span>
-                                {currentPost.groupName}
-                            </div>
-                        )}
-                        {!currentPost.groupName && <div style={{ marginBottom: '6px' }}></div>}
-                        <ClickableAuthor
-                            authorId={currentPost.authorId}
-                            authorName={currentPost.authorName}
-                            author={currentPost.author}
+                        <ClickableText
+                            id={currentPost.authorId}
+                            text={currentPost.authorName || currentPost.author}
+                            type="author"
                             fallbackText="Unknown User"
+                            fontSize="16px"
+                            fontWeight="600"
                             color="inherit"
                             hoverColor="#1877f2"
                         />

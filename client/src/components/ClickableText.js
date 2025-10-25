@@ -1,11 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function ClickableAuthor({
-    authorId,
-    authorName,
-    author,
-    fallbackText = 'Unknown User',
+function ClickableText({
+    id,
+    text,
+    fallbackText = 'Unknown',
+    // 'author', 'group'
+    type = 'author',
     fontSize = '16px',
     fontWeight = '600',
     color = 'inherit',
@@ -15,14 +16,26 @@ function ClickableAuthor({
 }) {
     const navigate = useNavigate();
 
-    const handleAuthorClick = () => {
-        if (authorId) {
-            navigate(`/profile/${authorId}`);
+    const handleClick = () => {
+        if (id) {
+            switch (type) {
+                case 'author':
+                    navigate(`/profile/${id}`);
+                    break;
+                case 'group':
+                    navigate(`/group/${id}`);
+                    break;
+                case 'hashtag':
+                    navigate(`/hashtag/${id}`);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
-    const displayName = authorName || author || fallbackText;
-    const isClickable = !!authorId;
+    const displayText = text || fallbackText;
+    const isClickable = !!id;
 
     const defaultStyle = {
         fontSize: fontSize,
@@ -38,7 +51,7 @@ function ClickableAuthor({
         <span
             className={className}
             style={defaultStyle}
-            onClick={handleAuthorClick}
+            onClick={handleClick}
             onMouseEnter={(e) => {
                 if (isClickable) {
                     e.target.style.textDecoration = 'underline';
@@ -52,9 +65,9 @@ function ClickableAuthor({
                 }
             }}
         >
-            {displayName}
+            {displayText}
         </span>
     );
 }
 
-export default ClickableAuthor;
+export default ClickableText;
