@@ -15,6 +15,7 @@ const handlePostCommand = async (req, res) => {
                     authorId: data.authorId,
                     authorProfilePicture: data.authorProfilePicture,
                     groupId: data.groupId,
+                    images: data.images || [],
                     likes: 0,
                     comments: []
                 })
@@ -209,4 +210,54 @@ const handlePostCommand = async (req, res) => {
     }
 }
 
-module.exports = { handlePostCommand }
+// Handle image upload for posts
+const uploadPostImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No image file provided'
+            });
+        }
+
+        if (!req.body.userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required'
+            });
+        }
+
+        // Get the uploaded file information
+        const uploadedFile = req.file;
+        const imageUrl = `/uploads/${uploadedFile.filename}`;
+
+        console.log('Image uploaded successfully:', {
+            originalName: uploadedFile.originalname,
+            filename: uploadedFile.filename,
+            size: uploadedFile.size,
+            mimetype: uploadedFile.mimetype,
+            imageUrl: imageUrl,
+            userId: req.body.userId,
+            groupId: req.body.groupId || null
+        });
+
+        // Return success response with image URL
+        res.json({
+            success: true,
+            message: 'Image uploaded successfully',
+            imageUrl: imageUrl,
+            filename: uploadedFile.filename,
+            size: uploadedFile.size,
+            mimetype: uploadedFile.mimetype
+        });
+
+    } catch (error) {
+        console.error('Image upload error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to upload image: ' + error.message
+        });
+    }
+};
+
+module.exports = { handlePostCommand, uploadPostImage }

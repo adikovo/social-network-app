@@ -141,6 +141,7 @@ function GroupDetails() {
         setGroupPosts(prevPosts => [newPost, ...prevPosts]);
     };
 
+
     const handlePostUpdated = (deletedPostId, updatedPost) => {
         if (deletedPostId) {
             //remove the deleted post from arrray
@@ -282,7 +283,10 @@ function GroupDetails() {
 
                 {/* show create post for members only - hide when showing members */}
                 {isMember && !showMembers && (
-                    <CreatePost onPostCreated={handlePostCreated} groupId={groupId} />
+                    <CreatePost
+                        onPostCreated={handlePostCreated}
+                        groupId={groupId}
+                    />
                 )}
 
                 {/* show members list or posts based on state */}

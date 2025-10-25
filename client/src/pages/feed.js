@@ -85,6 +85,7 @@ function Feed() {
         }
     };
 
+
     // Show loading while checking for stored user
     if (isLoading) {
         return <div>Loading...</div>;

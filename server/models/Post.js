@@ -8,6 +8,7 @@ const postSchema = new mongoose.Schema({
     authorId: String,
     authorProfilePicture: String,
     groupId: String,
+    images: [String],
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
     likedBy: [String],

@@ -1,8 +1,36 @@
 import React, { useState } from 'react';
 import ExtraInput from './ExtraInput';
 
-const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment...", onImageClick, onVideoClick }) => {
+const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment..." }) => {
     const [commentText, setCommentText] = useState('');
+
+    const handleImageClick = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // TODO: Implement actual image upload logic for comments
+                console.log('Uploading image for comment:', file);
+            }
+        };
+        input.click();
+    };
+
+    const handleVideoClick = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'video/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // TODO: Implement actual video upload logic for comments
+                console.log('Uploading video for comment:', file);
+            }
+        };
+        input.click();
+    };
 
     const handleSubmit = () => {
         if (commentText.trim()) {
@@ -64,8 +92,8 @@ const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment...", 
             }}>
                 {/* left side - attachment and formatting icons */}
                 <ExtraInput
-                    onImageClick={onImageClick}
-                    onVideoClick={onVideoClick}
+                    onImageClick={handleImageClick}
+                    onVideoClick={handleVideoClick}
                 />
 
                 {/* right side - action buttons */}

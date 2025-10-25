@@ -160,6 +160,7 @@ const Post = ({ post, onPostUpdated }) => {
     };
 
 
+
     const handleEditPost = () => {
         setIsEditing(true);
         setEditText(post.content || '');
@@ -296,50 +297,20 @@ const Post = ({ post, onPostUpdated }) => {
                         gap: '12px',
                         marginTop: '12px'
                     }}>
-                        <button
+                        <MyButton
                             onClick={handleSaveEdit}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                padding: '8px 16px',
-                                backgroundColor: '#333',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#555'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = '#333'}
+                            variant="primary"
                         >
                             <span>✓</span>
                             Save
-                        </button>
-                        <button
+                        </MyButton>
+                        <MyButton
                             onClick={handleCancelEdit}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                padding: '8px 16px',
-                                backgroundColor: 'white',
-                                color: '#666',
-                                border: '1px solid #e0e0e0',
-                                borderRadius: '6px',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                cursor: 'pointer',
-                                transition: 'background-color 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                            variant="secondary"
                         >
                             <span>✕</span>
                             Cancel
-                        </button>
+                        </MyButton>
                     </div>
                 </div>
             ) : (
