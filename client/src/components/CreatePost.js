@@ -4,8 +4,9 @@ import { useUserContext } from '../context/UserContext';
 import ProfilePicture from './ProfilePicture';
 import MyAlert from './MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
+import ExtraInput from './ExtraInput';
 
-const CreatePost = ({ onPostCreated, groupId = null }) => {
+const CreatePost = ({ onPostCreated, groupId = null, onImageClick, onVideoClick }) => {
     const { user } = useUserContext();
     const [postText, setPostText] = useState('');
     const { alert, showSuccess, showError, hideAlert } = useMyAlert();
@@ -126,6 +127,18 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
                 >
                     Post
                 </button>
+            </div>
+
+            {/* Extra Input Options */}
+            <div style={{
+                marginTop: '12px',
+                paddingTop: '12px',
+                borderTop: '1px solid #e9ecef'
+            }}>
+                <ExtraInput
+                    onImageClick={onImageClick}
+                    onVideoClick={onVideoClick}
+                />
             </div>
 
             {/* MyAlert Component */}

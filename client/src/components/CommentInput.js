@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import ExtraInput from './ExtraInput';
 
-const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment..." }) => {
+const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment...", onImageClick, onVideoClick }) => {
     const [commentText, setCommentText] = useState('');
 
     const handleSubmit = () => {
@@ -62,70 +63,10 @@ const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment..." }
                 alignItems: 'center'
             }}>
                 {/* left side - attachment and formatting icons */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px'
-                }}>
-                    {/* image/media icon */}
-                    <button
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '4px',
-                            borderRadius: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#6c757d',
-                            fontSize: '18px'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                        title="Attach image"
-                    >
-                        🖼️
-                    </button>
-
-                    {/* GIF button */}
-                    <button
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            color: '#6c757d',
-                            fontSize: '14px',
-                            fontWeight: '500'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                        title="Add GIF"
-                    >
-                        GIF
-                    </button>
-
-                    {/* text formatting button */}
-                    <button
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            color: '#6c757d',
-                            fontSize: '14px',
-                            fontWeight: 'bold'
-                        }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-                        title="Text formatting"
-                    >
-                        Aa
-                    </button>
-                </div>
+                <ExtraInput
+                    onImageClick={onImageClick}
+                    onVideoClick={onVideoClick}
+                />
 
                 {/* right side - action buttons */}
                 <div style={{
