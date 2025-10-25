@@ -13,6 +13,7 @@ const handlePostCommand = async (req, res) => {
                     content: data.content,
                     author: data.author,
                     authorId: data.authorId,
+                    authorProfilePicture: data.authorProfilePicture,
                     groupId: data.groupId,
                     likes: 0,
                     comments: []
@@ -121,6 +122,7 @@ const handlePostCommand = async (req, res) => {
                     content: data.commentText,
                     author: data.author,
                     authorId: data.userId,
+                    authorProfilePicture: data.authorProfilePicture,
                     createdAt: new Date()
                 };
 

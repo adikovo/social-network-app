@@ -13,6 +13,7 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
                 content: postText.trim(),
                 author: user?.username || user?.name || 'You',
                 authorId: user?.id,
+                authorProfilePicture: user?.profilePicture,
             };
 
             if (groupId) {

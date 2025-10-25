@@ -6,6 +6,7 @@ const postSchema = new mongoose.Schema({
     content: String,
     author: String,
     authorId: String,
+    authorProfilePicture: String,
     groupId: String,
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },

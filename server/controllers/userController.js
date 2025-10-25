@@ -209,7 +209,8 @@ const handleUserCommand = async (req, res) => {
                         role: getUser.role,
                         friends: getUser.friends,
                         groups: getUser.groups,
-                        bio: getUser.bio
+                        bio: getUser.bio,
+                        profilePicture: getUser.profilePicture
                     }
                 })
 
@@ -262,6 +263,29 @@ const handleUserCommand = async (req, res) => {
                     message: 'received request check completed',
                     hasReceivedRequest: hasReceivedRequest
                 })
+
+            case 'uploadProfilePicture':
+                const { userId, pictureUrl } = data;
+                const updatedUser = await User.findByIdAndUpdate(
+                    userId,
+                    { profilePicture: pictureUrl },
+                    { new: true });
+                res.json({ success: true, user: updatedUser })
+
+            case 'deleteProfilePicture':
+                const deleteUserPicture = await User.findByIdAndUpdate(
+                    data.userId,
+                    { profilePicture: null },
+                    { new: true }
+                );
+                if (!deleteUser) {
+                    return res.json({ success: false, message: 'User not found' });
+                }
+                return res.json({
+                    success: true,
+                    message: 'Profile picture deleted successfully',
+                    user: deleteUserPicture
+                });
 
             //if command is not recognized
             default:

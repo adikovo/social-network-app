@@ -7,6 +7,8 @@ import MyButton from '../components/myButton';
 import MyCard from '../components/MyCard';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
+import ProfilePicture from '../components/ProfilePicture';
+import ThreeDotMenu from '../components/ThreeDotMenu';
 import { useUserContext } from '../context/UserContext';
 
 
@@ -316,7 +318,83 @@ function Profile() {
             })
     }
 
-    // Show loading while checking for stored user
+    const handleProfilePictureChange = async (file) => {
+        try {
+            //create a preview URL for immediate display
+            const previewUrl = URL.createObjectURL(file);
+
+            //create FormData to send the file to server
+            const formData = new FormData();
+            formData.append('userId', currentUser.id);
+            formData.append('profilePicture', file);
+
+            const res = await axios.post('http://localhost:3001/api/users/upload-profile-picture', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            console.log('Profile picture upload response:', res.data);
+
+            //update the profile user state with the new picture
+            if (res.data.success && res.data.user) {
+                setProfileUser(prevUser => ({
+                    ...prevUser,
+                    profilePicture: res.data.user.profilePicture
+                }));
+                alert('Profile picture updated successfully!');
+            }
+        } catch (error) {
+            console.error('Profile picture upload error:', error);
+            alert('Failed to update profile picture');
+        }
+    }
+
+    const handleDeleteProfilePicture = async () => {
+        if (!window.confirm('Are you sure you want to delete your profile picture?')) {
+            return;
+        }
+
+        try {
+            const res = await axios.post('http://localhost:3001/api/users', {
+                command: 'deleteProfilePicture',
+                data: {
+                    userId: currentUser.id
+                }
+            });
+
+            console.log('Profile picture delete response:', res.data);
+
+            if (res.data.success) {
+                setProfileUser(prevUser => ({
+                    ...prevUser,
+                    profilePicture: null
+                }));
+                alert('Profile picture deleted successfully!');
+            }
+        } catch (error) {
+            console.error('Profile picture delete error:', error);
+            alert('Failed to delete profile picture');
+        }
+    }
+
+    const handleMenuClick = (item) => {
+        switch (item.id) {
+            case 'editBio':
+                setIsEditingBio(!isEditingBio);
+                break;
+            case 'deleteProfilePicture':
+                handleDeleteProfilePicture();
+                break;
+            case 'deleteAccount':
+                handleDeleteUser();
+                break;
+            default:
+                console.log('Unknown menu item:', item.id);
+        }
+    }
+
+    //show loading while checking for stored user
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -330,7 +408,49 @@ function Profile() {
                 padding: '20px',
                 marginTop: '100px'
             }}>
-                <h1>{profileUser ? `${profileUser.name}'s Profile` : 'Profile'}</h1>
+                {/* Profile Header with Picture, Name, and Options Menu */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '20px'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <ProfilePicture
+                            currentImage={profileUser?.profilePicture}
+                            onImageChange={handleProfilePictureChange}
+                            size="large"
+                            editMode={isOwnProfile}
+                            userId={profileUser?.id}
+                        />
+                        <h1 style={{ marginTop: 0, marginRight: 0, marginBottom: 0, marginLeft: '25px' }}>
+                            {profileUser ? `${profileUser.name}'s Profile` : 'Profile'}
+                        </h1>
+                    </div>
+
+                    {/* Profile Options Menu - only show when viewing own profile */}
+                    {isOwnProfile && (
+                        <ThreeDotMenu
+                            menuItems={[
+                                {
+                                    id: 'editBio',
+                                    label: 'Edit Bio'
+                                },
+                                {
+                                    id: 'deleteProfilePicture',
+                                    label: 'Delete Profile Picture',
+                                    danger: true
+                                },
+                                {
+                                    id: 'deleteAccount',
+                                    label: 'Delete Account',
+                                    danger: true
+                                }
+                            ]}
+                            onItemClick={handleMenuClick}
+                        />
+                    )}
+                </div>
                 <div className="mb-3">
                     {/*add roomie button only show if viewing someone else profile */}
                     {!isOwnProfile && currentUser && !isAlreadyFriend && (
@@ -378,7 +498,6 @@ function Profile() {
                         Bio
                     </MyButton>
 
-
                     {/*my roomies button only show if viewing own profile */}
                     {isOwnProfile && (
                         <MyButton
@@ -390,22 +509,7 @@ function Profile() {
                         </MyButton>
                     )}
 
-
-
-
-
-
-                    {/*delete account button only show if viewing own profile */}
-                    {isOwnProfile && (
-                        <MyButton
-                            variant='danger'
-                            onClick={handleDeleteUser}
-                        >
-                            Delete account
-                        </MyButton>
-                    )}
                 </div>
-
 
                 {/*friends list */}
                 {currentMode === 'friends' && friends.length > 0 && (
@@ -445,15 +549,27 @@ function Profile() {
                 {/*bio section - always show */}
                 {currentMode === 'bio' && <div className="mt-4">
                     <div>
-                        {/*edit bio button only show if viewing own profile */}
-                        {isOwnProfile && (
-                            <MyButton
-                                variant='outline-primary'
-                                onClick={() => setIsEditingBio(!isEditingBio)}
-                                style={{ marginRight: '10px' }}
-                            >
-                                {isEditingBio ? 'Cancel' : 'Edit Bio'}
-                            </MyButton>
+                        {/*bio form buttons */}
+                        {isEditingBio && (
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                marginBottom: '15px',
+                                gap: '10px'
+                            }}>
+                                <MyButton
+                                    variant='secondary'
+                                    onClick={() => setIsEditingBio(false)}
+                                >
+                                    Cancel
+                                </MyButton>
+                                <MyButton
+                                    variant='success'
+                                    onClick={handleUpdateBio}
+                                >
+                                    Save Bio
+                                </MyButton>
+                            </div>
                         )}
 
                         <BioForm
@@ -462,16 +578,6 @@ function Profile() {
                             isEditing={isEditingBio}
                             showTitle={false}
                         />
-                        {/*save bio button - show only when editing bio*/}
-                        {isEditingBio && (
-                            <div className="mt-3">
-                                <button
-                                    className="btn btn-success"
-                                    onClick={handleUpdateBio}>
-                                    Save Bio
-                                </button>
-                            </div>
-                        )}
                     </div>
                 </div>}
                 <br />

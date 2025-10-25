@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema({
     groups: Array,
     pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     receivedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    profilePicture: {
+        type: String,
+        default: '/images/default-avatar.png'
+    },
     // Bio fields for roommates application
     bio: {
         age: Number,

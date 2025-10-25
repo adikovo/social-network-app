@@ -1,5 +1,6 @@
 import React from 'react';
 import MyButton from './myButton';
+import UserInfo from './UserInfo';
 
 
 //dynamic card component for displaying different types of search results
@@ -29,14 +30,17 @@ function MyCard({ type, data, onClick, button }) {
                 return (
                     <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <div>
-                                <div style={{ fontWeight: '500', color: '#1f2937' }}>
-                                    {data.name}
-                                </div>
-                                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
+                            <div style={{ flex: 1 }}>
+                                <UserInfo
+                                    userId={data._id}
+                                    userName={data.name}
+                                    profilePicture={data.profilePicture}
+                                    size="small"
+                                />
+                                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', marginLeft: '52px' }}>
                                     {data.email}
                                 </div>
-                                <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                <div style={{ fontSize: '12px', color: '#6b7280', marginLeft: '52px' }}>
                                     Roomies: {data.friends ? data.friends.length : 0}
                                 </div>
                             </div>
@@ -52,14 +56,26 @@ function MyCard({ type, data, onClick, button }) {
             case 'posts':
                 return (
                     <>
-                        <div style={{ fontWeight: '500', color: '#1f2937', marginBottom: '4px' }}>
+                        <div style={{ marginBottom: '8px' }}>
+                            <UserInfo
+                                userId={data.authorId}
+                                userName={data.authorName || data.author}
+                                profilePicture={data.authorProfilePicture}
+                                size="small"
+                                date={new Date(data.createdAt).toLocaleDateString()}
+                            />
+                        </div>
+                        <div style={{
+                            fontWeight: '500',
+                            color: '#1f2937',
+                            marginBottom: '4px',
+                            textAlign: 'center',
+                            lineHeight: '1.4'
+                        }}>
                             {data.content.length > 100 ? `${data.content.substring(0, 100)}...` : data.content}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                            By: {data.author}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
-                            {new Date(data.createdAt).toLocaleDateString()} • {data.likes} likes
+                        <div style={{ fontSize: '12px', color: '#6b7280', textAlign: 'center' }}>
+                            {data.likes} likes
                         </div>
                     </>
                 );

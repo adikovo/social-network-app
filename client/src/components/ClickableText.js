@@ -8,8 +8,8 @@ function ClickableText({
     // 'author', 'group'
     type = 'author',
     fontSize = '16px',
-    fontWeight = '600',
-    color = 'inherit',
+    fontWeight = 'bold',
+    color = '#666',
     hoverColor = '#1877f2',
     style = {},
     className = ''

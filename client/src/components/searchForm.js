@@ -31,16 +31,20 @@ function SearchForm({
             {/*field select */}
             {searchFields.length > 1 && (
                 <div style={{ marginBottom: '10px' }}>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                    <label htmlFor="searchField" style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
                         Search by:
                     </label>
-                    <select value={selectedField} onChange={(e) => setSelectedField(e.target.value)} style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                    }}
+                    <select
+                        id="searchField"
+                        value={selectedField}
+                        onChange={(e) => setSelectedField(e.target.value)}
+                        style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '6px',
+                            fontSize: '14px',
+                        }}
                     >
                         {searchFields.map(field => (
                             <option key={field} value={field}>
@@ -53,10 +57,14 @@ function SearchForm({
 
             {/*search input*/}
             <div style={{ marginBottom: '10px' }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
+                <label htmlFor="searchInput" style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>
                     Search {searchType} by {selectedField}
                 </label>
-                <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+                <input
+                    id="searchInput"
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder={placeholder || `Enter ${searchType}...`}
                     style={{
                         width: '100%',

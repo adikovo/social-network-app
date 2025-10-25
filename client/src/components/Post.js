@@ -3,7 +3,7 @@ import CommentInput from './CommentInput';
 import CommentsModel from './CommentsModel';
 import ThreeDotMenu from './ThreeDotMenu';
 import MyButton from './myButton';
-import ClickableText from './ClickableText';
+import UserInfo from './UserInfo';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -66,7 +66,8 @@ const Post = ({ post, onPostUpdated }) => {
                 postId: currentPost._id,
                 commentText: commentText,
                 author: user?.username || user?.name || 'You',
-                userId: user.id
+                userId: user.id,
+                authorProfilePicture: user?.profilePicture
             }
         })
             .then(res => {
@@ -215,10 +216,6 @@ const Post = ({ post, onPostUpdated }) => {
         return date.toISOString().split('T')[0];
     };
 
-    const getInitials = (name) => {
-        if (!name) return '?';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
-    };
 
     return (
         <div style={{
@@ -234,79 +231,19 @@ const Post = ({ post, onPostUpdated }) => {
             <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
+                justifyContent: 'space-between',
                 marginBottom: '16px'
             }}>
-                <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    backgroundColor: '#e0e0e0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    color: '#666',
-                    fontSize: '16px',
-                    marginRight: '12px',
-                    flexShrink: 0
-                }}>
-                    {getInitials(currentPost.authorName || currentPost.author)}
-                </div>
-                <div style={{ flex: 1, textAlign: 'left' }}>
-                    {/*group name - if exist*/}
-                    {currentPost.groupName && (
-                        <div style={{
-                            display: 'inline-block',
-                            backgroundColor: '#f0f2f5',
-                            borderRadius: '16px',
-                            padding: '4px 8px',
-                            marginBottom: '4px',
-                            fontSize: '14px',
-                            color: '#65676b',
-                            fontWeight: '500'
-                        }}>
-                            <span style={{ marginRight: '4px' }}>👥</span>
-                            <ClickableText
-                                id={currentPost.groupId}
-                                text={currentPost.groupName}
-                                type="group"
-                                fallbackText="Unknown Group"
-                                fontSize="14px"
-                                fontWeight="500"
-                                color="#65676b"
-                                hoverColor="#1877f2"
-                            />
-                        </div>
-                    )}
-
-                    {/*author name*/}
-                    <div style={{
-                        fontWeight: '600',
-                        fontSize: '16px',
-                        color: '#333',
-                        marginBottom: '2px',
-                        textAlign: 'left'
-                    }}>
-                        <ClickableText
-                            id={currentPost.authorId}
-                            text={currentPost.authorName || currentPost.author}
-                            type="author"
-                            fallbackText="Unknown User"
-                            fontSize="16px"
-                            fontWeight="600"
-                            color="inherit"
-                            hoverColor="#1877f2"
-                        />
-                    </div>
-                    <div style={{
-                        fontSize: '14px',
-                        color: '#666',
-                        fontWeight: '400',
-                        textAlign: 'left'
-                    }}>
-                        {formatDate(currentPost.createdAt)}
-                    </div>
-                </div>
+                <UserInfo
+                    userId={currentPost.authorId}
+                    userName={currentPost.authorName || currentPost.author}
+                    profilePicture={currentPost.authorProfilePicture}
+                    size="small"
+                    showGroupName={!!currentPost.groupName}
+                    groupName={currentPost.groupName}
+                    groupId={currentPost.groupId}
+                    date={formatDate(currentPost.createdAt)}
+                />
 
                 {/*3 dot menu button - only show if user is author */}
                 {isAuthor && (

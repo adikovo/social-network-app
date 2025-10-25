@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ThreeDotMenu from './ThreeDotMenu';
-import ClickableText from './ClickableText';
+import UserInfo from './UserInfo';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -93,49 +93,13 @@ const Comment = ({ comment, onEdit, onDelete, post }) => {
                 alignItems: 'center',
                 marginBottom: '8px'
             }}>
-                <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: '#e0e0e0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    color: '#666',
-                    fontSize: '14px',
-                    marginRight: '12px',
-                    flexShrink: 0
-                }}>
-                    {comment.author ? comment.author[0].toUpperCase() : '?'}
-                </div>
-                <div style={{ flex: 1, textAlign: 'left' }}>
-                    <div style={{
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#333',
-                        marginBottom: '2px',
-                        textAlign: 'left'
-                    }}>
-                        <ClickableText
-                            id={comment.authorId}
-                            text={comment.authorName || comment.author}
-                            type="author"
-                            fallbackText="Unknown User"
-                            fontSize="14px"
-                            fontWeight="600"
-                            color="#333"
-                            hoverColor="#1877f2"
-                        />
-                    </div>
-                    <div style={{
-                        fontSize: '12px',
-                        color: '#666',
-                        textAlign: 'left'
-                    }}>
-                        {comment.createdAt ? formatDate(comment.createdAt) : 'Unknown date'}
-                    </div>
-                </div>
+                <UserInfo
+                    userId={comment.authorId}
+                    userName={comment.authorName || comment.author}
+                    profilePicture={comment.authorProfilePicture}
+                    size="small"
+                    date={comment.createdAt ? formatDate(comment.createdAt) : 'Unknown date'}
+                />
 
                 {/* 3 dot menu - show if user is author or group admin when comment in  its group */}
                 {canManageComment && (

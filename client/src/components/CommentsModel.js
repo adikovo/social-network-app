@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CommentInput from './CommentInput';
 import Comment from './Comment';
+import UserInfo from './UserInfo';
 
 const CommentsModel = ({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, onCommentDelete }) => {
     const [showCommentInput, setShowCommentInput] = useState(false);
@@ -22,10 +23,6 @@ const CommentsModel = ({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, 
         return date.toISOString().split('T')[0];
     };
 
-    const getInitials = (name) => {
-        if (!name) return '?';
-        return name.split(' ').map(n => n[0]).join('').toUpperCase();
-    };
 
     return (
         <div style={{
@@ -103,42 +100,15 @@ const CommentsModel = ({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, 
                         marginBottom: '20px'
                     }}>
                         <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
                             marginBottom: '12px'
                         }}>
-                            <div style={{
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '50%',
-                                backgroundColor: '#e0e0e0',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontWeight: 'bold',
-                                color: '#666',
-                                fontSize: '16px',
-                                marginRight: '12px',
-                                flexShrink: 0
-                            }}>
-                                {getInitials(post.authorName || post.author)}
-                            </div>
-                            <div>
-                                <div style={{
-                                    fontSize: '16px',
-                                    fontWeight: '600',
-                                    color: '#333',
-                                    marginBottom: '2px'
-                                }}>
-                                    {post.authorName || post.author || 'Unknown User'}
-                                </div>
-                                <div style={{
-                                    fontSize: '14px',
-                                    color: '#666'
-                                }}>
-                                    {formatDate(post.createdAt)}
-                                </div>
-                            </div>
+                            <UserInfo
+                                userId={post.authorId}
+                                userName={post.authorName || post.author}
+                                profilePicture={post.authorProfilePicture}
+                                size="small"
+                                date={formatDate(post.createdAt)}
+                            />
                         </div>
                         <div style={{
                             fontSize: '16px',
