@@ -4,7 +4,7 @@ import UserInfo from './UserInfo';
 
 
 //dynamic card component for displaying different types of search results
-function MyCard({ type, data, onClick, button, compact = false }) {
+function MyCard({ type, data, onClick, button, compact = false, profilePictureSize = "medium" }) {
     const itemStyle = {
         padding: '12px',
         backgroundColor: 'white',
@@ -36,7 +36,7 @@ function MyCard({ type, data, onClick, button, compact = false }) {
                                     userId={data._id}
                                     userName={data.name}
                                     profilePicture={data.profilePicture}
-                                    size="medium"
+                                    size={profilePictureSize}
                                     email={data.email}
                                     roomiesCount={data.friends ? data.friends.length : 0}
                                 />

@@ -9,7 +9,7 @@ import CreateGroupForm from '../components/createGroupForm';
 import GroupInfo from '../components/GroupInfo';
 import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
-import UserInfo from '../components/UserInfo';
+import FriendsList from '../components/FriendsList';
 import { useUserContext } from '../context/UserContext';
 
 function GroupDetails() {
@@ -20,7 +20,7 @@ function GroupDetails() {
 
     const [group, setGroup] = useState(null);
     const [showEditForm, setShowEditForm] = useState(false);
-    const [showMembersModal, setShowMembersModal] = useState(false);
+    const [showMembers, setShowMembers] = useState(false);
     const [groupPosts, setGroupPosts] = useState([]);
 
     // Redirect to login if not authenticated
@@ -193,8 +193,8 @@ function GroupDetails() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                         <h1 style={{ margin: 0 }}>{group?.name || 'Loading...'}</h1>
                         {group && (
-                            <MyButton onClick={() => setShowMembersModal(true)}>
-                                View Members ({group.members ? group.members.length : 0})
+                            <MyButton onClick={() => setShowMembers(!showMembers)}>
+                                {showMembers ? 'Hide Members' : `View Members (${group.members ? group.members.length : 0})`}
                             </MyButton>
                         )}
                     </div>
@@ -231,33 +231,53 @@ function GroupDetails() {
                 )}
                 {group && <GroupInfo group={group} />}
 
-                {/* show create post for members only */}
-                {isMember && (
+                {/* show create post for members only - hide when showing members */}
+                {isMember && !showMembers && (
                     <CreatePost onPostCreated={handlePostCreated} groupId={groupId} />
                 )}
 
-                {/*show posts based on group privacy */}
-                {(group?.privacy === 'public' || isMember) && (
+                {/* show members list or posts based on state */}
+                {showMembers ? (
                     <div style={{ marginTop: '20px' }}>
-                        {groupPosts.length > 0 ? (
-                            groupPosts.map((post) => (
-                                <Post
-                                    key={post._id}
-                                    post={post}
-                                    onPostUpdated={handlePostUpdated}
-                                />
-                            ))
-                        ) : (
-                            <div style={{
-                                textAlign: 'center',
-                                padding: '40px',
-                                color: '#666'
-                            }}>
-                                <p>No posts in this group yet.</p>
-                                {isMember && <p>Be the first to share something!</p>}
-                            </div>
-                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                            <MyButton
+                                variant='secondary'
+                                onClick={() => setShowMembers(false)}
+                                style={{ marginRight: '15px' }}
+                            >
+                                ← Back to Feed
+                            </MyButton>
+                        </div>
+                        <FriendsList
+                            type="groupMembers"
+                            groupId={groupId}
+                            showInModal={false}
+                        />
                     </div>
+                ) : (
+                    /*show posts based on group privacy */
+                    (group?.privacy === 'public' || isMember) && (
+                        <div style={{ marginTop: '20px' }}>
+                            {groupPosts.length > 0 ? (
+                                groupPosts.map((post) => (
+                                    <Post
+                                        key={post._id}
+                                        post={post}
+                                        onPostUpdated={handlePostUpdated}
+                                    />
+                                ))
+                            ) : (
+                                <div style={{
+                                    textAlign: 'center',
+                                    padding: '40px',
+                                    color: '#666'
+                                }}>
+                                    <p>No posts in this group yet.</p>
+                                    {isMember && <p>Be the first to share something!</p>}
+                                </div>
+                            )}
+                        </div>
+                    )
                 )}
             </div>
 
@@ -271,87 +291,6 @@ function GroupDetails() {
                 groupToEdit={group}
             />
 
-            {/* Members Modal TODO: change itttt!!! */}
-            {showMembersModal && (
-                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Group Members</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setShowMembersModal(false)}
-                                ></button>
-                            </div>
-                            <div className="modal-body">
-                                {group?.membersWithNames && group.membersWithNames.length > 0 ? (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                        {group.membersWithNames.map((member, index) => (
-                                            <div key={member.id || index} style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                padding: '12px',
-                                                backgroundColor: '#f8f9fa',
-                                                borderRadius: '8px',
-                                                border: '1px solid #e9ecef'
-                                            }}>
-                                                <div style={{ flex: 1 }}>
-                                                    <UserInfo
-                                                        userId={member.id}
-                                                        userName={member.name}
-                                                        profilePicture={member.profilePicture}
-                                                        size="small"
-                                                        email={member.email}
-                                                    />
-                                                </div>
-                                                <div style={{ display: 'flex', gap: '8px' }}>
-                                                    {member.id === group.createdBy && (
-                                                        <span style={{
-                                                            backgroundColor: '#007bff',
-                                                            color: 'white',
-                                                            padding: '4px 8px',
-                                                            borderRadius: '12px',
-                                                            fontSize: '12px',
-                                                            fontWeight: '500'
-                                                        }}>
-                                                            Creator
-                                                        </span>
-                                                    )}
-                                                    {group.admins?.includes(member.id) && member.id !== group.createdBy && (
-                                                        <span style={{
-                                                            backgroundColor: '#6c757d',
-                                                            color: 'white',
-                                                            padding: '4px 8px',
-                                                            borderRadius: '12px',
-                                                            fontSize: '12px',
-                                                            fontWeight: '500'
-                                                        }}>
-                                                            Admin
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p>No members found.</p>
-                                )}
-                            </div>
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    onClick={() => setShowMembersModal(false)}
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     )
 

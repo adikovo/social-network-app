@@ -4,11 +4,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import BioForm from '../components/BioForm';
 import MyButton from '../components/myButton';
-import MyCard from '../components/MyCard';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/searchSideBar';
 import ProfilePicture from '../components/ProfilePicture';
 import ThreeDotMenu from '../components/ThreeDotMenu';
+import FriendsList from '../components/FriendsList';
 import { useUserContext } from '../context/UserContext';
 
 
@@ -18,7 +18,6 @@ function Profile() {
     const userId = useParams().userId;
     //current user from context
     const { user: currentUser, isLoading } = useUserContext();
-    const [friends, setFriends] = useState([]);
     const [currentMode, setCurrentMode] = useState('bio');
     const [userBio, setUserBio] = useState({});
     const [isEditingBio, setIsEditingBio] = useState(false);
@@ -112,24 +111,6 @@ function Profile() {
             });
     }
 
-    function handleGetFriends() {
-
-        setCurrentMode('friends');
-
-        axios.post('http://localhost:3001/api/users', {
-            command: 'getFriends',
-            data: {
-                userId: userId
-            }
-        })
-            .then(res => {
-                console.log('Friends response:', res.data);
-                setFriends(res.data.friends);
-            })
-            .catch(err => {
-                console.error('Friends error:', err);
-            })
-    }
 
     function handleDeleteUser() {
 
@@ -297,26 +278,6 @@ function Profile() {
             })
     }
 
-    function handleRemoveFriend(friendId) {
-
-        axios.post('http://localhost:3001/api/users', {
-            command: 'removeFriend',
-            data: {
-                userId: currentUser.id,
-                friendId: friendId
-            }
-        })
-            .then(res => {
-                console.log('Remove friend response:', res.data);
-                alert('Friend removed successfully!');
-                //refresh the friends list
-                handleGetFriends();
-            })
-            .catch(err => {
-                console.error('Remove friend error:', err);
-                alert('Failed to remove friend');
-            })
-    }
 
     const handleProfilePictureChange = async (file) => {
         try {
@@ -502,7 +463,7 @@ function Profile() {
                     {isOwnProfile && (
                         <MyButton
                             variant='secondary'
-                            onClick={handleGetFriends}
+                            onClick={() => setCurrentMode('friends')}
                             style={{ marginRight: '10px' }}
                         >
                             My Roomies
@@ -512,40 +473,11 @@ function Profile() {
                 </div>
 
                 {/*friends list */}
-                {currentMode === 'friends' && friends.length > 0 && (
-                    <div className="mt-4">
-                        <h3>My Roomies ({friends.length})</h3>
-                        <div>
-                            {friends.map((friend) => (
-                                <MyCard
-                                    key={friend._id}
-                                    type="users"
-                                    data={friend}
-                                    compact={true}
-                                    onClick={(friendData) => {
-                                        //navigate to friend's profile
-                                        navigate(`/profile/${friendData._id}`);
-                                    }}
-                                    button={
-                                        <MyButton
-                                            variant='danger'
-                                            onClick={() => handleRemoveFriend(friend._id)}
-                                        >
-                                            Remove Roomie
-                                        </MyButton>
-                                    }
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/*show message when no friends */}
-                {currentMode === 'friends' && friends.length === 0 && (
-                    <div className="mt-4">
-                        <p className="text-muted">No friends found.</p>
-                    </div>
-                )}
+                <FriendsList
+                    userId={userId}
+                    currentMode={currentMode}
+                    onModeChange={setCurrentMode}
+                />
 
                 {/*bio section - always show */}
                 {currentMode === 'bio' && <div className="mt-4">
