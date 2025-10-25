@@ -12,6 +12,20 @@ const userSchema = new mongoose.Schema({
     groups: Array,
     pendingRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     receivedRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    notifications: [{
+        type: {
+            type: String,
+            enum: ['joinGroupApproved', 'joinGroupDeclined', 'friendRequestAccepted']
+        },
+        fromUserId: String,
+        fromUserName: String,
+        fromUserProfilePicture: String,
+        groupId: String,
+        groupName: String,
+        message: String,
+        createdAt: { type: Date, default: Date.now },
+        read: { type: Boolean, default: false }
+    }],
     profilePicture: {
         type: String,
         default: '/images/default-avatar.png'

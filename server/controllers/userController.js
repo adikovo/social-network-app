@@ -122,6 +122,26 @@ const handleUserCommand = async (req, res) => {
                 );
                 console.log('Sender updated:', sender?.friends);
 
+                // Add notification to the user who sent the friend request
+                console.log('Creating friend request acceptance notification for user:', data.friendId);
+                console.log('Acceptor user:', acceptor?.name);
+
+                await User.findByIdAndUpdate(
+                    data.friendId,
+                    {
+                        $push: {
+                            notifications: {
+                                type: 'friendRequestAccepted',
+                                fromUserId: data.userId,
+                                fromUserName: acceptor.name,
+                                fromUserProfilePicture: acceptor.profilePicture,
+                                message: `${acceptor.name} accepted your friend request`
+                            }
+                        }
+                    }
+                );
+                console.log('Friend request acceptance notification created successfully');
+
                 return res.json({ message: 'friend request accepted successfully' })
 
             case 'declineFriendRequest':
@@ -286,6 +306,32 @@ const handleUserCommand = async (req, res) => {
                     message: 'Profile picture deleted successfully',
                     user: deleteUserPicture
                 });
+
+            case 'getNotifications':
+                const userWithNotifications = await User.findById(data.userId);
+                if (!userWithNotifications) {
+                    return res.json({ message: 'user not found' });
+                }
+
+                console.log('Fetching notifications for user:', data.userId);
+                console.log('Total notifications found:', userWithNotifications.notifications.length);
+
+                // Sort notifications by creation date (newest first)
+                const sortedNotifications = userWithNotifications.notifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                console.log('Sorted notifications:', sortedNotifications.map(n => ({ type: n.type, message: n.message })));
+
+                return res.json({
+                    message: 'notifications retrieved successfully',
+                    notifications: sortedNotifications
+                });
+
+            case 'dismissNotification':
+                await User.findByIdAndUpdate(
+                    data.userId,
+                    { $pull: { notifications: { _id: data.notificationId } } }
+                );
+                return res.json({ message: 'notification dismissed successfully' });
 
             //if command is not recognized
             default:

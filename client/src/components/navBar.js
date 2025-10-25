@@ -3,6 +3,7 @@ import { data, useNavigate } from 'react-router-dom';
 import MyButton from './myButton';
 import DropdownMenu from './DropdownMenu';
 import RoomieRequestCard from './RoomieRequestCard';
+import ResultNotification from './ResultNotification';
 import NotificationBadge from './NotificationBadge';
 import AppLogo from './AppLogo';
 import ProfilePicture from './ProfilePicture';
@@ -16,19 +17,22 @@ function NavBar() {
     const [showRequestDropdown, setShowRequestDropdown] = useState(false);
     const [roomiesRequests, setRoomiesRequests] = useState([]);
     const [groupJoinRequests, setGroupJoinRequests] = useState([]);
+    const [notifications, setNotifications] = useState([]);
     const profileRef = useRef(null);
     const requestRef = useRef(null);
 
 
-    //fetch roomie requests and group join requests when user is loaded
+    //fetch roomie requests, group join requests, and notifications when user is loaded
     useEffect(() => {
         if (user) {
             fetchRoomiesRequests();
             fetchGroupJoinRequests();
+            fetchNotifications();
         } else {
             // Clear requests when user logs out
             setRoomiesRequests([]);
             setGroupJoinRequests([]);
+            setNotifications([]);
         }
     }, [user]);
 
@@ -56,6 +60,7 @@ function NavBar() {
         // Clear all local state first
         setRoomiesRequests([]);
         setGroupJoinRequests([]);
+        setNotifications([]);
         setShowProfileDropdown(false);
         setShowRequestDropdown(false);
 
@@ -131,6 +136,49 @@ function NavBar() {
             })
     }
 
+    const fetchNotifications = () => {
+        if (!user) return;
+
+        axios.post('http://localhost:3001/api/users', {
+            command: 'getNotifications',
+            data: {
+                userId: user.id
+            }
+        })
+            .then(res => {
+                console.log('Notifications response:', res.data);
+                console.log('Notifications received:', res.data.notifications);
+                setNotifications(res.data.notifications);
+            })
+            .catch(err => {
+                console.error('Notifications error:', err);
+                if (user) {
+                    alert('Failed to fetch notifications');
+                }
+            })
+    }
+
+    const handleDismissNotification = (notificationId) => {
+        if (!user) return;
+
+        axios.post('http://localhost:3001/api/users', {
+            command: 'dismissNotification',
+            data: {
+                userId: user.id,
+                notificationId: notificationId
+            }
+        })
+            .then(res => {
+                console.log('Dismiss notification response:', res.data);
+                // Remove the notification from local state
+                setNotifications(prev => prev.filter(notif => notif._id !== notificationId));
+            })
+            .catch(err => {
+                console.error('Dismiss notification error:', err);
+                alert('Failed to dismiss notification');
+            })
+    }
+
     const handleAcceptRequest = (requestId) => {
         if (!user) return;
 
@@ -151,8 +199,12 @@ function NavBar() {
                 alert('Failed to accept friend request');
             })
         setShowRequestDropdown(false);
-        //refresh friend requests
+        //refresh friend requests and notifications
         fetchRoomiesRequests();
+        // Add small delay to ensure notifications are created on server
+        setTimeout(() => {
+            fetchNotifications();
+        }, 500);
     };
 
     const handleDeclineRequest = (requestId) => {
@@ -178,9 +230,13 @@ function NavBar() {
                 console.log('Accept group join request response:', res.data);
                 alert('Group join request accepted successfully!');
                 setShowRequestDropdown(false);
-                //refresh both request lists
+                //refresh both request lists and notifications
                 fetchRoomiesRequests();
                 fetchGroupJoinRequests();
+                // Add small delay to ensure notifications are created on server
+                setTimeout(() => {
+                    fetchNotifications();
+                }, 500);
             })
             .catch(err => {
                 console.error('Accept group join request error:', err);
@@ -203,9 +259,13 @@ function NavBar() {
                 console.log('Decline group join request response:', res.data);
                 alert('Group join request declined successfully!');
                 setShowRequestDropdown(false);
-                //refresh both request lists
+                //refresh both request lists and notifications
                 fetchRoomiesRequests();
                 fetchGroupJoinRequests();
+                // Add small delay to ensure notifications are created on server
+                setTimeout(() => {
+                    fetchNotifications();
+                }, 500);
             })
             .catch(err => {
                 console.error('Decline group join request error:', err);
@@ -276,8 +336,8 @@ function NavBar() {
                         variant="icon"
                         onClick={() => setShowRequestDropdown(!showRequestDropdown)}
                     >
-                        R
-                        <NotificationBadge count={(roomiesRequests?.length || 0) + (groupJoinRequests?.length || 0)} />
+                        N
+                        <NotificationBadge count={(roomiesRequests?.length || 0) + (groupJoinRequests?.length || 0) + (notifications?.length || 0)} />
                     </MyButton>
 
                     <DropdownMenu
@@ -286,14 +346,14 @@ function NavBar() {
                         width="280px"
                         maxHeight="400px"
                     >
-                        {(!roomiesRequests || roomiesRequests.length === 0) && (!groupJoinRequests || groupJoinRequests.length === 0) ? (
+                        {(!roomiesRequests || roomiesRequests.length === 0) && (!groupJoinRequests || groupJoinRequests.length === 0) && (!notifications || notifications.length === 0) ? (
                             <div style={{
                                 padding: '1rem',
                                 textAlign: 'center',
                                 color: '#6b7280',
                                 fontSize: '14px'
                             }}>
-                                No requests
+                                No notifications
                             </div>
                         ) : (
                             <>
@@ -304,7 +364,7 @@ function NavBar() {
                                         request={request}
                                         onAccept={handleAcceptRequest}
                                         onDecline={handleDeclineRequest}
-                                        isLast={index === (roomiesRequests?.length || 0) - 1 && (!groupJoinRequests || groupJoinRequests.length === 0)}
+                                        isLast={index === (roomiesRequests?.length || 0) - 1 && (!groupJoinRequests || groupJoinRequests.length === 0) && (!notifications || notifications.length === 0)}
                                     />
                                 ))}
 
@@ -315,7 +375,17 @@ function NavBar() {
                                         request={request}
                                         onAccept={() => handleAcceptGroupJoinRequest(request)}
                                         onDecline={() => handleDeclineGroupJoinRequest(request)}
-                                        isLast={index === (groupJoinRequests?.length || 0) - 1}
+                                        isLast={index === (groupJoinRequests?.length || 0) - 1 && (!notifications || notifications.length === 0)}
+                                    />
+                                ))}
+
+                                {/* Result Notifications */}
+                                {(notifications || []).map((notification, index) => (
+                                    <ResultNotification
+                                        key={`notification-${notification._id}`}
+                                        notification={notification}
+                                        onDismiss={handleDismissNotification}
+                                        isLast={index === (notifications?.length || 0) - 1}
                                     />
                                 ))}
                             </>

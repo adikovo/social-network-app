@@ -341,6 +341,30 @@ const handleGroupCommand = async (req, res) => {
                     { new: true }
                 );
 
+                // Add notification to the user who requested to join
+                const adminUser = await User.findById(data.userId);
+                console.log('Creating join group approval notification for user:', data.requestUserId);
+                console.log('Admin user:', adminUser?.name);
+                console.log('Group name:', acceptGroup.name);
+
+                await User.findByIdAndUpdate(
+                    data.requestUserId,
+                    {
+                        $push: {
+                            notifications: {
+                                type: 'joinGroupApproved',
+                                fromUserId: data.userId,
+                                fromUserName: adminUser.name,
+                                fromUserProfilePicture: adminUser.profilePicture,
+                                groupId: data.groupId,
+                                groupName: acceptGroup.name,
+                                message: `Your request to join "${acceptGroup.name}" was approved!`
+                            }
+                        }
+                    }
+                );
+                console.log('Join group approval notification created successfully');
+
                 return res.json({ message: 'join request accepted successfully', group: acceptGroup });
 
             case 'declineJoinRequest':
@@ -354,6 +378,25 @@ const handleGroupCommand = async (req, res) => {
                 if (!declineGroup) {
                     return res.json({ message: 'group not found' });
                 }
+
+                // Add notification to the user who requested to join
+                const declineAdminUser = await User.findById(data.userId);
+                await User.findByIdAndUpdate(
+                    data.requestUserId,
+                    {
+                        $push: {
+                            notifications: {
+                                type: 'joinGroupDeclined',
+                                fromUserId: data.userId,
+                                fromUserName: declineAdminUser.name,
+                                fromUserProfilePicture: declineAdminUser.profilePicture,
+                                groupId: data.groupId,
+                                groupName: declineGroup.name,
+                                message: `Your request to join "${declineGroup.name}" was declined.`
+                            }
+                        }
+                    }
+                );
 
                 return res.json({ message: 'join request declined successfully', group: declineGroup });
 
