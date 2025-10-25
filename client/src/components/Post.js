@@ -4,6 +4,8 @@ import CommentsModel from './CommentsModel';
 import ThreeDotMenu from './ThreeDotMenu';
 import MyButton from './myButton';
 import UserInfo from './UserInfo';
+import ImageView from './ImageView';
+import ImageGallery from './ImageGallery';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 import MyAlert from './MyAlert';
@@ -19,6 +21,8 @@ const Post = ({ post, onPostUpdated }) => {
     const [showCommentsModal, setShowCommentsModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(post.content || '');
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const { alert, showError, hideAlert } = useMyAlert();
 
     // update currentPost when post prop changes
@@ -158,6 +162,48 @@ const Post = ({ post, onPostUpdated }) => {
     const handleCommentCancel = () => {
         setShowCommentInput(false);
     };
+
+    const handleImageClick = (imageIndex) => {
+        setSelectedImage(currentPost.images);
+        setCurrentImageIndex(imageIndex);
+    };
+
+    const handleCloseImageModal = () => {
+        setSelectedImage(null);
+        setCurrentImageIndex(0);
+    };
+
+    const handlePreviousImage = () => {
+        setCurrentImageIndex(prev =>
+            prev === 0 ? selectedImage.length - 1 : prev - 1
+        );
+    };
+
+    const handleNextImage = () => {
+        setCurrentImageIndex(prev =>
+            prev === selectedImage.length - 1 ? 0 : prev + 1
+        );
+    };
+
+    const handleKeyDown = (e) => {
+        if (selectedImage) {
+            if (e.key === 'Escape') {
+                handleCloseImageModal();
+            } else if (e.key === 'ArrowLeft') {
+                handlePreviousImage();
+            } else if (e.key === 'ArrowRight') {
+                handleNextImage();
+            }
+        }
+    };
+
+    // Add keyboard event listener
+    useEffect(() => {
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedImage]);
 
 
 
@@ -314,16 +360,24 @@ const Post = ({ post, onPostUpdated }) => {
                     </div>
                 </div>
             ) : (
-                <div style={{
-                    fontSize: '16px',
-                    lineHeight: '1.5',
-                    color: '#333',
-                    marginBottom: '16px',
-                    wordWrap: 'break-word',
-                    textAlign: 'left'
-                }}>
-                    {currentPost.content}
-                </div>
+                <>
+                    <div style={{
+                        fontSize: '16px',
+                        lineHeight: '1.5',
+                        color: '#333',
+                        marginBottom: '16px',
+                        wordWrap: 'break-word',
+                        textAlign: 'left'
+                    }}>
+                        {currentPost.content}
+                    </div>
+
+                    {/* Post Images */}
+                    <ImageGallery
+                        images={currentPost.images}
+                        onImageClick={handleImageClick}
+                    />
+                </>
             )}
 
             {/*footer */}
@@ -395,6 +449,16 @@ const Post = ({ post, onPostUpdated }) => {
                 type={alert.type}
                 duration={alert.duration}
                 onClose={hideAlert}
+            />
+
+            {/* Image Modal/Lightbox */}
+            <ImageView
+                images={selectedImage}
+                currentIndex={currentImageIndex}
+                isOpen={!!selectedImage}
+                onClose={handleCloseImageModal}
+                onPrevious={handlePreviousImage}
+                onNext={handleNextImage}
             />
         </div>
     );

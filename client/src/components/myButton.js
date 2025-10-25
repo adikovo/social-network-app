@@ -27,7 +27,10 @@ function MyButton({
         dropdown: 'btn-dropdown',
         icon: 'btn-icon',
         like: 'btn-like',
-        comment: 'btn-comment'
+        comment: 'btn-comment',
+        close: 'btn-close',
+        navPrev: 'btn-nav-prev',
+        navNext: 'btn-nav-next'
     };
 
     //different button sizes
@@ -61,7 +64,10 @@ function MyButton({
         dropdown: 'rgb(107 114 128 / 0.2)',
         icon: 'rgb(107 114 128 / 0.2)',
         like: 'rgb(231 76 60 / 0.3)',
-        comment: 'rgb(107 114 128 / 0.3)'
+        comment: 'rgb(107 114 128 / 0.3)',
+        close: 'rgb(255 255 255 / 0.3)',
+        navPrev: 'rgb(255 255 255 / 0.3)',
+        navNext: 'rgb(255 255 255 / 0.3)'
     };
 
     return (
@@ -189,6 +195,65 @@ function MyButton({
                     gap: '6px',
                     transition: 'background-color 0.2s ease',
                     cursor: 'pointer'
+                }),
+                ...(variant === 'close' && {
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '0',
+                    width: '40px',
+                    height: '40px',
+                    color: 'white',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    transition: 'all 0.2s ease'
+                }),
+                ...(variant === 'navPrev' && {
+                    position: 'absolute',
+                    left: '20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '50px',
+                    height: '50px',
+                    color: 'white',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    transition: 'all 0.2s ease'
+                }),
+                ...(variant === 'navNext' && {
+                    position: 'absolute',
+                    right: '20px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '50px',
+                    height: '50px',
+                    color: 'white',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    transition: 'all 0.2s ease'
                 })
             }}
             onMouseEnter={(e) => {
@@ -204,6 +269,14 @@ function MyButton({
                         e.target.style.backgroundColor = '#f5f5f5';
                         e.target.style.transform = 'translateY(-1px)';
                         e.target.style.boxShadow = '0 6px 12px -2px rgb(59 130 246 / 0.3), 0 4px 8px -4px rgb(59 130 246 / 0.3)';
+                    } else if (variant === 'close') {
+                        //close button hover effect
+                        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                        e.target.style.transform = 'scale(1.1)';
+                    } else if (variant === 'navPrev' || variant === 'navNext') {
+                        //modal button variants hover effect
+                        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                        e.target.style.transform = 'translateY(-50%) scale(1.1)';
                     } else {
                         //other variants lift and shadow effect
                         e.target.style.transform = 'translateY(-1px)';
@@ -222,6 +295,14 @@ function MyButton({
                         e.target.style.backgroundColor = 'transparent';
                         e.target.style.transform = 'translateY(0)';
                         e.target.style.boxShadow = 'none';
+                    } else if (variant === 'close') {
+                        //close button reset hover effect
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.transform = 'scale(1)';
+                    } else if (variant === 'navPrev' || variant === 'navNext') {
+                        // button variants reset hover effect
+                        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                        e.target.style.transform = 'translateY(-50%) scale(1)';
                     } else {
                         e.target.style.transform = 'translateY(0)';
                         e.target.style.boxShadow = variant === 'primary' || variant === 'success' || variant === 'danger'
