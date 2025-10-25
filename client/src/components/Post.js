@@ -6,6 +6,7 @@ import MyButton from './myButton';
 import UserInfo from './UserInfo';
 import ImageView from './ImageView';
 import ImageGallery from './ImageGallery';
+import EditImageGallery from './EditImageGallery';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 import MyAlert from './MyAlert';
@@ -21,6 +22,7 @@ const Post = ({ post, onPostUpdated }) => {
     const [showCommentsModal, setShowCommentsModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(post.content || '');
+    const [removedImages, setRemovedImages] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const { alert, showError, hideAlert } = useMyAlert();
@@ -197,7 +199,7 @@ const Post = ({ post, onPostUpdated }) => {
         }
     };
 
-    // Add keyboard event listener
+    // keyboard event listener (left right arrows)
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
         return () => {
@@ -210,6 +212,11 @@ const Post = ({ post, onPostUpdated }) => {
     const handleEditPost = () => {
         setIsEditing(true);
         setEditText(post.content || '');
+        setRemovedImages([]);
+    };
+
+    const handleRemoveImage = (imageIndex) => {
+        setRemovedImages([...removedImages, imageIndex]);
     };
 
     const handleSaveEdit = () => {
@@ -217,12 +224,14 @@ const Post = ({ post, onPostUpdated }) => {
             command: 'update',
             data: {
                 postId: currentPost._id,
-                newContent: editText
+                newContent: editText,
+                removedImages: removedImages
             }
         })
             .then(res => {
                 console.log('Edit post response:', res.data);
                 setIsEditing(false);
+                setRemovedImages([]);
                 if (onPostUpdated) {
                     onPostUpdated(null, res.data.post);
                 }
@@ -231,12 +240,14 @@ const Post = ({ post, onPostUpdated }) => {
                 console.error('Edit post error:', err);
                 // Still exit edit mode even if there's an error
                 setIsEditing(false);
+                setRemovedImages([]);
             });
     };
 
     const handleCancelEdit = () => {
         setIsEditing(false);
         setEditText(post.content || '');
+        setRemovedImages([]);
     };
 
     const handleDeletePost = () => {
@@ -279,7 +290,7 @@ const Post = ({ post, onPostUpdated }) => {
             maxWidth: '100%',
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif'
         }}>
-            {/* Header */}
+            {/*header */}
             <div style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -315,7 +326,7 @@ const Post = ({ post, onPostUpdated }) => {
                 )}
             </div>
 
-            {/* Content */}
+            {/*post content */}
             {isEditing ? (
                 <div style={{ marginBottom: '16px' }}>
                     <textarea
@@ -338,6 +349,14 @@ const Post = ({ post, onPostUpdated }) => {
                         }}
                         placeholder="What's on your mind?"
                     />
+
+                    {/* Show existing images in edit mode */}
+                    <EditImageGallery
+                        images={currentPost.images}
+                        removedImages={removedImages}
+                        onRemoveImage={handleRemoveImage}
+                    />
+
                     <div style={{
                         display: 'flex',
                         gap: '12px',
@@ -372,7 +391,7 @@ const Post = ({ post, onPostUpdated }) => {
                         {currentPost.content}
                     </div>
 
-                    {/* Post Images */}
+                    {/*post images */}
                     <ImageGallery
                         images={currentPost.images}
                         onImageClick={handleImageClick}
@@ -442,7 +461,7 @@ const Post = ({ post, onPostUpdated }) => {
                 onCommentDelete={handleCommentDelete}
             />
 
-            {/* MyAlert Component */}
+            {/* MyAlert component */}
             <MyAlert
                 show={alert.show}
                 message={alert.message}
@@ -451,7 +470,7 @@ const Post = ({ post, onPostUpdated }) => {
                 onClose={hideAlert}
             />
 
-            {/* Image Modal/Lightbox */}
+            {/* click on image view */}
             <ImageView
                 images={selectedImage}
                 currentIndex={currentImageIndex}

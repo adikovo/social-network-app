@@ -57,17 +57,34 @@ const handlePostCommand = async (req, res) => {
                 })
             case 'update':
                 //find post by id and update its content
-                const updatePost = await Post.findByIdAndUpdate(
-                    data.postId,
-                    { content: data.newContent },
-                    { new: true }
-                )
-                if (!updatePost) {
+                const postToUpdate = await Post.findById(data.postId)
+                if (!postToUpdate) {
                     return res.json({ message: 'post not found' })
                 }
-                else {
-                    return res.json({ message: 'post found & updated successfully', post: updatePost })
+
+                // Prepare update object
+                const updateData = { content: data.newContent }
+
+                // Handle image removal if provided
+                if (data.removedImages && Array.isArray(data.removedImages) && data.removedImages.length > 0) {
+                    if (postToUpdate.images && postToUpdate.images.length > 0) {
+                        // Filter out removed images
+                        updateData.images = postToUpdate.images.filter((_, index) => !data.removedImages.includes(index))
+
+                        // If no images left, set to empty array
+                        if (updateData.images.length === 0) {
+                            updateData.images = []
+                        }
+                    }
                 }
+
+                const updatePost = await Post.findByIdAndUpdate(
+                    data.postId,
+                    updateData,
+                    { new: true }
+                )
+
+                return res.json({ message: 'post found & updated successfully', post: updatePost })
             case 'delete':
                 //find post by id first to check if user is authorized to delete it
                 const postToDelete = await Post.findById(data.postId)
