@@ -231,7 +231,6 @@ function NavBar() {
         })
             .then(res => {
                 console.log('Accept group join request response:', res.data);
-                showSuccess('Group join request accepted successfully!');
                 setShowRequestDropdown(false);
                 //refresh both request lists and notifications
                 fetchRoomiesRequests();

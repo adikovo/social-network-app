@@ -1,7 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import UserInfo from './UserInfo';
 
 function ResultNotification({ notification, onDismiss, isLast }) {
+    const navigate = useNavigate();
+
+    const handleNotificationClick = () => {
+        if (notification.type === 'joinGroupApproved' && notification.groupId) {
+            navigate(`/group/${notification.groupId}`);
+        } else if (notification.type === 'friendRequestAccepted' && notification.fromUserId) {
+            navigate(`/profile/${notification.fromUserId}`);
+        }
+    };
 
     const getNotificationMessage = () => {
         switch (notification.type) {
@@ -17,20 +27,27 @@ function ResultNotification({ notification, onDismiss, isLast }) {
     };
 
     const getNotificationStyle = () => {
+        const baseStyle = {
+            transition: 'background-color 0.2s ease'
+        };
+
         switch (notification.type) {
             case 'joinGroupApproved':
             case 'friendRequestAccepted':
                 return {
+                    ...baseStyle,
                     borderLeft: '4px solid #10b981', // green
                     backgroundColor: '#f0fdf4'
                 };
             case 'joinGroupDeclined':
                 return {
+                    ...baseStyle,
                     borderLeft: '4px solid #ef4444', // red
                     backgroundColor: '#fef2f2'
                 };
             default:
                 return {
+                    ...baseStyle,
                     borderLeft: '4px solid #6b7280', // gray
                     backgroundColor: '#f9fafb'
                 };
@@ -51,9 +68,25 @@ function ResultNotification({ notification, onDismiss, isLast }) {
 
     return (
         <div
+            onClick={(notification.type === 'joinGroupApproved' || notification.type === 'friendRequestAccepted') ? handleNotificationClick : undefined}
+            onMouseEnter={(e) => {
+                if (notification.type === 'joinGroupApproved') {
+                    e.target.style.backgroundColor = '#e6fffa';
+                } else if (notification.type === 'friendRequestAccepted') {
+                    e.target.style.backgroundColor = '#e6fffa';
+                }
+            }}
+            onMouseLeave={(e) => {
+                if (notification.type === 'joinGroupApproved') {
+                    e.target.style.backgroundColor = '#f0fdf4';
+                } else if (notification.type === 'friendRequestAccepted') {
+                    e.target.style.backgroundColor = '#f0fdf4';
+                }
+            }}
             style={{
                 padding: '12px 16px',
                 borderBottom: isLast ? 'none' : '1px solid #e5e7eb',
+                cursor: (notification.type === 'joinGroupApproved' || notification.type === 'friendRequestAccepted') ? 'pointer' : 'default',
                 ...getNotificationStyle()
             }}
         >
