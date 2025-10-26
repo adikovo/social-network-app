@@ -4,6 +4,8 @@ import ImageInPost from './ImageInPost';
 const ImageGallery = ({ images, onImageClick }) => {
     if (!images || images.length === 0) return null;
 
+
+    //get the style for image container based on number of images
     const getImageContainerStyle = (index, totalImages) => {
         if (totalImages === 1) {
             return {
@@ -23,15 +25,12 @@ const ImageGallery = ({ images, onImageClick }) => {
         }
     };
 
+    //get the style for image grid based on number of images
     const getGridStyle = (totalImages) => {
         if (totalImages === 1) {
             return {
                 gridTemplateColumns: '1fr',
                 maxWidth: '100%'
-            };
-        } else if (totalImages === 2) {
-            return {
-                gridTemplateColumns: '1fr 1fr'
             };
         } else {
             return {

@@ -16,6 +16,7 @@ const handlePostCommand = async (req, res) => {
                     authorProfilePicture: data.authorProfilePicture,
                     groupId: data.groupId,
                     images: data.images || [],
+                    videos: data.videos || [],
                     likes: 0,
                     comments: []
                 })
@@ -74,6 +75,19 @@ const handlePostCommand = async (req, res) => {
                         // If no images left, set to empty array
                         if (updateData.images.length === 0) {
                             updateData.images = []
+                        }
+                    }
+                }
+
+                // handle video removal if provided
+                if (data.removedVideos && Array.isArray(data.removedVideos) && data.removedVideos.length > 0) {
+                    if (postToUpdate.videos && postToUpdate.videos.length > 0) {
+                        //filter out removed videos
+                        updateData.videos = postToUpdate.videos.filter((_, index) => !data.removedVideos.includes(index))
+
+                        //if no videos left, set to empty array
+                        if (updateData.videos.length === 0) {
+                            updateData.videos = []
                         }
                     }
                 }

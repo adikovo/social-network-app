@@ -7,6 +7,8 @@ import UserInfo from './UserInfo';
 import ImageView from './ImageView';
 import ImageGallery from './ImageGallery';
 import EditImageGallery from './EditImageGallery';
+import VideoGallery from './VideoGallery';
+import EditVideoGallery from './EditVideoGallery';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 import MyAlert from './MyAlert';
@@ -23,6 +25,7 @@ const Post = ({ post, onPostUpdated }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(post.content || '');
     const [removedImages, setRemovedImages] = useState([]);
+    const [removedVideos, setRemovedVideos] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const { alert, showError, hideAlert } = useMyAlert();
@@ -219,26 +222,32 @@ const Post = ({ post, onPostUpdated }) => {
         setRemovedImages([...removedImages, imageIndex]);
     };
 
+    const handleRemoveVideo = (videoIndex) => {
+        setRemovedVideos([...removedVideos, videoIndex]);
+    };
+
     const handleSaveEdit = () => {
         axios.post('http://localhost:3001/api/posts', {
             command: 'update',
             data: {
                 postId: currentPost._id,
                 newContent: editText,
-                removedImages: removedImages
+                removedImages: removedImages,
+                removedVideos: removedVideos
             }
         })
             .then(res => {
                 console.log('Edit post response:', res.data);
                 setIsEditing(false);
                 setRemovedImages([]);
+                setRemovedVideos([]);
                 if (onPostUpdated) {
                     onPostUpdated(null, res.data.post);
                 }
             })
             .catch(err => {
                 console.error('Edit post error:', err);
-                // Still exit edit mode even if there's an error
+                //still exit edit mode even if there's an error
                 setIsEditing(false);
                 setRemovedImages([]);
             });
@@ -248,6 +257,7 @@ const Post = ({ post, onPostUpdated }) => {
         setIsEditing(false);
         setEditText(post.content || '');
         setRemovedImages([]);
+        setRemovedVideos([]);
     };
 
     const handleDeletePost = () => {
@@ -271,7 +281,7 @@ const Post = ({ post, onPostUpdated }) => {
             });
     };
 
-    // Check if current user is the author of the post
+    //check if current user is the author of the post
     const isAuthor = user && (user.id === currentPost.authorId || user.username === currentPost.author || user.name === currentPost.author);
 
     const formatDate = (dateString) => {
@@ -350,11 +360,18 @@ const Post = ({ post, onPostUpdated }) => {
                         placeholder="What's on your mind?"
                     />
 
-                    {/* Show existing images in edit mode */}
+                    {/*show existing images in edit mode */}
                     <EditImageGallery
                         images={currentPost.images}
                         removedImages={removedImages}
                         onRemoveImage={handleRemoveImage}
+                    />
+
+                    {/*show existing videos in edit mode */}
+                    <EditVideoGallery
+                        videos={currentPost.videos}
+                        removedVideos={removedVideos}
+                        onRemoveVideo={handleRemoveVideo}
                     />
 
                     <div style={{
@@ -395,6 +412,15 @@ const Post = ({ post, onPostUpdated }) => {
                     <ImageGallery
                         images={currentPost.images}
                         onImageClick={handleImageClick}
+                    />
+
+                    {/*post videos */}
+                    <VideoGallery
+                        videos={currentPost.videos}
+                        onVideoClick={(index) => {
+                            // Handle video click - could open in modal or play inline
+                            console.log('Video clicked:', index);
+                        }}
                     />
                 </>
             )}
@@ -461,7 +487,7 @@ const Post = ({ post, onPostUpdated }) => {
                 onCommentDelete={handleCommentDelete}
             />
 
-            {/* MyAlert component */}
+            {/*myAlert component */}
             <MyAlert
                 show={alert.show}
                 message={alert.message}

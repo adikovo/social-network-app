@@ -1,6 +1,7 @@
 import React from 'react';
+import MyButton from './myButton';
 
-const ExtraInput = ({ onImageClick, onVideoClick }) => {
+const ExtraInput = ({ onImageClick, onVideoClick, onYouTubeClick }) => {
     return (
         <div style={{
             display: 'flex',
@@ -50,6 +51,23 @@ const ExtraInput = ({ onImageClick, onVideoClick }) => {
             >
                 🎥
             </button>
+
+            {/*youtube video button */}
+            <MyButton
+                variant="youtube"
+                onClick={onYouTubeClick}
+                title="Add YouTube video"
+            >
+                <img
+                    src="/images/youtube_logo.png"
+                    alt="YouTube"
+                    style={{
+                        width: '24px',
+                        height: '24px',
+                        objectFit: 'contain'
+                    }}
+                />
+            </MyButton>
         </div>
     );
 };

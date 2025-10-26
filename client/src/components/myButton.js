@@ -31,7 +31,8 @@ function MyButton({
         close: 'btn-close',
         navPrev: 'btn-nav-prev',
         navNext: 'btn-nav-next',
-        notification: 'btn-notification'
+        notification: 'btn-notification',
+        youtube: 'btn-youtube'
     };
 
     //different button sizes
@@ -69,7 +70,8 @@ function MyButton({
         close: 'rgb(255 255 255 / 0.3)',
         navPrev: 'rgb(255 255 255 / 0.3)',
         navNext: 'rgb(255 255 255 / 0.3)',
-        notification: 'rgb(99 102 241 / 0.3)'
+        notification: 'rgb(99 102 241 / 0.3)',
+        youtube: 'rgb(255 0 0 / 0.3)'
     };
 
     return (
@@ -276,6 +278,20 @@ function MyButton({
                     fontFamily: 'system-ui, -apple-system, sans-serif',
                     boxShadow: 'none',
                     lineHeight: '1'
+                }),
+                ...(variant === 'youtube' && {
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ff0000',
+                    fontSize: '18px',
+                    transition: 'background-color 0.2s ease',
+                    fontFamily: 'system-ui, -apple-system, sans-serif'
                 })
             }}
             onMouseEnter={(e) => {
@@ -283,6 +299,9 @@ function MyButton({
                     if (variant === 'nav' || variant === 'dropdown' || variant === 'notification') {
                         //nav, dropdown, and notification variants hover just change background
                         e.target.style.backgroundColor = '#f3f4f6';
+                    } else if (variant === 'youtube') {
+                        //youtube variant hover effect
+                        e.target.style.backgroundColor = '#ffebee';
                     } else if (variant === 'icon') {
                         //icon variant hover changes background color
                         e.target.style.backgroundColor = '#d1d5db';
@@ -310,6 +329,8 @@ function MyButton({
             onMouseLeave={(e) => {
                 if (!disabled) {
                     if (variant === 'nav' || variant === 'dropdown' || variant === 'notification') {
+                        e.target.style.backgroundColor = 'transparent';
+                    } else if (variant === 'youtube') {
                         e.target.style.backgroundColor = 'transparent';
                     } else if (variant === 'icon') {
                         e.target.style.backgroundColor = '#e5e7eb';

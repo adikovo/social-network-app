@@ -4,12 +4,15 @@ const router = express.Router();
 const { handlePostCommand, uploadPostImage } = require("../controllers/postController");
 const multer = require("multer");
 
-// Configure multer for file uploads
+//configure multer for file uploads
 const storage = multer.diskStorage({
+
     destination: function (req, file, cb) {
         cb(null, 'uploads/');
     },
+
     filename: function (req, file, cb) {
+        //create a unique file name for the uploaded image
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, 'post-' + uniqueSuffix + '-' + file.originalname);
     }
@@ -18,10 +21,11 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
+        // 5MB limit
+        fileSize: 5 * 1024 * 1024
     },
     fileFilter: function (req, file, cb) {
-        // Check if file is an image
+        //check if file is an image
         if (file.mimetype.startsWith('image/')) {
             cb(null, true);
         } else {

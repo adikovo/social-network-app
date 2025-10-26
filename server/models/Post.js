@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema({
     authorProfilePicture: String,
     groupId: String,
     images: [String],
+    videos: [String],
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
     likedBy: [String],
