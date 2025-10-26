@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/navBar';
 import LeftChatPanel from '../components/LeftChatPanel';
+import ProfilePicture from '../components/ProfilePicture';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
@@ -13,6 +14,8 @@ function Chat() {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [messagesLoading, setMessagesLoading] = useState(false);
+    const [messageInput, setMessageInput] = useState('');
+    const [sendingMessage, setSendingMessage] = useState(false);
 
     //redirect to login if user is not authenticated
     useEffect(() => {
@@ -22,6 +25,17 @@ function Chat() {
         }
     }, [user, isLoading, navigate]);
 
+    //cleanup when user logs out
+    useEffect(() => {
+        if (!user) {
+            setConversations([]);
+            setSelectedConversation(null);
+            setMessages([]);
+            setMessageInput('');
+            setSendingMessage(false);
+        }
+    }, [user]);
+
     //fetch conversations when user is loaded
     useEffect(() => {
         if (user) {
@@ -29,7 +43,7 @@ function Chat() {
         }
     }, [user]);
 
-    const fetchConversations = async () => {
+    const fetchConversations = async (onComplete) => {
         if (!user) return;
 
         try {
@@ -60,6 +74,11 @@ function Chat() {
                 formattedConversations.sort((a, b) => b.lastMessageTime - a.lastMessageTime);
 
                 setConversations(formattedConversations);
+
+                // Call the callback with the updated conversations
+                if (onComplete) {
+                    onComplete(formattedConversations);
+                }
             } else {
                 console.error('Failed to fetch conversations:', response.data.message);
                 setConversations([]);
@@ -73,7 +92,7 @@ function Chat() {
     };
 
     const fetchMessages = async (conversationId) => {
-        if (!conversationId) return;
+        if (!conversationId || !user) return;
 
         try {
             setMessagesLoading(true);
@@ -107,9 +126,98 @@ function Chat() {
         }
     };
 
+    const sendMessage = async () => {
+        if (!messageInput.trim() || !selectedConversation || sendingMessage || !user) {
+            return;
+        }
+
+        try {
+            setSendingMessage(true);
+
+            //get the receiver ID from the selected conversation
+            const currentUserId = user._id || user.id;
+            const receiverId = selectedConversation.conversationId.split('_').find(id => id !== currentUserId);
+
+            const messageData = {
+                senderId: currentUserId,
+                receiverId: receiverId,
+                content: messageInput.trim(),
+                conversationId: selectedConversation.conversationId
+            };
+
+            //send message to backend
+            const response = await axios.post('http://localhost:3001/api/messages', messageData);
+
+            if (response.data.success) {
+                const messageContent = messageInput.trim();
+
+                //add the new message to the local messages state
+                const newMessage = {
+                    id: response.data.message._id,
+                    senderId: currentUserId,
+                    senderName: user.name,
+                    content: messageContent,
+                    timestamp: new Date(),
+                    read: false,
+                    isOwn: true
+                };
+
+                setMessages(prevMessages => [...prevMessages, newMessage]);
+                setMessageInput('');
+
+                // conversation updates
+                if (selectedConversation.isNewConversation) {
+                    // For new conversations, refresh the conversations list from server
+                    // This ensures we get the real conversation with proper database ID
+                    await fetchConversations((updatedConversations) => {
+                        // Find and select the newly created conversation
+                        const newConversation = updatedConversations.find(conv =>
+                            conv.conversationId === selectedConversation.conversationId
+                        );
+
+                        if (newConversation) {
+                            setSelectedConversation(newConversation);
+                        }
+                    });
+                } else {
+                    // for existing conversations, update the last message
+                    setConversations(prevConversations =>
+                        prevConversations.map(conv =>
+                            conv.id === selectedConversation.id
+                                ? { ...conv, lastMessage: messageContent, lastMessageTime: new Date() }
+                                : conv
+                        )
+                    );
+                }
+            } else {
+                console.error('Failed to send message:', response.data.message);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            // Show user-friendly error message
+            if (error.response?.status === 404) {
+                console.error('Message API endpoint not found. Please check if the server is running.');
+            } else if (error.response?.status === 500) {
+                console.error('Server error occurred while sending message.');
+            } else {
+                console.error('Network error occurred while sending message.');
+            }
+        } finally {
+            setSendingMessage(false);
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    };
+
     const handleConversationSelect = (conversation) => {
+        if (!user) return;
+
         setSelectedConversation(conversation);
-        console.log('Selected conversation:', conversation);
 
         //fetch messages for the selected conversation
         if (conversation.conversationId) {
@@ -196,20 +304,11 @@ function Chat() {
                                     alignItems: 'center',
                                     gap: '12px'
                                 }}>
-                                    <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '50%',
-                                        backgroundColor: '#3b82f6',
-                                        color: 'white',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '16px',
-                                        fontWeight: '600'
-                                    }}>
-                                        {selectedConversation.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                                    </div>
+                                    <ProfilePicture
+                                        currentImage={selectedConversation.profilePicture}
+                                        size="small"
+                                        editMode={false}
+                                    />
                                     <div>
                                         <h3 style={{
                                             margin: '0',
@@ -219,13 +318,6 @@ function Chat() {
                                         }}>
                                             {selectedConversation.name}
                                         </h3>
-                                        <p style={{
-                                            margin: '0',
-                                            fontSize: '14px',
-                                            color: '#6b7280'
-                                        }}>
-                                            Online
-                                        </p>
                                     </div>
                                 </div>
 
@@ -302,6 +394,10 @@ function Chat() {
                                         <input
                                             type="text"
                                             placeholder="Type a message..."
+                                            value={messageInput}
+                                            onChange={(e) => setMessageInput(e.target.value)}
+                                            onKeyPress={handleKeyPress}
+                                            disabled={sendingMessage}
                                             style={{
                                                 flex: 1,
                                                 padding: '12px 16px',
@@ -309,20 +405,26 @@ function Chat() {
                                                 borderRadius: '24px',
                                                 fontSize: '14px',
                                                 outline: 'none',
-                                                backgroundColor: '#f9fafb'
+                                                backgroundColor: '#f9fafb',
+                                                opacity: sendingMessage ? 0.6 : 1
                                             }}
                                         />
-                                        <button style={{
-                                            padding: '12px 20px',
-                                            backgroundColor: '#3b82f6',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '24px',
-                                            fontSize: '14px',
-                                            fontWeight: '600',
-                                            cursor: 'pointer'
-                                        }}>
-                                            Send
+                                        <button
+                                            onClick={sendMessage}
+                                            disabled={!messageInput.trim() || sendingMessage}
+                                            style={{
+                                                padding: '12px 20px',
+                                                backgroundColor: (!messageInput.trim() || sendingMessage) ? '#9ca3af' : '#3b82f6',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '24px',
+                                                fontSize: '14px',
+                                                fontWeight: '600',
+                                                cursor: (!messageInput.trim() || sendingMessage) ? 'not-allowed' : 'pointer',
+                                                transition: 'background-color 0.2s ease'
+                                            }}
+                                        >
+                                            {sendingMessage ? 'Sending...' : 'Send'}
                                         </button>
                                     </div>
                                 </div>

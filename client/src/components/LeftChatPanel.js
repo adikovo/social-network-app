@@ -32,20 +32,32 @@ function LeftChatPanel({
     };
 
     const handleNewConversation = (friend) => {
-        //create a new conversation with this friend
-        const newConversation = {
-            id: `new_${friend._id}`,
-            conversationId: [currentUserId, friend._id].sort().join('_'),
-            name: friend.name,
-            profilePicture: friend.profilePicture || '/images/default-avatar.png',
-            lastMessage: '',
-            lastMessageTime: new Date(),
-            unreadCount: 0,
-            isNewConversation: true
-        };
+        // Check if conversation already exists
+        const conversationId = [currentUserId, friend._id].sort().join('_');
+        const existingConversation = conversations.find(conv =>
+            conv.conversationId === conversationId
+        );
 
-        onConversationSelect(newConversation);
-        setSearchMode('conversations');
+        if (existingConversation) {
+            // If conversation exists, select it
+            onConversationSelect(existingConversation);
+            setSearchMode('conversations');
+        } else {
+            //create a new temporary conversation
+            const newConversation = {
+                id: `new_${friend._id}`,
+                conversationId: conversationId,
+                name: friend.name,
+                profilePicture: friend.profilePicture || '/images/default-avatar.png',
+                lastMessage: '',
+                lastMessageTime: new Date(),
+                unreadCount: 0,
+                isNewConversation: true
+            };
+
+            onConversationSelect(newConversation);
+            setSearchMode('conversations');
+        }
     };
 
     const handleBackToConversations = () => {

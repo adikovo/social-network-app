@@ -56,7 +56,7 @@ const getConversationMessages = async (conversationId) => {
 const getUserConversations = async (userId) => {
     try {
         const conversations = await Conversation.find({
-            participants: userId
+            participants: { $in: [userId] }
         })
             .populate('participants', 'name profilePicture')
             .populate('lastMessageSender', 'name')
@@ -65,38 +65,6 @@ const getUserConversations = async (userId) => {
         return {
             success: true,
             conversations: conversations
-        };
-    } catch (error) {
-        return {
-            success: false,
-            message: error.message
-        };
-    }
-};
-
-//send a message
-const sendMessage = async (conversationId, senderId, receiverId, content) => {
-    try {
-        const message = await Message.create({
-            conversationId,
-            senderId,
-            receiverId,
-            content
-        });
-
-        // update conversation's last message
-        await Conversation.findOneAndUpdate(
-            { conversationId: conversationId },
-            {
-                lastMessage: content,
-                lastMessageAt: new Date(),
-                lastMessageSender: senderId
-            }
-        );
-
-        return {
-            success: true,
-            message: message
         };
     } catch (error) {
         return {
@@ -131,6 +99,5 @@ module.exports = {
     startConversation,
     getConversationMessages,
     getUserConversations,
-    sendMessage,
     deleteConversation
 };
