@@ -84,9 +84,7 @@ function NavBar() {
     };
 
     const handleChat = () => {
-        //TODO:
-        // Add chat navigation logic here
-        console.log('Navigate to chat');
+        navigate('/chat');
     };
 
     const handleStats = () => {

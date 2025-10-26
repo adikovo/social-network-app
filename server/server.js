@@ -11,6 +11,8 @@ const groupRoutes = require('./routes/groupRoutes')
 const postRoutes = require('./routes/postRoutes')
 const authRoutes = require('./routes/authRoutes')
 const feedRoutes = require('./routes/feedRoutes')
+const conversationRoutes = require('./routes/conversationRoute')
+const messageRoutes = require('./routes/messageRoutes')
 
 const app = express()
 const server = http.createServer(app)
@@ -39,7 +41,8 @@ app.use("/api/groups", groupRoutes)
 app.use("/api/posts", postRoutes)
 app.use("/api/auth", authRoutes)
 app.use("/api/feed", feedRoutes)
-
+app.use("/api/conversations", conversationRoutes)
+app.use("/api/messages", messageRoutes)
 
 const PORT = 3001
 server.listen(PORT, () => {

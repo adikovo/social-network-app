@@ -1,4 +1,6 @@
 const { Server } = require("socket.io");
+const Message = require('./models/Message');
+const Conversation = require('./models/Conversation');
 
 //initialize Socket.io server
 const initSocket = (server) => {
@@ -21,19 +23,53 @@ const initSocket = (server) => {
         })
 
         //send private message between two users
-        socket.on('send-message', (data) => {
-            const { senderId, receiverId, senderName, message } = data
+        socket.on('send-message', async (data) => {
+            try {
+                const { senderId, receiverId, senderName, message } = data
 
-            const messageData = {
-                senderId: senderId,
-                senderName: senderName,
-                message: message,
-                timestamp: new Date()
+                // Create conversationId by sorting user IDs
+                const conversationId = [senderId, receiverId].sort().join('_')
+
+                // Save message to database
+                const newMessage = new Message({
+                    senderId: senderId,
+                    receiverId: receiverId,
+                    content: message,
+                    conversationId: conversationId,
+                    timestamp: new Date(),
+                    read: false
+                })
+
+                await newMessage.save()
+
+                // Update or create conversation
+                await Conversation.findOneAndUpdate(
+                    { conversationId: conversationId },
+                    {
+                        participants: [senderId, receiverId],
+                        lastMessage: message,
+                        lastMessageAt: new Date(),
+                        lastMessageSender: senderId,
+                        conversationId: conversationId
+                    },
+                    { upsert: true, new: true }
+                )
+
+                const messageData = {
+                    senderId: senderId,
+                    senderName: senderName,
+                    message: message,
+                    timestamp: new Date(),
+                    conversationId: conversationId
+                }
+
+                //send message to the receiver's personal room
+                socket.to(`user-${receiverId}`).emit('receive-message', messageData)
+                console.log(`Private message from ${senderName} (${senderId}) to user ${receiverId}: ${message}`)
+            } catch (error) {
+                console.error('Error sending message:', error)
+                socket.emit('message-error', { error: 'Failed to send message' })
             }
-
-            //send message to the receiver's personal room
-            socket.to(`user-${receiverId}`).emit('receive-message', messageData)
-            console.log(`Private message from ${senderName} (${senderId}) to user ${receiverId}: ${message}`)
         })
 
         //handle disconnection

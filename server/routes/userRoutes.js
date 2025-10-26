@@ -36,6 +36,35 @@ const upload = multer({
 //endpoint for CRUD operations
 router.post("/", handleUserCommand);
 
+//endpoint to get user by ID
+router.get("/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        const user = await User.findById(userId).select('name email profilePicture');
+        
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found' 
+            });
+        }
+
+        res.json({
+            success: true,
+            user: user
+        });
+
+    } catch (error) {
+        console.error('Get user error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user',
+            error: error.message
+        });
+    }
+});
+
 //endpoint for profile picture upload
 router.post("/upload-profile-picture", upload.single('profilePicture'), async (req, res) => {
     try {

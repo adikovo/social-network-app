@@ -6,6 +6,7 @@ import Feed from './pages/feed';
 import Groups from './pages/groups';
 import GroupDetails from './pages/groupDetails';
 import Profile from './pages/profile';
+import Chat from './pages/chat';
 
 //router handler for the apps
 function AppRouter() {
@@ -19,6 +20,7 @@ function AppRouter() {
             <Route path="/groups" element={<Groups />} />
             <Route path="/group/:groupId" element={<GroupDetails />} />
             <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/chat" element={<Chat />} />
 
         </Routes>
     );
