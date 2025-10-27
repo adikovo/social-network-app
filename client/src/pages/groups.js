@@ -41,11 +41,7 @@ function Groups() {
         const data = showAll ? {} : { userId: currentUser?.id }
 
         //fetch all user's groups from the server
-        axios.post('http://localhost:3001/api/groups',
-            {
-                command: 'list',
-                data: data
-            })
+        axios.post('http://localhost:3001/api/groups/list', data)
             .then(res => {
                 console.log('Groups response:', res.data);
                 setGroups(res.data.groups);
@@ -66,11 +62,8 @@ function Groups() {
 
         setSearchTerm(trimmed);
         setIsSearching(true);
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'search',
-            data: {
-                name: trimmed
-            }
+        axios.post('http://localhost:3001/api/groups/search', {
+            name: trimmed
         })
             .then(res => {
                 setSearchResults(res.data.groups || []);
@@ -101,15 +94,10 @@ function Groups() {
     };
 
     function handleJoinGroup(groupId) {
-        axios.post('http://localhost:3001/api/groups',
-            {
-                command: 'joinGroup',
-                data: {
-                    groupId: groupId,
-                    userId: currentUser?.id
-                }
-            }
-        )
+        axios.post('http://localhost:3001/api/groups/join', {
+            groupId: groupId,
+            userId: currentUser?.id
+        })
             .then(res => {
                 console.log('join group response:', res.data);
                 showSuccess('Successfully joined the group!');
@@ -123,15 +111,10 @@ function Groups() {
     }
 
     function handleLeaveGroup(groupId) {
-        axios.post('http://localhost:3001/api/groups',
-            {
-                command: 'leaveGroup',
-                data: {
-                    userId: currentUser?.id,
-                    groupId: groupId
-                }
-            }
-        )
+        axios.post('http://localhost:3001/api/groups/leave', {
+            userId: currentUser?.id,
+            groupId: groupId
+        })
             .then(res => {
                 console.log('leave group response:', res.data);
                 showSuccess('Successfully left the group!');

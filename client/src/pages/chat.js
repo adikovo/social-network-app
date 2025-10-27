@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/navBar';
 import LeftChatPanel from '../components/LeftChatPanel';
 import ProfilePicture from '../components/ProfilePicture';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
+import io from 'socket.io-client';
 
 function Chat() {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ function Chat() {
     const [messagesLoading, setMessagesLoading] = useState(false);
     const [messageInput, setMessageInput] = useState('');
     const [sendingMessage, setSendingMessage] = useState(false);
+    const socketRef = useRef(null);
 
     //redirect to login if user is not authenticated
     useEffect(() => {
@@ -42,6 +44,94 @@ function Chat() {
             fetchConversations();
         }
     }, [user]);
+
+    //setup WebSocket connection when user is loaded
+    useEffect(() => {
+        if (user && !socketRef.current) {
+            //establish WebSocket connection
+            socketRef.current = io('http://localhost:3001');
+
+            const socket = socketRef.current;
+            const userId = user?._id || user?.id;
+
+            //join user's personal room
+            socket.emit('join-user-room', { userId });
+
+            //listen for incoming messages
+            socket.on('receive-message', (messageData) => {
+                //only process messages from other users (not our own)
+                if (messageData.senderId !== userId) {
+                    //add the new message to the current conversation if it matches
+                    if (selectedConversation && selectedConversation.conversationId === messageData.conversationId) {
+                        const newMessage = {
+                            id: `temp_${Date.now()}`, //temporary ID for real-time messages
+                            senderId: messageData.senderId,
+                            senderName: messageData.senderName,
+                            content: messageData.message,
+                            timestamp: new Date(messageData.timestamp),
+                            read: false,
+                            isOwn: false
+                        };
+
+                        setMessages(prevMessages => [...prevMessages, newMessage]);
+                    }
+                }
+
+                //update conversations list with new message and correct unread count
+                setConversations(prevConversations => {
+                    const existingConversation = prevConversations.find(conv => conv.conversationId === messageData.conversationId);
+
+                    if (existingConversation) {
+                        // Update existing conversation with correct unread count logic
+                        return prevConversations.map(conv => {
+                            if (conv.conversationId === messageData.conversationId) {
+                                const isCurrentConversation = conv.id === selectedConversation?.id;
+                                const isFromOtherUser = messageData.senderId !== userId;
+
+                                return {
+                                    ...conv,
+                                    lastMessage: messageData.message,
+                                    lastMessageTime: new Date(messageData.timestamp),
+                                    unreadCount: isCurrentConversation ? 0 : (isFromOtherUser ? (conv.unreadCount || 0) + 1 : conv.unreadCount || 0)
+                                };
+                            }
+                            return conv;
+                        });
+                    } else {
+                        // If conversation doesn't exist in the list, refresh from server
+                        fetchConversations();
+                        return prevConversations;
+                    }
+                });
+
+                //dispatch event to update navbar badge
+                window.dispatchEvent(new CustomEvent('newMessage', {
+                    detail: { conversationId: messageData.conversationId }
+                }));
+            });
+
+            //listen for message errors
+            socket.on('message-error', (error) => {
+                console.error('Message error:', error);
+            });
+
+            //handle connection events
+            socket.on('connect', () => {
+            });
+
+            socket.on('disconnect', () => {
+                // Disconnected from WebSocket server
+            });
+        }
+
+        //cleanup function
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
+        };
+    }, [user, selectedConversation]);
 
     const fetchConversations = async (onComplete) => {
         if (!user) return;
@@ -127,7 +217,7 @@ function Chat() {
     };
 
     const sendMessage = async () => {
-        if (!messageInput.trim() || !selectedConversation || sendingMessage || !user) {
+        if (!messageInput.trim() || !selectedConversation || sendingMessage || !user || !socketRef.current) {
             return;
         }
 
@@ -137,76 +227,62 @@ function Chat() {
             //get the receiver ID from the selected conversation
             const currentUserId = user?._id || user?.id;
             const receiverId = selectedConversation.conversationId.split('_').find(id => id !== currentUserId);
+            const messageContent = messageInput.trim();
 
-            const messageData = {
+            //send message via WebSocket
+            socketRef.current.emit('send-message', {
                 senderId: currentUserId,
                 receiverId: receiverId,
-                content: messageInput.trim(),
-                conversationId: selectedConversation.conversationId
+                senderName: user?.name,
+                message: messageContent
+            });
+
+            //add the new message to the local messages state immediately for better UX
+            const newMessage = {
+                id: `temp_${Date.now()}`, //temporary ID for optimistic update
+                senderId: currentUserId,
+                senderName: user?.name,
+                content: messageContent,
+                timestamp: new Date(),
+                read: false,
+                isOwn: true
             };
 
-            //send message to backend
-            const response = await axios.post('http://localhost:3001/api/messages', messageData);
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+            setMessageInput('');
 
-            if (response.data.success) {
-                const messageContent = messageInput.trim();
+            //update conversations list immediately with new message
+            setConversations(prevConversations =>
+                prevConversations.map(conv =>
+                    conv.id === selectedConversation.id
+                        ? { ...conv, lastMessage: messageContent, lastMessageTime: new Date() }
+                        : conv
+                )
+            );
 
-                //add the new message to the local messages state
-                const newMessage = {
-                    id: response.data.message._id,
-                    senderId: currentUserId,
-                    senderName: user?.name,
-                    content: messageContent,
-                    timestamp: new Date(),
-                    read: false,
-                    isOwn: true
-                };
-
-                setMessages(prevMessages => [...prevMessages, newMessage]);
-                setMessageInput('');
-
-                // conversation updates
-                if (selectedConversation.isNewConversation) {
-                    // For new conversations, refresh the conversations list from server
-                    // This ensures we get the real conversation with proper database ID
-                    await fetchConversations((updatedConversations) => {
-                        // Find and select the newly created conversation
-                        const newConversation = updatedConversations.find(conv =>
-                            conv.conversationId === selectedConversation.conversationId
-                        );
-
-                        if (newConversation) {
-                            setSelectedConversation(newConversation);
-                        }
-
-                        //dispatch event to update navbar badge for new conversations
-                        window.dispatchEvent(new CustomEvent('conversationRead', {
-                            detail: { conversationId: selectedConversation.conversationId }
-                        }));
-                    });
-                } else {
-                    // for existing conversations, update the last message
-                    setConversations(prevConversations =>
-                        prevConversations.map(conv =>
-                            conv.id === selectedConversation.id
-                                ? { ...conv, lastMessage: messageContent, lastMessageTime: new Date() }
-                                : conv
-                        )
+            //handle new conversation case
+            if (selectedConversation.isNewConversation) {
+                // For new conversations, refresh the conversations list from server
+                // This ensures we get the real conversation with proper database ID
+                fetchConversations((updatedConversations) => {
+                    // Find and select the newly created conversation
+                    const newConversation = updatedConversations.find(conv =>
+                        conv.conversationId === selectedConversation.conversationId
                     );
-                }
-            } else {
-                console.error('Failed to send message:', response.data.message);
+
+                    if (newConversation) {
+                        setSelectedConversation(newConversation);
+                    }
+
+                    //dispatch event to update navbar badge for new conversations
+                    window.dispatchEvent(new CustomEvent('conversationRead', {
+                        detail: { conversationId: selectedConversation.conversationId }
+                    }));
+                });
             }
+
         } catch (error) {
             console.error('Error sending message:', error);
-            // Show user-friendly error message
-            if (error.response?.status === 404) {
-                console.error('Message API endpoint not found. Please check if the server is running.');
-            } else if (error.response?.status === 500) {
-                console.error('Server error occurred while sending message.');
-            } else {
-                console.error('Network error occurred while sending message.');
-            }
         } finally {
             setSendingMessage(false);
         }

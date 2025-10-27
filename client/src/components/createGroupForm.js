@@ -30,18 +30,14 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
         if (editMode) {
             //edit existing group
             const groupData = {
-                command: 'update',
-                data: {
-                    groupId: groupToEdit._id,
-                    newName: name,
-                    newDescription: description,
-                    newPrivacy: privacy,
-                    userId: userId
-                }
+                groupId: groupToEdit._id,
+                newName: name,
+                newDescription: description,
+                newPrivacy: privacy,
+                userId: userId
             };
 
-
-            axios.post('http://localhost:3001/api/groups', groupData)
+            axios.post('http://localhost:3001/api/groups/update', groupData)
                 .then(res => {
                     console.log('Update group response:', res.data);
                     showSuccess('Group updated successfully!');
@@ -55,18 +51,15 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
         } else {
             // Create new group
             const groupData = {
-                command: 'create',
-                data: {
-                    name: name,
-                    description: description,
-                    members: [userId],
-                    createdBy: userId,
-                    privacy: privacy,
-                    posts: []
-                }
+                name: name,
+                description: description,
+                members: [userId],
+                createdBy: userId,
+                privacy: privacy,
+                posts: []
             };
 
-            axios.post('http://localhost:3001/api/groups', groupData)
+            axios.post('http://localhost:3001/api/groups/create', groupData)
                 .then(res => {
                     console.log('Create group response:', res.data);
                     showSuccess('Group created successfully!');

@@ -22,12 +22,9 @@ function Comment({ comment, onEdit, onDelete, post }) {
             if (post && post.groupId && user && !isAuthor) {
                 setIsCheckingAdmin(true);
                 try {
-                    const response = await axios.post('http://localhost:3001/api/groups', {
-                        command: 'checkAdmin',
-                        data: {
-                            userId: user.id,
-                            groupId: post.groupId
-                        }
+                    const response = await axios.post('http://localhost:3001/api/groups/check-admin', {
+                        userId: user.id,
+                        groupId: post.groupId
                     });
                     setIsGroupAdmin(response.data.isAdmin || false);
                 } catch (error) {

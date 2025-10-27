@@ -30,18 +30,36 @@ function SearchResultsOverlay({
         setIsSearching(true);
 
         try {
-            //prepare search data with groupId if available
-            let searchPayload = {
-                command: 'search',
-                data: searchData.data || { [searchData.field || 'name']: searchData.term }
-            };
+            let res;
 
-            //if searching posts and have a groupId, add it to the search
-            if (searchData.type === 'posts' && searchData.groupId) {
-                searchPayload.data.groupId = searchData.groupId;
+            // Use different endpoints based on search type
+            if (searchData.type === 'groups') {
+                // Use the new groups search endpoint
+                res = await axios.post('http://localhost:3001/api/groups/search', {
+                    name: searchData.term
+                });
+            } else if (searchData.type === 'users') {
+                // Use the users search endpoint
+                res = await axios.post('http://localhost:3001/api/users', {
+                    command: 'search',
+                    data: { name: searchData.term }
+                });
+            } else if (searchData.type === 'posts') {
+                // Use the posts search endpoint
+                const searchPayload = {
+                    command: 'search',
+                    data: { content: searchData.term }
+                };
+
+                //if searching posts and have a groupId, add it to the search
+                if (searchData.groupId) {
+                    searchPayload.data.groupId = searchData.groupId;
+                }
+
+                res = await axios.post('http://localhost:3001/api/posts', searchPayload);
+            } else {
+                throw new Error('Unknown search type');
             }
-
-            const res = await axios.post(`http://localhost:3001/api/${searchData.type}`, searchPayload);
 
             setSearchResults(res.data[searchData.type] || []);
         } catch (error) {

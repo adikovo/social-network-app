@@ -62,12 +62,9 @@ function FriendsList({
     function handleGetGroupMembers() {
         setLoading(true);
 
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'getGroup',
-            data: {
-                groupId: groupId,
-                userId: currentUser?.id
-            }
+        axios.post('http://localhost:3001/api/groups/get', {
+            groupId: groupId,
+            userId: currentUser?.id
         })
             .then(res => {
                 console.log('Group members response:', res.data);
@@ -84,12 +81,9 @@ function FriendsList({
     function checkAdminStatus() {
         if (!groupId || !currentUser?.id) return;
 
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'checkAdmin',
-            data: {
-                groupId: groupId,
-                userId: currentUser.id
-            }
+        axios.post('http://localhost:3001/api/groups/check-admin', {
+            groupId: groupId,
+            userId: currentUser.id
         })
             .then(res => {
                 console.log('Admin check response:', res.data);
@@ -104,13 +98,10 @@ function FriendsList({
     function handlePromoteToAdmin(memberId) {
         if (!groupId || !currentUser?.id) return;
 
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'addAdmin',
-            data: {
-                groupId: groupId,
-                userId: memberId,
-                requestingUserId: currentUser.id
-            }
+        axios.post('http://localhost:3001/api/groups/add-admin', {
+            groupId: groupId,
+            userId: memberId,
+            requestingUserId: currentUser.id
         })
             .then(res => {
                 console.log('Promote to admin response:', res.data);
@@ -127,13 +118,10 @@ function FriendsList({
     function handleRemoveAdmin(memberId) {
         if (!groupId || !currentUser?.id) return;
 
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'removeAdmin',
-            data: {
-                groupId: groupId,
-                userId: memberId,
-                requestingUserId: currentUser.id
-            }
+        axios.post('http://localhost:3001/api/groups/remove-admin', {
+            groupId: groupId,
+            userId: memberId,
+            requestingUserId: currentUser.id
         })
             .then(res => {
                 console.log('Remove admin response:', res.data);

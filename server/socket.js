@@ -43,7 +43,7 @@ const initSocket = (server) => {
                 await newMessage.save()
 
                 // Update or create conversation
-                await Conversation.findOneAndUpdate(
+                const conversation = await Conversation.findOneAndUpdate(
                     { conversationId: conversationId },
                     {
                         participants: [senderId, receiverId],
@@ -54,6 +54,40 @@ const initSocket = (server) => {
                     },
                     { upsert: true, new: true }
                 )
+
+                // Update unread counts for the receiver
+                if (conversation.unreadCounts && conversation.unreadCounts.length > 0) {
+                    // Find receiver's unread count entry
+                    const receiverUnreadIndex = conversation.unreadCounts.findIndex(
+                        unreadCount => unreadCount.userId.toString() === receiverId
+                    );
+
+                    if (receiverUnreadIndex !== -1) {
+                        // Increment receiver's unread count
+                        conversation.unreadCounts[receiverUnreadIndex].count += 1;
+                    } else {
+                        // Add new unread count entry for receiver
+                        conversation.unreadCounts.push({ userId: receiverId, count: 1 });
+                    }
+
+                    // Ensure sender's unread count entry exists (but don't increment it)
+                    const senderUnreadIndex = conversation.unreadCounts.findIndex(
+                        unreadCount => unreadCount.userId.toString() === senderId
+                    );
+
+                    if (senderUnreadIndex === -1) {
+                        conversation.unreadCounts.push({ userId: senderId, count: 0 });
+                    }
+
+                    await conversation.save();
+                } else {
+                    // Initialize unread counts array
+                    conversation.unreadCounts = [
+                        { userId: senderId, count: 0 },
+                        { userId: receiverId, count: 1 }
+                    ];
+                    await conversation.save();
+                }
 
                 const messageData = {
                     senderId: senderId,

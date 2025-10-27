@@ -71,12 +71,18 @@ function NavBar() {
             fetchUnreadChatCount();
         };
 
+        const handleNewMessage = (event) => {
+            fetchUnreadChatCount();
+        };
+
         window.addEventListener('conversationRead', handleConversationRead);
         window.addEventListener('conversationDeleted', handleConversationDeleted);
+        window.addEventListener('newMessage', handleNewMessage);
 
         return () => {
             window.removeEventListener('conversationRead', handleConversationRead);
             window.removeEventListener('conversationDeleted', handleConversationDeleted);
+            window.removeEventListener('newMessage', handleNewMessage);
         };
     }, []);
 
@@ -133,11 +139,8 @@ function NavBar() {
     const fetchGroupJoinRequests = () => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'getJoinRequests',
-            data: {
-                userId: user.id
-            }
+        axios.post('http://localhost:3001/api/groups/join-requests', {
+            userId: user.id
         })
             .then(res => {
                 console.log('Group join requests response:', res.data);
@@ -252,13 +255,10 @@ function NavBar() {
     const handleAcceptGroupJoinRequest = (request) => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'acceptJoinRequest',
-            data: {
-                userId: user.id,
-                groupId: request.groupId,
-                requestUserId: request.id
-            }
+        axios.post('http://localhost:3001/api/groups/accept-join-request', {
+            userId: user.id,
+            groupId: request.groupId,
+            requestUserId: request.id
         })
             .then(res => {
                 console.log('Accept group join request response:', res.data);
@@ -280,13 +280,10 @@ function NavBar() {
     const handleDeclineGroupJoinRequest = (request) => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/groups', {
-            command: 'declineJoinRequest',
-            data: {
-                userId: user.id,
-                groupId: request.groupId,
-                requestUserId: request.id
-            }
+        axios.post('http://localhost:3001/api/groups/decline-join-request', {
+            userId: user.id,
+            groupId: request.groupId,
+            requestUserId: request.id
         })
             .then(res => {
                 console.log('Decline group join request response:', res.data);
