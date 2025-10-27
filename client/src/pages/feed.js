@@ -47,9 +47,8 @@ function Feed() {
     function getPosts() {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/feed', {
-            command: 'getFeed',
-            data: { userId: user.id }
+        axios.get('http://localhost:3001/api/feed', {
+            params: { userId: user.id }
         })
             .then(res => {
                 console.log('Posts response:', res.data);
