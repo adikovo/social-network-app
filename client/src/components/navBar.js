@@ -20,22 +20,25 @@ function NavBar() {
     const [roomiesRequests, setRoomiesRequests] = useState([]);
     const [groupJoinRequests, setGroupJoinRequests] = useState([]);
     const [notifications, setNotifications] = useState([]);
+    const [unreadChatCount, setUnreadChatCount] = useState(0);
     const { alert, showSuccess, showError, hideAlert } = useMyAlert();
     const profileRef = useRef(null);
     const requestRef = useRef(null);
 
 
-    //fetch roomie requests, group join requests, and notifications when user is loaded
+    //fetch roomie requests, group join requests, notifications, and unread chat count when user is loaded
     useEffect(() => {
         if (user) {
             fetchRoomiesRequests();
             fetchGroupJoinRequests();
             fetchNotifications();
+            fetchUnreadChatCount();
         } else {
             // Clear requests when user logs out
             setRoomiesRequests([]);
             setGroupJoinRequests([]);
             setNotifications([]);
+            setUnreadChatCount(0);
         }
     }, [user]);
 
@@ -85,6 +88,8 @@ function NavBar() {
 
     const handleChat = () => {
         navigate('/chat');
+        //refresh unread count when navigating to chat
+        fetchUnreadChatCount();
     };
 
     const handleStats = () => {
@@ -157,6 +162,24 @@ function NavBar() {
                     showError('Failed to fetch notifications');
                 }
             })
+    }
+
+    const fetchUnreadChatCount = () => {
+        if (!user) return;
+
+        axios.get(`http://localhost:3001/api/conversations/${user._id || user.id}`)
+            .then(res => {
+                if (res.data.success) {
+                    //calculate number of conversations with unread messages
+                    const conversationsWithUnread = res.data.conversations.filter(conversation => {
+                        return (conversation.unreadCount || 0) > 0;
+                    }).length;
+                    setUnreadChatCount(conversationsWithUnread);
+                }
+            })
+            .catch(err => {
+                console.error('Unread chat count error:', err);
+            });
     }
 
     const handleDismissNotification = (notificationId) => {
@@ -325,7 +348,10 @@ function NavBar() {
 
                     <MyButton variant="nav" onClick={handleGroups}> Groups </MyButton>
 
-                    <MyButton variant="nav" onClick={handleChat}> Chat </MyButton>
+                    <div style={{ position: 'relative' }}>
+                        <MyButton variant="nav" onClick={handleChat}> Chat </MyButton>
+                        <NotificationBadge count={unreadChatCount} />
+                    </div>
 
                     <MyButton variant="nav" onClick={handleStats}> Stats </MyButton>
                 </div>

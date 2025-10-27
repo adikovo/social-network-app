@@ -66,7 +66,7 @@ function Chat() {
                         profilePicture: otherParticipant ? otherParticipant.profilePicture : '/images/default-avatar.png',
                         lastMessage: conversation.lastMessage || '',
                         lastMessageTime: new Date(conversation.lastMessageAt),
-                        unreadCount: 0 // You can implement unread count logic later
+                        unreadCount: conversation.unreadCount || 0
                     };
                 });
 
@@ -214,7 +214,7 @@ function Chat() {
         }
     };
 
-    const handleConversationSelect = (conversation) => {
+    const handleConversationSelect = async (conversation) => {
         if (!user) return;
 
         setSelectedConversation(conversation);
@@ -222,6 +222,24 @@ function Chat() {
         //fetch messages for the selected conversation
         if (conversation.conversationId) {
             fetchMessages(conversation.conversationId);
+
+            //mark conversation as read
+            try {
+                await axios.put(`http://localhost:3001/api/conversations/${conversation.conversationId}/read`, {
+                    userId: user._id || user.id
+                });
+
+                //update local state to remove unread count
+                setConversations(prevConversations =>
+                    prevConversations.map(conv =>
+                        conv.id === conversation.id
+                            ? { ...conv, unreadCount: 0 }
+                            : conv
+                    )
+                );
+            } catch (error) {
+                console.error('Error marking conversation as read:', error);
+            }
         }
     };
 

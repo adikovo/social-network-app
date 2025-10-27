@@ -23,7 +23,17 @@ const conversationSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
-    }
+    },
+    unreadCounts: [{
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        count: {
+            type: Number,
+            default: 0
+        }
+    }]
 });
 
 //conversation describes one document in db

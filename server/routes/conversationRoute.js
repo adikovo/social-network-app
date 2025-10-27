@@ -4,7 +4,8 @@ const {
     startConversation,
     getConversationMessages,
     getUserConversations,
-    deleteConversation
+    deleteConversation,
+    markConversationAsRead
 } = require('../controllers/conversationController');
 
 //get or create conversation between two users
@@ -37,6 +38,24 @@ router.delete('/:conversationId', async (req, res) => {
             return res.status(404).json({ error: 'Conversation not found' });
         }
         res.json({ message: 'Conversation deleted successfully', conversation: deletedConversation });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//mark conversation as read for a user
+router.put('/:conversationId/read', async (req, res) => {
+    try {
+        const { conversationId } = req.params;
+        const { userId } = req.body;
+
+        const result = await markConversationAsRead(conversationId, userId);
+
+        if (result.success) {
+            res.json(result);
+        } else {
+            res.status(400).json(result);
+        }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

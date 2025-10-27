@@ -62,11 +62,23 @@ const getUserConversations = async (userId) => {
             .populate('lastMessageSender', 'name')
             .sort({ lastMessageAt: -1 });
 
+        const conversationsWithUnreadCount = conversations.map(conversation => {
+            const userUnreadCount = conversation.unreadCounts.find(
+                unreadCount => unreadCount.userId.toString() === userId.toString()
+            );
+
+            return {
+                ...conversation.toObject(),
+                unreadCount: userUnreadCount ? userUnreadCount.count : 0
+            };
+        });
+
         return {
             success: true,
-            conversations: conversations
+            conversations: conversationsWithUnreadCount
         };
     } catch (error) {
+        console.error('Error in getUserConversations:', error);
         return {
             success: false,
             message: error.message
@@ -95,9 +107,53 @@ const deleteConversation = async (conversationId) => {
     }
 };
 
+//mark messages as read for a specific user in a conversation
+const markConversationAsRead = async (conversationId, userId) => {
+    try {
+        console.log('markConversationAsRead called with:', conversationId, userId);
+
+        // First ensure unreadCounts array exists
+        const conversation = await Conversation.findOne({ conversationId: conversationId });
+
+        if (!conversation.unreadCounts || conversation.unreadCounts.length === 0) {
+            console.log('Initializing unreadCounts for conversation:', conversationId);
+            conversation.unreadCounts = [
+                { userId: conversation.participants[0], count: 0 },
+                { userId: conversation.participants[1], count: 0 }
+            ];
+            await conversation.save();
+        }
+
+        await Conversation.findOneAndUpdate(
+            { conversationId: conversationId },
+            {
+                $set: {
+                    'unreadCounts.$[elem].count': 0
+                }
+            },
+            {
+                arrayFilters: [{ 'elem.userId': userId }]
+            }
+        );
+
+        console.log('Conversation marked as read successfully');
+        return {
+            success: true,
+            message: 'Messages marked as read'
+        };
+    } catch (error) {
+        console.error('Error marking conversation as read:', error);
+        return {
+            success: false,
+            message: error.message
+        };
+    }
+};
+
 module.exports = {
     startConversation,
     getConversationMessages,
     getUserConversations,
-    deleteConversation
+    deleteConversation,
+    markConversationAsRead
 };

@@ -56,16 +56,43 @@ const sendMessage = async (messageData) => {
                 conversationId: conversationId,
                 lastMessage: content.trim(),
                 lastMessageAt: new Date(),
-                lastMessageSender: senderId
+                lastMessageSender: senderId,
+                unreadCounts: [
+                    //sender unread count
+                    { userId: senderId, count: 0 },
+                    //receiver unread count    
+                    { userId: receiverId, count: 1 }
+                ]
             });
         } else {
-            //update existing conversation with last message info
+            //update existing conversation with last message info and increment receiver unread count
+            // check unreadCounts array exists and has entries for both users
+            const conversation = await Conversation.findOne({ conversationId: conversationId });
+
+            if (!conversation.unreadCounts || conversation.unreadCounts.length === 0) {
+                // Initialize unreadCounts if missing
+                conversation.unreadCounts = [
+                    { userId: senderId, count: 0 },
+                    { userId: receiverId, count: 0 }
+                ];
+                await conversation.save();
+            }
+
+            // increment the receiver unread count
             await Conversation.findOneAndUpdate(
                 { conversationId: conversationId },
                 {
-                    lastMessage: content.trim(),
-                    lastMessageAt: new Date(),
-                    lastMessageSender: senderId
+                    $set: {
+                        lastMessage: content.trim(),
+                        lastMessageAt: new Date(),
+                        lastMessageSender: senderId
+                    },
+                    $inc: {
+                        'unreadCounts.$[elem].count': 1
+                    }
+                },
+                {
+                    arrayFilters: [{ 'elem.userId': receiverId }]
                 }
             );
         }
