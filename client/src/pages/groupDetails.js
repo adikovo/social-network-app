@@ -11,7 +11,9 @@ import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
 import FriendsList from '../components/FriendsList';
 import TopContributorsChart from '../components/TopContributorsChart';
+import MemberJoinTimelineChart from '../components/MemberJoinTimelineChart';
 import StatsCard from '../components/StatsCard';
+import Tab from '../components/Tab';
 import { useUserContext } from '../context/UserContext';
 import MyAlert from '../components/MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
@@ -29,6 +31,7 @@ function GroupDetails() {
     const [groupPosts, setGroupPosts] = useState([]);
     const [hasPendingJoinRequest, setHasPendingJoinRequest] = useState(false);
     const [groupStats, setGroupStats] = useState(null);
+    const [activeTab, setActiveTab] = useState('contributors');
     const { alert, showSuccess, showError, showInfo, hideAlert } = useMyAlert();
 
     // Redirect to login if not authenticated
@@ -327,13 +330,39 @@ function GroupDetails() {
                                     <StatsCard label="Active Contributors" value={groupStats.topContributors.length} />
                                 </div>
 
-                                {/*top contributors chart */}
-                                {groupStats.topContributors && groupStats.topContributors.length > 0 ? (
-                                    <TopContributorsChart data={groupStats.topContributors} />
-                                ) : (
-                                    <div style={{ padding: '40px', textAlign: 'center', color: '#666', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                        <p>No contributors data available yet. Posts will appear here as members create content.</p>
+                                {/*tabs for different charts */}
+                                <div style={{ marginBottom: '20px' }}>
+                                    <div style={{ display: 'flex', borderBottom: '2px solid #e5e7eb' }}>
+                                        <Tab
+                                            label="Top Contributors"
+                                            isActive={activeTab === 'contributors'}
+                                            onClick={() => setActiveTab('contributors')}
+                                        />
+                                        <Tab
+                                            label="Member Join Timeline"
+                                            isActive={activeTab === 'timeline'}
+                                            onClick={() => setActiveTab('timeline')}
+                                        />
                                     </div>
+                                </div>
+
+                                {/*chart content based on active tab */}
+                                {activeTab === 'contributors' ? (
+                                    groupStats.topContributors && groupStats.topContributors.length > 0 ? (
+                                        <TopContributorsChart data={groupStats.topContributors} />
+                                    ) : (
+                                        <div style={{ padding: '40px', textAlign: 'center', color: '#666', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                                            <p>No contributors data available yet. Posts will appear here as members create content.</p>
+                                        </div>
+                                    )
+                                ) : (
+                                    groupStats.memberJoinTimeline && groupStats.memberJoinTimeline.length > 0 ? (
+                                        <MemberJoinTimelineChart data={groupStats.memberJoinTimeline} />
+                                    ) : (
+                                        <div style={{ padding: '40px', textAlign: 'center', color: '#666', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                                            <p>No join data available yet.</p>
+                                        </div>
+                                    )
                                 )}
                             </div>
                         ) : (

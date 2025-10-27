@@ -145,7 +145,10 @@ const handleGroupCommand = async (req, res) => {
                     //for public groups, add user to group members directly
                     const joinGroup = await Group.findByIdAndUpdate(
                         data.groupId,
-                        { $addToSet: { members: data.userId } },
+                        {
+                            $addToSet: { members: data.userId },
+                            $push: { memberJoinDates: { userId: data.userId, joinDate: new Date() } }
+                        },
                         { new: true }
                     )
 
@@ -353,7 +356,8 @@ const handleGroupCommand = async (req, res) => {
                     data.groupId,
                     {
                         $pull: { joinRequests: data.requestUserId },
-                        $addToSet: { members: data.requestUserId }
+                        $addToSet: { members: data.requestUserId },
+                        $push: { memberJoinDates: { userId: data.requestUserId, joinDate: new Date() } }
                     },
                     { new: true }
                 );
@@ -475,16 +479,44 @@ const handleGroupCommand = async (req, res) => {
                 //convert to array and sort by count
                 const topContributors = Object.values(contributorCounts)
                     .sort((a, b) => b.count - a.count)
-                     //top 5 contributors
+                    //top 5 contributors
                     .slice(0, 5);
+
+                //process member join dates for timeline chart
+                const joinDates = statGroup.memberJoinDates || [];
+                console.log('memberJoinDates:', joinDates);
+                console.log('Number of join dates:', joinDates.length);
+
+                //group by month
+                const joinDatesByMonth = {};
+                joinDates.forEach(({ joinDate }) => {
+                    const date = new Date(joinDate);
+                    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    joinDatesByMonth[monthKey] = (joinDatesByMonth[monthKey] || 0) + 1;
+                });
+
+                //convert to array and sort by date
+                const timelineData = Object.entries(joinDatesByMonth)
+                    .map(([date, count]) => ({
+                        date,
+                        joins: count
+                    }))
+                    .sort((a, b) => a.date.localeCompare(b.date));
+
+                console.log('Timeline data:', timelineData);
+
+                const statsResponse = {
+                    topContributors: topContributors,
+                    totalPosts: allPosts.length,
+                    totalMembers: statGroup.members.length,
+                    memberJoinTimeline: timelineData
+                };
+
+                console.log('Stats response being sent:', JSON.stringify(statsResponse, null, 2));
 
                 return res.json({
                     message: 'group statistics retrieved successfully',
-                    stats: {
-                        topContributors: topContributors,
-                        totalPosts: allPosts.length,
-                        totalMembers: statGroup.members.length
-                    }
+                    stats: statsResponse
                 });
 
             //if command is not recognized

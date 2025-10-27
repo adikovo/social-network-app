@@ -14,7 +14,12 @@ const groupSchema = new mongoose.Schema({
     privacy: String,
     posts: Array,
     //join requests for private groups
-    joinRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    joinRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    //track when each member joined
+    memberJoinDates: [{
+        userId: String,
+        joinDate: { type: Date, default: Date.now }
+    }]
 })
 
 //group describes one document in db
