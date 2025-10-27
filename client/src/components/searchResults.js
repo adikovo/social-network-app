@@ -14,7 +14,6 @@ function SearchResults({
     //the search term for display
     searchTerm
 }) {
-    console.log('SearchResults received:', { searchType, results, searchTerm });
 
     const renderResults = () => {
         return results.map((item) => {

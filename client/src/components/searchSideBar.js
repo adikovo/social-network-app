@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import axios from 'axios';
 import SearchForm from './SearchForm';
+import MultiSearchForm from './MultiSearchForm';
 import SearchResults from './SearchResults';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,19 +22,22 @@ function SearchSideBar() {
             return {
                 type: 'posts',
                 fields: ['content', 'author', 'date', 'group'],
-                placeholder: 'Search posts...'
+                placeholder: 'Search posts...',
+                title: 'Search Posts'
             };
         } else if (path === '/groups') {
             return {
                 type: 'groups',
                 fields: ['name', 'description', 'createdBy'],
-                placeholder: 'Search groups...'
+                placeholder: 'Search groups...',
+                title: 'Search Groups'
             };
         } else {
             return {
                 type: 'users',
                 fields: ['name', 'age', 'pets', 'budget', 'location', 'smoking', 'cleanliness'],
-                placeholder: 'Search users...'
+                placeholder: 'Search users...',
+                title: 'Search Users'
             }
         }
     }
@@ -41,27 +45,45 @@ function SearchSideBar() {
     const searchType = getSearchType();
 
     const handleSearch = async (searchData) => {
-        console.log('Search triggered with:', searchData);
-        setSearchTerm(searchData.term);
-        setIsSearching(true);
 
-        try {
-            const res = await axios.post(`http://localhost:3001/api/${searchData.type}`, {
-                command: 'search',
-                data: {
-                    [searchData.field]: searchData.term
-                }
-            });
-            console.log('Search response:', res.data);
-            console.log('Posts found:', res.data[searchData.type]);
-            //create an array even if the response dont match expected structure
-            setSearchResults(res.data[searchData.type] || []);
-        }
-        catch (error) {
-            console.error('search error:', error);
-            setSearchResults([]);
-        } finally {
-            setIsSearching(false);
+        //multi parameter search for posts
+        if (searchData.type === 'posts' && searchData.data) {
+            setSearchTerm(Object.values(searchData.data).join(', '));
+            setIsSearching(true);
+
+            try {
+                const res = await axios.post(`http://localhost:3001/api/${searchData.type}`, {
+                    command: 'search',
+                    data: searchData.data
+                });
+                setSearchResults(res.data[searchData.type] || []);
+            }
+            catch (error) {
+                console.error('Multi-parameter search error:', error);
+                setSearchResults([]);
+            } finally {
+                setIsSearching(false);
+            }
+        } else {
+            // single parameter search for other types
+            setSearchTerm(searchData.term);
+            setIsSearching(true);
+
+            try {
+                const res = await axios.post(`http://localhost:3001/api/${searchData.type}`, {
+                    command: 'search',
+                    data: {
+                        [searchData.field]: searchData.term
+                    }
+                });
+                setSearchResults(res.data[searchData.type] || []);
+            }
+            catch (error) {
+                console.error('Single-parameter search error:', error);
+                setSearchResults([]);
+            } finally {
+                setIsSearching(false);
+            }
         }
     };
 
@@ -77,7 +99,11 @@ function SearchSideBar() {
 
     const handleGroupClick = (group) => {
         navigate(`/group/${group._id}`);
+    };
 
+    const handleClearResults = () => {
+        setSearchResults([]);
+        setSearchTerm('');
     };
 
     return (
@@ -89,20 +115,30 @@ function SearchSideBar() {
             height: '100vh',
             backgroundColor: '#f8f9fa',
             borderRight: '1px solid #e5e7eb',
-            padding: '100px 20px 20px 20px', // Top padding to account for navbar
+            padding: '100px 20px 20px 20px',
             overflowY: 'auto',
             zIndex: 50
         }}>
-            <h5 style={{ marginBottom: '20px', color: '#1f2937' }}>Search</h5>
+            <h5 style={{ marginBottom: '20px', color: '#1f2937' }}>{searchType.title}</h5>
 
             {/*search form */}
-            <SearchForm
-                searchType={searchType.type}
-                searchFields={searchType.fields}
-                placeholder={searchType.placeholder}
-                onSearch={handleSearch}
-                isSearching={isSearching}
-            />
+            {searchType.type === 'posts' ? (
+                <MultiSearchForm
+                    searchType={searchType.type}
+                    onSearch={handleSearch}
+                    isSearching={isSearching}
+                    placeholder={searchType.placeholder}
+                    onClear={handleClearResults}
+                />
+            ) : (
+                <SearchForm
+                    searchType={searchType.type}
+                    searchFields={searchType.fields}
+                    placeholder={searchType.placeholder}
+                    onSearch={handleSearch}
+                    isSearching={isSearching}
+                />
+            )}
 
             {/*search results */}
             <SearchResults

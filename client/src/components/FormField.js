@@ -8,16 +8,18 @@ function FormField({
     onChange,
     placeholder,
     isEditing,
-    options = null, // for select fields
-    rows = null, // for textarea
+    options = null,
+    rows = null,
     className = '',
     style = {}
 }) {
     const inputStyle = {
-        borderRadius: type === 'textarea' ? '10px' : '8px',
-        textAlign: 'left',
-        fontSize: type === 'textarea' ? '1rem' : '0.9rem',
-        padding: type === 'textarea' ? '0.75rem' : '0.5rem',
+        width: '100%',
+        padding: '8px 12px',
+        border: '1px solid #d1d5db',
+        borderRadius: '6px',
+        fontSize: '14px',
+        boxSizing: 'border-box',
         ...style
     };
 
@@ -49,7 +51,6 @@ function FormField({
         if (type === 'select') {
             return (
                 <select
-                    className="form-select"
                     id={id}
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
@@ -68,7 +69,6 @@ function FormField({
         return (
             <input
                 type={type}
-                className="form-control"
                 id={id}
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
@@ -80,12 +80,11 @@ function FormField({
 
     return (
         <div className={`mb-${type === 'textarea' ? '3' : '2'} ${className}`}>
-            <label htmlFor={id} className="form-label" style={{
-                color: '#212529',
-                fontWeight: '600',
-                textAlign: 'left',
+            <label htmlFor={id} style={{
                 display: 'block',
-                fontSize: type === 'textarea' ? '1rem' : '0.9rem'
+                marginBottom: '5px',
+                fontWeight: '500',
+                fontSize: '14px'
             }}>
                 {label}
             </label>

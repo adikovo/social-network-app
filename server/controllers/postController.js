@@ -32,23 +32,30 @@ const handlePostCommand = async (req, res) => {
 
             case 'search':
                 //multi parameter search for posts
-                const { author, date, group, content } = data
+                const { author, fromDate, toDate, group, content } = data
                 const postSearchQuery = {}
 
                 //build search query based on provided parameters
                 if (author) {
                     postSearchQuery.author = { $regex: author, $options: 'i' }
                 }
-                if (date) {
-                    //search for posts on a specific date
-                    const searchDate = new Date(date)
-                    const startOfDay = new Date(searchDate.getFullYear(), searchDate.getMonth(), searchDate.getDate())
-                    const endOfDay = new Date(searchDate.getFullYear(), searchDate.getMonth(), searchDate.getDate() + 1)
+                if (fromDate || toDate) {
+                    //search for posts within a date range
+                    const dateQuery = {}
 
-                    postSearchQuery.createdAt = {
-                        $gte: startOfDay,
-                        $lt: endOfDay
+                    if (fromDate) {
+                        const startDate = new Date(fromDate)
+                        startDate.setHours(0, 0, 0, 0)
+                        dateQuery.$gte = startDate
                     }
+
+                    if (toDate) {
+                        const endDate = new Date(toDate)
+                        endDate.setHours(23, 59, 59, 999)
+                        dateQuery.$lte = endDate
+                    }
+
+                    postSearchQuery.createdAt = dateQuery
                 }
                 if (group) {
                     //find groups matching the name
