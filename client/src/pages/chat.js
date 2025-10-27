@@ -49,14 +49,14 @@ function Chat() {
         try {
             setLoading(true);
             //API call to fetch conversations
-            const userId = user._id || user.id;
+            const userId = user?._id || user?.id;
             const response = await axios.get(`http://localhost:3001/api/conversations/${userId}`);
 
             if (response.data.success) {
                 //convert the data to match the expected format
                 const formattedConversations = response.data.conversations.map(conversation => {
                     //find the other participant 
-                    const currentUserId = user._id || user.id;
+                    const currentUserId = user?._id || user?.id;
                     const otherParticipant = conversation.participants.find(p => p._id !== currentUserId);
 
                     return {
@@ -102,7 +102,7 @@ function Chat() {
 
             if (response.data.success) {
                 //convert messages to include sender info
-                const currentUserId = user._id || user.id;
+                const currentUserId = user?._id || user?.id;
                 const formattedMessages = response.data.messages.map(message => ({
                     id: message._id,
                     senderId: message.senderId._id,
@@ -135,7 +135,7 @@ function Chat() {
             setSendingMessage(true);
 
             //get the receiver ID from the selected conversation
-            const currentUserId = user._id || user.id;
+            const currentUserId = user?._id || user?.id;
             const receiverId = selectedConversation.conversationId.split('_').find(id => id !== currentUserId);
 
             const messageData = {
@@ -155,7 +155,7 @@ function Chat() {
                 const newMessage = {
                     id: response.data.message._id,
                     senderId: currentUserId,
-                    senderName: user.name,
+                    senderName: user?.name,
                     content: messageContent,
                     timestamp: new Date(),
                     read: false,
@@ -229,7 +229,7 @@ function Chat() {
 
         try {
             const response = await axios.delete(`http://localhost:3001/api/conversations/${conversation.conversationId}`, {
-                data: { userId: user._id || user.id }
+                data: { userId: user?._id || user?.id }
             });
 
             if (response.status === 200) {
@@ -269,7 +269,7 @@ function Chat() {
             //mark conversation as read
             try {
                 await axios.put(`http://localhost:3001/api/conversations/${conversation.conversationId}/read`, {
-                    userId: user._id || user.id
+                    userId: user?._id || user?.id
                 });
 
                 //update local state to remove unread count
@@ -342,8 +342,8 @@ function Chat() {
                                 conversations={conversations}
                                 onConversationSelect={handleConversationSelect}
                                 selectedConversationId={selectedConversation?.id}
-                                currentUserId={user.id}
-                                userFriends={user.friends || []}
+                                currentUserId={user?.id}
+                                userFriends={user?.friends || []}
                                 onDeleteConversation={handleDeleteConversation}
                             />
                         )}

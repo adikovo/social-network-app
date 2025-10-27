@@ -38,7 +38,7 @@ function Groups() {
     function fetchGroups(showAll = false) {
         //if showAll is true, fetch all groups
         //else fetch all groups the user is a member 
-        const data = showAll ? {} : { userId: currentUser.id }
+        const data = showAll ? {} : { userId: currentUser?.id }
 
         //fetch all user's groups from the server
         axios.post('http://localhost:3001/api/groups',
@@ -106,7 +106,7 @@ function Groups() {
                 command: 'joinGroup',
                 data: {
                     groupId: groupId,
-                    userId: currentUser.id
+                    userId: currentUser?.id
                 }
             }
         )
@@ -127,7 +127,7 @@ function Groups() {
             {
                 command: 'leaveGroup',
                 data: {
-                    userId: currentUser.id,
+                    userId: currentUser?.id,
                     groupId: groupId
                 }
             }
@@ -173,7 +173,7 @@ function Groups() {
                         <div key={group._id} className="col-md-4 mb-4">
                             <GroupCard
                                 group={group}
-                                userId={currentUser.id}
+                                userId={currentUser?.id}
                                 onJoin={handleJoinGroup}
                                 onLeave={handleLeaveGroup}
                                 showAdmin={true}
@@ -201,7 +201,7 @@ function Groups() {
                 <CreateGroupForm
                     show={showCreateGroup}
                     onClose={() => setShowCreateGroup(false)}
-                    userId={currentUser.id}
+                    userId={currentUser?.id}
                     onGroupCreated={fetchGroups}
                 />
 
