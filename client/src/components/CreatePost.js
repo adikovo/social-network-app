@@ -203,10 +203,7 @@ function CreatePost({ onPostCreated, groupId = null }) {
                 postData.groupId = groupId;
             }
 
-            axios.post('http://localhost:3001/api/posts', {
-                command: 'create',
-                data: postData
-            })
+            axios.post('http://localhost:3001/api/posts', postData)
                 .then(res => {
                     console.log('Post created successfully:', res.data);
                     showSuccess('Post created successfully!');

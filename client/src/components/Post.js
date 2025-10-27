@@ -41,13 +41,10 @@ function Post({ post, onPostUpdated }) {
 
         const likedState = !isLiked;
 
-        axios.post('http://localhost:3001/api/posts', {
-            command: 'like',
-            data: {
-                postId: currentPost._id,
-                isLiked: likedState,
-                userId: user.id
-            }
+        axios.put('http://localhost:3001/api/posts/like', {
+            postId: currentPost._id,
+            isLiked: likedState,
+            userId: user.id
         })
             .then(res => {
                 console.log('Like post response:', res.data);
@@ -72,15 +69,12 @@ function Post({ post, onPostUpdated }) {
 
     const submitComment = (commentText, closeInput = false) => {
         //API call to add comment
-        axios.post('http://localhost:3001/api/posts', {
-            command: 'comment',
-            data: {
-                postId: currentPost._id,
-                commentText: commentText,
-                author: user?.username || user?.name || 'You',
-                userId: user.id,
-                authorProfilePicture: user?.profilePicture
-            }
+        axios.post('http://localhost:3001/api/posts/comment', {
+            postId: currentPost._id,
+            commentText: commentText,
+            author: user?.username || user?.name || 'You',
+            userId: user.id,
+            authorProfilePicture: user?.profilePicture
         })
             .then(res => {
                 //update comment count based on actual comments array
@@ -116,13 +110,10 @@ function Post({ post, onPostUpdated }) {
 
     const handleCommentEdit = (comment, newText) => {
         // API call to edit comment
-        axios.post('http://localhost:3001/api/posts', {
-            command: 'edit comment',
-            data: {
-                postId: currentPost._id,
-                commentId: comment._id || comment.createdAt,
-                newContent: newText
-            }
+        axios.put('http://localhost:3001/api/posts/comment', {
+            postId: currentPost._id,
+            commentId: comment._id || comment.createdAt,
+            newContent: newText
         })
             .then(res => {
                 // Update the post with the edited comment
@@ -139,8 +130,7 @@ function Post({ post, onPostUpdated }) {
 
     const handleCommentDelete = (comment) => {
         // API call to delete comment
-        axios.post('http://localhost:3001/api/posts', {
-            command: 'delete comment',
+        axios.delete('http://localhost:3001/api/posts/comment', {
             data: {
                 postId: currentPost._id,
                 commentId: comment._id || comment.createdAt // Use createdAt as fallback ID
@@ -227,14 +217,11 @@ function Post({ post, onPostUpdated }) {
     };
 
     const handleSaveEdit = () => {
-        axios.post('http://localhost:3001/api/posts', {
-            command: 'update',
-            data: {
-                postId: currentPost._id,
-                newContent: editText,
-                removedImages: removedImages,
-                removedVideos: removedVideos
-            }
+        axios.put('http://localhost:3001/api/posts', {
+            postId: currentPost._id,
+            newContent: editText,
+            removedImages: removedImages,
+            removedVideos: removedVideos
         })
             .then(res => {
                 console.log('Edit post response:', res.data);
@@ -261,8 +248,7 @@ function Post({ post, onPostUpdated }) {
     };
 
     const handleDeletePost = () => {
-        axios.post('http://localhost:3001/api/posts', {
-            command: 'delete',
+        axios.delete('http://localhost:3001/api/posts', {
             data: {
                 postId: post._id,
                 userId: user.id

@@ -49,22 +49,21 @@ function SearchResultsOverlay({
                 });
             } else if (searchData.type === 'posts') {
                 // Use the posts search endpoint
-                const searchPayload = {
-                    command: 'search',
-                    data: { content: searchData.term }
-                };
+                const searchParams = { content: searchData.term };
 
                 //if searching posts and have a groupId, add it to the search
                 if (searchData.groupId) {
-                    searchPayload.data.groupId = searchData.groupId;
+                    searchParams.groupId = searchData.groupId;
                 }
 
-                res = await axios.post('http://localhost:3001/api/posts', searchPayload);
+                res = await axios.get('http://localhost:3001/api/posts/search', {
+                    params: searchParams
+                });
             } else {
                 throw new Error('Unknown search type');
             }
 
-            setSearchResults(res.data[searchData.type] || []);
+            setSearchResults(res.data[searchData.type] || res.data.posts || []);
         } catch (error) {
             console.error('Search error:', error);
             setSearchResults([]);
