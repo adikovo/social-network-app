@@ -7,15 +7,16 @@ function MultiSearchForm({
     searchType,
     onSearch,
     isSearching,
-    onClear
+    onClear,
+    fields
 }) {
-    const [searchData, setSearchData] = useState({
-        content: '',
-        author: '',
-        group: '',
-        fromDate: '',
-        toDate: ''
-    });
+    //initialize state dynamically based on fields
+    const initialState = fields.reduce((acc, field) => {
+        acc[field.id] = '';
+        return acc;
+    }, {});
+
+    const [searchData, setSearchData] = useState(initialState);
 
     function handleInputChange(field, value) {
         setSearchData(prev => ({
@@ -46,14 +47,7 @@ function MultiSearchForm({
     }
 
     function handleClear() {
-        setSearchData({
-            content: '',
-            author: '',
-            group: '',
-            fromDate: '',
-            toDate: ''
-        });
-
+        setSearchData(initialState);
         if (onClear) {
             onClear();
         }
@@ -63,63 +57,21 @@ function MultiSearchForm({
 
     return (
         <form onSubmit={handleSearch} style={{ marginBottom: '20px' }}>
-            {/* Content Input */}
-            <FormField
-                id="contentInput"
-                label="Content"
-                type="text"
-                value={searchData.content}
-                onChange={(value) => handleInputChange('content', value)}
-                placeholder="Search in post content..."
-                isEditing={true}
-                style={{ marginBottom: '12px' }}
-            />
-
-            {/* Author Input */}
-            <FormField
-                id="authorInput"
-                label="Author"
-                type="text"
-                value={searchData.author}
-                onChange={(value) => handleInputChange('author', value)}
-                placeholder="Search by author name..."
-                isEditing={true}
-                style={{ marginBottom: '12px' }}
-            />
-
-            {/* Group Input */}
-            <FormField
-                id="groupInput"
-                label="Group"
-                type="text"
-                value={searchData.group}
-                onChange={(value) => handleInputChange('group', value)}
-                placeholder="Search by group name..."
-                isEditing={true}
-                style={{ marginBottom: '12px' }}
-            />
-
-            {/* From Date Input */}
-            <FormField
-                id="fromDateInput"
-                label="From Date"
-                type="date"
-                value={searchData.fromDate}
-                onChange={(value) => handleInputChange('fromDate', value)}
-                isEditing={true}
-                style={{ marginBottom: '12px' }}
-            />
-
-            {/* To Date Input */}
-            <FormField
-                id="toDateInput"
-                label="To Date"
-                type="date"
-                value={searchData.toDate}
-                onChange={(value) => handleInputChange('toDate', value)}
-                isEditing={true}
-                style={{ marginBottom: '15px' }}
-            />
+            {/* Dynamic Form Fields */}
+            {fields.map((field, index) => (
+                <FormField
+                    key={field.id}
+                    id={field.id}
+                    label={field.label}
+                    type={field.type}
+                    value={searchData[field.id]}
+                    onChange={(value) => handleInputChange(field.id, value)}
+                    placeholder={field.placeholder}
+                    options={field.options}
+                    isEditing={true}
+                    style={{ marginBottom: index === fields.length - 1 ? '15px' : '12px' }}
+                />
+            ))}
 
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '10px' }}>

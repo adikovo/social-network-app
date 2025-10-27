@@ -18,12 +18,19 @@ function SearchSideBar() {
     const getSearchType = () => {
         const path = window.location.pathname;
 
-        if (path === '/feed') {
+        if (path === '/feed' || path.startsWith('/group/')) {
             return {
                 type: 'posts',
                 fields: ['content', 'author', 'date', 'group'],
                 placeholder: 'Search posts...',
-                title: 'Search Posts'
+                title: 'Search Posts',
+                multiSearchFields: [
+                    { id: 'content', label: 'Content', type: 'text', placeholder: 'Search in post content...' },
+                    { id: 'author', label: 'Author', type: 'text', placeholder: 'Search by author name...' },
+                    { id: 'group', label: 'Group', type: 'text', placeholder: 'Search by group name...' },
+                    { id: 'fromDate', label: 'From Date', type: 'date' },
+                    { id: 'toDate', label: 'To Date', type: 'date' }
+                ]
             };
         } else if (path === '/groups') {
             return {
@@ -37,7 +44,44 @@ function SearchSideBar() {
                 type: 'users',
                 fields: ['name', 'age', 'pets', 'budget', 'location', 'smoking', 'cleanliness'],
                 placeholder: 'Search users...',
-                title: 'Search Users'
+                title: 'Search Users',
+                multiSearchFields: [
+                    { id: 'name', label: 'Name', type: 'text', placeholder: 'Search by name...' },
+                    { id: 'age', label: 'Age', type: 'text', placeholder: 'Search by age...' },
+                    { id: 'location', label: 'Location', type: 'text', placeholder: 'Search by location...' },
+                    { id: 'budget', label: 'Budget', type: 'text', placeholder: 'Search by budget...' },
+                    {
+                        id: 'pets',
+                        label: 'Pets',
+                        type: 'select',
+                        options: [
+                            { value: 'yes', label: 'Yes, I have pets' },
+                            { value: 'no', label: 'No pets' },
+                            { value: 'allergic', label: 'Allergic to pets' }
+                        ]
+                    },
+                    {
+                        id: 'cleanliness',
+                        label: 'Cleanliness',
+                        type: 'select',
+                        options: [
+                            { value: 'very clean', label: 'Very Clean' },
+                            { value: 'clean', label: 'Clean' },
+                            { value: 'average', label: 'Average' },
+                            { value: 'messy', label: 'Messy' }
+                        ]
+                    },
+                    {
+                        id: 'smoking',
+                        label: 'Smoking',
+                        type: 'select',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' },
+                            { value: 'occasionally', label: 'Occasionally' }
+                        ]
+                    }
+                ]
             }
         }
     }
@@ -46,8 +90,8 @@ function SearchSideBar() {
 
     const handleSearch = async (searchData) => {
 
-        //multi parameter search for posts
-        if (searchData.type === 'posts' && searchData.data) {
+        //multi parameter search for posts and users
+        if ((searchData.type === 'posts' || searchData.type === 'users') && searchData.data) {
             setSearchTerm(Object.values(searchData.data).join(', '));
             setIsSearching(true);
 
@@ -56,6 +100,7 @@ function SearchSideBar() {
                     command: 'search',
                     data: searchData.data
                 });
+
                 setSearchResults(res.data[searchData.type] || []);
             }
             catch (error) {
@@ -122,13 +167,13 @@ function SearchSideBar() {
             <h5 style={{ marginBottom: '20px', color: '#1f2937' }}>{searchType.title}</h5>
 
             {/*search form */}
-            {searchType.type === 'posts' ? (
+            {searchType.type === 'posts' || searchType.type === 'users' ? (
                 <MultiSearchForm
                     searchType={searchType.type}
                     onSearch={handleSearch}
                     isSearching={isSearching}
-                    placeholder={searchType.placeholder}
                     onClear={handleClearResults}
+                    fields={searchType.multiSearchFields}
                 />
             ) : (
                 <SearchForm

@@ -31,21 +31,36 @@ const handleUserCommand = async (req, res) => {
 
             case 'search':
                 //multi parameter search for users
-                const { name, email, role } = data
+                const { name, age, location, budget, pets, cleanliness, smoking } = data
                 const searchQuery = {}
 
                 //build search query based on provided parameters
                 if (name) {
                     searchQuery.name = { $regex: name, $options: 'i' }
                 }
-                if (email) {
-                    searchQuery.email = { $regex: email, $options: 'i' }
+                if (age) {
+                    const ageNumber = parseInt(age);
+                    if (!isNaN(ageNumber)) {
+                        searchQuery['bio.age'] = ageNumber
+                    }
                 }
-                if (role) {
-                    searchQuery.role = role
+                if (location) {
+                    searchQuery['bio.location'] = { $regex: location, $options: 'i' }
+                }
+                if (budget) {
+                    searchQuery['bio.budget'] = { $regex: budget, $options: 'i' }
+                }
+                if (pets) {
+                    searchQuery['bio.lifestyle.pets'] = pets
+                }
+                if (cleanliness) {
+                    searchQuery['bio.lifestyle.cleanliness'] = cleanliness
+                }
+                if (smoking) {
+                    searchQuery['bio.lifestyle.smoking'] = smoking
                 }
 
-                const searchResults = await User.find(searchQuery)
+                const searchResults = await User.find(searchQuery);
                 return res.json({
                     message: 'user search completed successfully',
                     users: searchResults,
