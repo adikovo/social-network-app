@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const Group = require("../models/Group");
 
 //api endpoint to handle all CRUD operations
 const handlePostCommand = async (req, res) => {
@@ -31,12 +32,12 @@ const handlePostCommand = async (req, res) => {
 
             case 'search':
                 //multi parameter search for posts
-                const { author, date } = data
+                const { author, date, group, content } = data
                 const postSearchQuery = {}
 
                 //build search query based on provided parameters
                 if (author) {
-                    postSearchQuery.author = author
+                    postSearchQuery.author = { $regex: author, $options: 'i' }
                 }
                 if (date) {
                     //search for posts on a specific date
@@ -48,6 +49,27 @@ const handlePostCommand = async (req, res) => {
                         $gte: startOfDay,
                         $lt: endOfDay
                     }
+                }
+                if (group) {
+                    //find groups matching the name
+                    const matchingGroups = await Group.find({
+                        name: { $regex: group, $options: 'i' }
+                    }).select('_id');
+
+                    //extract group IDs
+                    const groupIds = matchingGroups.map(g => g._id.toString());
+
+                    //search posts by group IDs
+                    if (groupIds.length > 0) {
+                        postSearchQuery.groupId = { $in: groupIds };
+                    } else {
+
+                        postSearchQuery.groupId = { $in: [] };
+                    }
+                }
+                if (content) {
+                    //search for posts by content
+                    postSearchQuery.content = { $regex: content, $options: 'i' }
                 }
                 //sort posts by creation time in descending order
                 const postSearchResults = await Post.find(postSearchQuery).sort({ createdAt: -1 })

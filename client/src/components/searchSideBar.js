@@ -41,6 +41,7 @@ function SearchSideBar() {
     const searchType = getSearchType();
 
     const handleSearch = async (searchData) => {
+        console.log('Search triggered with:', searchData);
         setSearchTerm(searchData.term);
         setIsSearching(true);
 
@@ -51,6 +52,8 @@ function SearchSideBar() {
                     [searchData.field]: searchData.term
                 }
             });
+            console.log('Search response:', res.data);
+            console.log('Posts found:', res.data[searchData.type]);
             //create an array even if the response dont match expected structure
             setSearchResults(res.data[searchData.type] || []);
         }
