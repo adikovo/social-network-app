@@ -246,6 +246,9 @@ function GroupDetails() {
         group.admins?.includes(user.id)
     );
 
+    //check if current user is an admin of the group
+    const isAdmin = user && group && group.admins?.includes(user.id);
+
     // Show loading while checking for stored user
     if (isLoading) {
         return <div>Loading...</div>;
@@ -279,13 +282,13 @@ function GroupDetails() {
                     </div>
 
                     {/*show different buttons based on user role */}
-                    {isCreator ? (
-                        /* 3 dot menu - only show if user is creator */
+                    {(isCreator || isAdmin) ? (
+                        /* 3 dot menu show if user is creator or admin */
                         <ThreeDotMenu
                             menuItems={[
                                 { id: 'edit', label: 'Edit Group', action: 'edit' },
                                 { id: 'stats', label: 'Stats', action: 'stats' },
-                                { id: 'delete', label: 'Delete Group', action: 'delete', danger: true }
+                                ...(isCreator ? [{ id: 'delete', label: 'Delete Group', action: 'delete', danger: true }] : [])
                             ]}
                             onItemClick={(item) => {
                                 if (item.action === 'edit') {

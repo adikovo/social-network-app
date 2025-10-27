@@ -22,17 +22,20 @@ function FriendsList({
     const { user: currentUser } = useUserContext();
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
+    const [groupData, setGroupData] = useState(null);
     const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
-    // Check if current user is viewing their own profile
+    //check if current user is viewing their own profile
     const isOwnProfile = currentUser && currentUser.id === userId;
 
-    // Fetch data when component mounts or dependencies change
+    //fetch data when component mounts or dependencies change
     useEffect(() => {
         if (type === 'friends' && userId && isOwnProfile) {
             handleGetFriends();
         } else if (type === 'groupMembers' && groupId) {
             handleGetGroupMembers();
+            checkAdminStatus();
         }
     }, [userId, groupId, type, isOwnProfile]);
 
@@ -68,12 +71,80 @@ function FriendsList({
         })
             .then(res => {
                 console.log('Group members response:', res.data);
+                setGroupData(res.data.group);
                 setMembers(res.data.group.membersWithNames || []);
             })
             .catch(err => {
                 console.error('Group members error:', err);
             })
             .finally(() => setLoading(false));
+    }
+
+    //check if current user is an admin of the group
+    function checkAdminStatus() {
+        if (!groupId || !currentUser?.id) return;
+
+        axios.post('http://localhost:3001/api/groups', {
+            command: 'checkAdmin',
+            data: {
+                groupId: groupId,
+                userId: currentUser.id
+            }
+        })
+            .then(res => {
+                console.log('Admin check response:', res.data);
+                setIsCurrentUserAdmin(res.data.isAdmin || false);
+            })
+            .catch(err => {
+                console.error('Admin check error:', err);
+                setIsCurrentUserAdmin(false);
+            });
+    }
+
+    function handlePromoteToAdmin(memberId) {
+        if (!groupId || !currentUser?.id) return;
+
+        axios.post('http://localhost:3001/api/groups', {
+            command: 'addAdmin',
+            data: {
+                groupId: groupId,
+                userId: memberId,
+                requestingUserId: currentUser.id
+            }
+        })
+            .then(res => {
+                console.log('Promote to admin response:', res.data);
+                showSuccess('Member promoted to admin successfully!');
+                //refresh the group members list
+                handleGetGroupMembers();
+            })
+            .catch(err => {
+                console.error('Promote to admin error:', err);
+                showError('Failed to promote member to admin: ' + (err.response?.data?.message || err.message));
+            });
+    }
+
+    function handleRemoveAdmin(memberId) {
+        if (!groupId || !currentUser?.id) return;
+
+        axios.post('http://localhost:3001/api/groups', {
+            command: 'removeAdmin',
+            data: {
+                groupId: groupId,
+                userId: memberId,
+                requestingUserId: currentUser.id
+            }
+        })
+            .then(res => {
+                console.log('Remove admin response:', res.data);
+                showSuccess('Admin privileges removed successfully!');
+                //refresh the group members list
+                handleGetGroupMembers();
+            })
+            .catch(err => {
+                console.error('Remove admin error:', err);
+                showError('Failed to remove admin privileges: ' + (err.response?.data?.message || err.message));
+            });
     }
 
     function handleRemoveFriend(friendId) {
@@ -147,6 +218,16 @@ function FriendsList({
                 />
             );
         } else if (type === 'groupMembers') {
+            //check if this member is an admin
+            const isMemberAdmin = groupData?.admins?.includes(member.id) || false;
+            const isCreator = groupData?.createdBy === member.id;
+
+            //show admin management buttons for admins
+            //only creators can remove admin privileges, admins can promote members
+            const isCurrentUserCreator = groupData?.createdBy === currentUser?.id;
+            const showPromoteButton = isCurrentUserAdmin && !isCreator && member.id !== currentUser?.id;
+            const showRemoveAdminButton = isCurrentUserCreator && isMemberAdmin && member.id !== currentUser?.id;
+
             return (
                 <MyCard
                     key={member.id}
@@ -158,6 +239,60 @@ function FriendsList({
                         navigate(`/profile/${memberData.id}`);
                         if (onClose) onClose();
                     }}
+                    button={
+                        (showPromoteButton || showRemoveAdminButton) ? (
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                {showRemoveAdminButton && (
+                                    <MyButton
+                                        variant='warning'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm(`Are you sure you want to remove admin privileges from ${member.name}?`)) {
+                                                handleRemoveAdmin(member.id);
+                                            }
+                                        }}
+                                    >
+                                        Remove Admin
+                                    </MyButton>
+                                )}
+                                {showPromoteButton && !isMemberAdmin && (
+                                    <MyButton
+                                        variant='success'
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm(`Are you sure you want to promote ${member.name} to admin?`)) {
+                                                handlePromoteToAdmin(member.id);
+                                            }
+                                        }}
+                                    >
+                                        Make Admin
+                                    </MyButton>
+                                )}
+                            </div>
+                        ) : isMemberAdmin ? (
+                            <div style={{
+                                padding: '4px 8px',
+                                backgroundColor: '#e3f2fd',
+                                color: '#1976d2',
+                                borderRadius: '4px',
+                                fontSize: '0.8rem',
+                                fontWeight: 'bold'
+                            }}>
+                                Admin
+                            </div>
+                        ) : isCreator ? (
+                            <div style={{
+                                padding: '4px 8px',
+                                backgroundColor: '#fff3e0',
+                                color: '#f57c00',
+                                borderRadius: '4px',
+                                fontSize: '0.8rem',
+                                fontWeight: 'bold'
+                            }}>
+                                Creator
+                            </div>
+                        ) : null
+                    }
                 />
             );
         }

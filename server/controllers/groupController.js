@@ -215,9 +215,9 @@ const handleGroupCommand = async (req, res) => {
                     return res.json({ message: 'group not found' })
                 }
 
-                //check if the requesting user is the creator or an admin
-                if (groupToRemoveAdmin.createdBy !== data.requestingUserId && !groupToRemoveAdmin.admins.includes(data.requestingUserId)) {
-                    return res.status(403).json({ message: 'unauthorized: only group creators and admins can remove admins' })
+                //check if the requesting user is the creator 
+                if (groupToRemoveAdmin.createdBy !== data.requestingUserId) {
+                    return res.status(403).json({ message: 'unauthorized: only group creators can remove admins' })
                 }
 
                 //revoke admin permissions from group member
