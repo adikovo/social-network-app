@@ -11,7 +11,7 @@ const VideoInPost = ({
 }) => {
     console.log('VideoInPost - video:', video, 'variant:', variant, 'index:', index);
 
-    // Check if this is an uploaded video or YouTube video
+    //check if this is an uploaded video or YouTube video
     const isUploadedVideo = video.type === 'uploaded' || (!video.url.includes('youtube.com') && !video.url.includes('youtu.be'));
 
     const handleVideoClick = () => {
@@ -103,8 +103,10 @@ const VideoInPost = ({
                 <iframe
                     src={`${video.url}?rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&fs=1`}
                     title={`YouTube video ${index + 1}`}
-                    style={getVideoStyle()}
-                    frameBorder="0"
+                    style={{
+                        ...getVideoStyle(),
+                        border: 'none'
+                    }}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                 />

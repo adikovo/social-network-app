@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/SearchSideBar';
+import SearchResultsOverlay from '../components/SearchResultsOverlay';
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 import { useUserContext } from '../context/UserContext';
@@ -13,6 +14,8 @@ function Feed() {
     const { user, isLoading } = useUserContext();
     const [userData, setUserData] = useState(null);
     const [posts, setPosts] = useState([]);
+    const [showSearchOverlay, setShowSearchOverlay] = useState(false);
+    const [searchData, setSearchData] = useState(null);
 
     // if user is not loaded yet, redirect to login
     useEffect(() => {
@@ -24,7 +27,7 @@ function Feed() {
 
     useEffect(() => {
         if (user) {
-            //fetch user data from server
+            //fetch user data from the server
             axios.post('http://localhost:3001/api/users',
                 {
                     command: 'getUser',
@@ -39,7 +42,7 @@ function Feed() {
                     console.error('User fetch error:', err);
                 });
 
-            // Fetch posts when user is loaded
+            //fetch posts when user is loaded
             getPosts();
         }
     }, [user])
@@ -69,6 +72,24 @@ function Feed() {
         setPosts(prevPosts => [newPost, ...prevPosts]);
     };
 
+    const handleSearchResults = (searchData) => {
+        setSearchData(searchData);
+        setShowSearchOverlay(true);
+    };
+
+    const handleCloseSearchOverlay = () => {
+        setShowSearchOverlay(false);
+        setSearchData(null);
+    };
+
+    const handleUserClick = (user) => {
+        navigate(`/profile/${user._id}`);
+    };
+
+    const handleGroupClick = (group) => {
+        navigate(`/group/${group._id}`);
+    };
+
     const handlePostUpdated = (deletedPostId, updatedPost) => {
         if (deletedPostId) {
 
@@ -83,13 +104,13 @@ function Feed() {
                 )
             );
         } else {
-            // For other updates, refresh from server
+            //for other updates refresh from server
             getPosts();
         }
     };
 
 
-    // Show loading while checking for stored user
+    //show loading while checking for stored user
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -97,15 +118,16 @@ function Feed() {
     return (
         <div>
             <NavBar />
-            <SearchSideBar />
+            <SearchSideBar onSearchResults={handleSearchResults} />
             <div style={{
-                marginLeft: '320px',
                 marginTop: '55px',
                 padding: '20px',
-                maxWidth: '800px'
+                maxWidth: '800px',
+                marginLeft: '320px',
+                marginRight: 'auto'
             }}>
 
-                {/* Create Post Component */}
+                {/*create post component */}
                 <CreatePost onPostCreated={handlePostCreated} />
 
                 <div style={{ marginTop: '20px' }}>
@@ -130,6 +152,14 @@ function Feed() {
                 </div>
 
             </div>
+
+            <SearchResultsOverlay
+                isVisible={showSearchOverlay}
+                onClose={handleCloseSearchOverlay}
+                searchData={searchData}
+                onUserClick={handleUserClick}
+                onGroupClick={handleGroupClick}
+            />
         </div>
     );
 }

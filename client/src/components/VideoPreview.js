@@ -42,9 +42,8 @@ function VideoPreview({ video, index, onRemove }) {
                         width: '200px',
                         height: '113px',
                         borderRadius: '8px',
-                        border: '1px solid #e9ecef'
+                        border: 'none'
                     }}
-                    frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                 />

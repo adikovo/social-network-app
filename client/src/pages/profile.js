@@ -6,6 +6,7 @@ import BioForm from '../components/BioForm';
 import MyButton from '../components/MyButton';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/SearchSideBar';
+import SearchResultsOverlay from '../components/SearchResultsOverlay';
 import ProfilePicture from '../components/ProfilePicture';
 import ThreeDotMenu from '../components/ThreeDotMenu';
 import FriendsList from '../components/FriendsList';
@@ -27,10 +28,12 @@ function Profile() {
     const [hasReceivedRequest, setHasReceivedRequest] = useState(false);
     const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
     const [profileUser, setProfileUser] = useState(null);
+    const [showSearchOverlay, setShowSearchOverlay] = useState(false);
+    const [searchData, setSearchData] = useState(null);
     const navigate = useNavigate();
     const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
-    // Redirect to login if not authenticated
+    //redirect to login if not authenticated
     useEffect(() => {
         if (!isLoading && !currentUser) {
             navigate('/login');
@@ -314,6 +317,24 @@ function Profile() {
         }
     }
 
+    const handleSearchResults = (searchData) => {
+        setSearchData(searchData);
+        setShowSearchOverlay(true);
+    };
+
+    const handleCloseSearchOverlay = () => {
+        setShowSearchOverlay(false);
+        setSearchData(null);
+    };
+
+    const handleUserClick = (user) => {
+        navigate(`/profile/${user._id}`);
+    };
+
+    const handleGroupClick = (group) => {
+        navigate(`/group/${group._id}`);
+    };
+
     const handleDeleteProfilePicture = async () => {
         if (!window.confirm('Are you sure you want to delete your profile picture?')) {
             return;
@@ -366,11 +387,13 @@ function Profile() {
     return (
         <div>
             <NavBar></NavBar>
-            <SearchSideBar />
+            <SearchSideBar onSearchResults={handleSearchResults} />
             <div style={{
-                marginLeft: '320px',
                 padding: '20px',
-                marginTop: '100px'
+                marginTop: '100px',
+                maxWidth: '1200px',
+                marginLeft: '320px',
+                marginRight: 'auto'
             }}>
                 {/* Profile Header with Picture, Name, and Options Menu */}
                 <div style={{
@@ -529,6 +552,14 @@ function Profile() {
                 type={alert.type}
                 duration={alert.duration}
                 onClose={hideAlert}
+            />
+
+            <SearchResultsOverlay
+                isVisible={showSearchOverlay}
+                onClose={handleCloseSearchOverlay}
+                searchData={searchData}
+                onUserClick={handleUserClick}
+                onGroupClick={handleGroupClick}
             />
         </div>
     )

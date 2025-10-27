@@ -32,7 +32,7 @@ const handlePostCommand = async (req, res) => {
 
             case 'search':
                 //multi parameter search for posts
-                const { author, fromDate, toDate, group, content } = data
+                const { author, fromDate, toDate, group, content, groupId } = data
                 const postSearchQuery = {}
 
                 //build search query based on provided parameters
@@ -57,6 +57,10 @@ const handlePostCommand = async (req, res) => {
 
                     postSearchQuery.createdAt = dateQuery
                 }
+                if (groupId) {
+                    //search posts by specific group ID
+                    postSearchQuery.groupId = groupId
+                }
                 if (group) {
                     //find groups matching the name
                     const matchingGroups = await Group.find({
@@ -78,8 +82,10 @@ const handlePostCommand = async (req, res) => {
                     //search for posts by content
                     postSearchQuery.content = { $regex: content, $options: 'i' }
                 }
+
                 //sort posts by creation time in descending order
                 const postSearchResults = await Post.find(postSearchQuery).sort({ createdAt: -1 })
+
                 return res.json({
                     message: 'post search completed successfully',
                     posts: postSearchResults,

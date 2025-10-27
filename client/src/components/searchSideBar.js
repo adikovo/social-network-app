@@ -1,24 +1,17 @@
-import React from 'react';
-import { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import SearchForm from './SearchForm';
 import MultiSearchForm from './MultiSearchForm';
-import SearchResults from './SearchResults';
 import { useNavigate } from 'react-router-dom';
 
 
-function SearchSideBar() {
+function SearchSideBar({ onSearchResults }) {
 
     const navigate = useNavigate()
-
-    const [searchResults, setSearchResults] = useState([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
 
     const getSearchType = () => {
         const path = window.location.pathname;
 
-        if (path === '/feed' || path.startsWith('/group/')) {
+        if (path === '/feed') {
             return {
                 type: 'posts',
                 fields: ['content', 'author', 'date', 'group'],
@@ -31,6 +24,22 @@ function SearchSideBar() {
                     { id: 'fromDate', label: 'From Date', type: 'date' },
                     { id: 'toDate', label: 'To Date', type: 'date' }
                 ]
+            };
+        } else if (path.startsWith('/group/')) {
+            const groupId = path.split('/')[2];
+
+            return {
+                type: 'posts',
+                fields: ['content', 'author', 'date'],
+                placeholder: 'Search posts in this group...',
+                title: 'Search Group Posts',
+                multiSearchFields: [
+                    { id: 'content', label: 'Content', type: 'text', placeholder: 'Search in post content...' },
+                    { id: 'author', label: 'Author', type: 'text', placeholder: 'Search by author name...' },
+                    { id: 'fromDate', label: 'From Date', type: 'date' },
+                    { id: 'toDate', label: 'To Date', type: 'date' }
+                ],
+                groupId: groupId
             };
         } else if (path === '/groups') {
             return {
@@ -89,67 +98,17 @@ function SearchSideBar() {
     const searchType = getSearchType();
 
     const handleSearch = async (searchData) => {
-
-        //multi parameter search for posts and users
-        if ((searchData.type === 'posts' || searchData.type === 'users') && searchData.data) {
-            setSearchTerm(Object.values(searchData.data).join(', '));
-            setIsSearching(true);
-
-            try {
-                const res = await axios.post(`http://localhost:3001/api/${searchData.type}`, {
-                    command: 'search',
-                    data: searchData.data
-                });
-
-                setSearchResults(res.data[searchData.type] || []);
-            }
-            catch (error) {
-                console.error('Multi-parameter search error:', error);
-                setSearchResults([]);
-            } finally {
-                setIsSearching(false);
-            }
-        } else {
-            // single parameter search for other types
-            setSearchTerm(searchData.term);
-            setIsSearching(true);
-
-            try {
-                const res = await axios.post(`http://localhost:3001/api/${searchData.type}`, {
-                    command: 'search',
-                    data: {
-                        [searchData.field]: searchData.term
-                    }
-                });
-                setSearchResults(res.data[searchData.type] || []);
-            }
-            catch (error) {
-                console.error('Single-parameter search error:', error);
-                setSearchResults([]);
-            } finally {
-                setIsSearching(false);
-            }
+        //call the parent components search handler to show overlay
+        if (onSearchResults) {
+            // Add groupId to searchData if we're in a group context
+            const searchDataWithGroup = {
+                ...searchData,
+                groupId: searchType.groupId
+            };
+            onSearchResults(searchDataWithGroup);
         }
     };
 
-    //click handlers for different result types
-    const handleUserClick = (user) => {
-        navigate(`/profile/${user._id}`);
-    };
-
-    const handlePostClick = (post) => {
-        console.log('Post clicked:', post);
-        // Navigate to post details or perform other actions
-    };
-
-    const handleGroupClick = (group) => {
-        navigate(`/group/${group._id}`);
-    };
-
-    const handleClearResults = () => {
-        setSearchResults([]);
-        setSearchTerm('');
-    };
 
     return (
         <div style={{
@@ -171,9 +130,9 @@ function SearchSideBar() {
                 <MultiSearchForm
                     searchType={searchType.type}
                     onSearch={handleSearch}
-                    isSearching={isSearching}
-                    onClear={handleClearResults}
-                    fields={searchType.multiSearchFields}
+                    isSearching={false}
+                    onClear={() => { }}
+                    fields={searchType.multiSearchFields || []}
                 />
             ) : (
                 <SearchForm
@@ -181,24 +140,8 @@ function SearchSideBar() {
                     searchFields={searchType.fields}
                     placeholder={searchType.placeholder}
                     onSearch={handleSearch}
-                    isSearching={isSearching}
+                    isSearching={false}
                 />
-            )}
-
-            {/*search results */}
-            <SearchResults
-                searchType={searchType.type}
-                results={searchResults}
-                onUserClick={handleUserClick}
-                onPostClick={handlePostClick}
-                onGroupClick={handleGroupClick}
-                searchTerm={searchTerm}
-            />
-
-            {searchTerm && searchResults && searchResults.length === 0 && !isSearching && (
-                <div style={{ textAlign: 'center', color: '#6b7280', marginTop: '20px' }}>
-                    No results found for "{searchTerm}"
-                </div>
             )}
         </div>
     );

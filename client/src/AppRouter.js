@@ -21,7 +21,6 @@ function AppRouter() {
             <Route path="/group/:groupId" element={<GroupDetails />} />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/chat" element={<Chat />} />
-
         </Routes>
     );
 }

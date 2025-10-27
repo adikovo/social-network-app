@@ -10,7 +10,7 @@ function MyCard({ type, data, onClick, button, compact = false, profilePictureSi
         backgroundColor: 'white',
         border: '1px solid #e5e7eb',
         borderRadius: '6px',
-        cursor: 'pointer',
+        cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.2s ease',
         marginBottom: '10px',
         maxWidth: compact ? '50%' : '100%'
@@ -104,7 +104,7 @@ function MyCard({ type, data, onClick, button, compact = false, profilePictureSi
             style={itemStyle}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            onClick={() => onClick(data)}
+            onClick={onClick ? () => onClick(data) : undefined}
         >
             {renderContent()}
         </div>

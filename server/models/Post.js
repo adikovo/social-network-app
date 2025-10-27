@@ -1,6 +1,15 @@
 
 const mongoose = require('mongoose');
 
+// Video schema for embedded video objects
+const videoSchema = new mongoose.Schema({
+    url: String,
+    type: String, // 'youtube' or 'uploaded'
+    filename: String,
+    videoId: String,
+    originalUrl: String
+}, { _id: false });
+
 //structure of post document in the db
 const postSchema = new mongoose.Schema({
     content: String,
@@ -18,15 +27,5 @@ const postSchema = new mongoose.Schema({
 
 //post describes one document in db
 const Post = mongoose.model('Post', postSchema);
-
-
-// Video schema for embedded video objects
-const videoSchema = new mongoose.Schema({
-    url: String,
-    type: String, // 'youtube' or 'uploaded'
-    filename: String,
-    videoId: String,
-    originalUrl: String
-}, { _id: false });
 
 module.exports = Post;

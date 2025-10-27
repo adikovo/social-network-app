@@ -6,6 +6,7 @@ import CreateGroupForm from '../components/CreateGroupForm';
 import GroupCard from '../components/GroupCard';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/SearchSideBar';
+import SearchResultsOverlay from '../components/SearchResultsOverlay';
 import MyButton from '../components/MyButton';
 import { useUserContext } from '../context/UserContext';
 import MyAlert from '../components/MyAlert';
@@ -22,6 +23,8 @@ function Groups() {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState(null);
     const [isSearching, setIsSearching] = useState(false);
+    const [showSearchOverlay, setShowSearchOverlay] = useState(false);
+    const [searchData, setSearchData] = useState(null);
     const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     //if user is not loaded yet, redirect to login
@@ -78,6 +81,24 @@ function Groups() {
             })
             .finally(() => setIsSearching(false));
     }
+
+    const handleSearchResults = (searchData) => {
+        setSearchData(searchData);
+        setShowSearchOverlay(true);
+    };
+
+    const handleCloseSearchOverlay = () => {
+        setShowSearchOverlay(false);
+        setSearchData(null);
+    };
+
+    const handleUserClick = (user) => {
+        navigate(`/profile/${user._id}`);
+    };
+
+    const handleGroupClick = (group) => {
+        navigate(`/group/${group._id}`);
+    };
 
     function handleJoinGroup(groupId) {
         axios.post('http://localhost:3001/api/groups',
@@ -140,57 +161,66 @@ function Groups() {
     }
 
     return (
-        <div style={{ marginLeft: '320px', padding: '20px', maxWidth: '800px' }}>
+        <div>
             <NavBar></NavBar>
-            <SearchSideBar />
+            <SearchSideBar onSearchResults={handleSearchResults} />
+            <div style={{ padding: '20px', maxWidth: '800px', marginLeft: '320px', marginRight: 'auto', marginTop: '70px' }}>
+                <p>Your Groups:</p>
 
-            <p style={{ marginTop: '70px' }}>Your Groups:</p>
-
-            <div className="row">
-                {/* map through groups and display each group */}
-                {groups.map((group) => (
-                    <div key={group._id} className="col-md-4 mb-4">
-                        <GroupCard
-                            group={group}
-                            userId={currentUser.id}
-                            onJoin={handleJoinGroup}
-                            onLeave={handleLeaveGroup}
-                            showAdmin={true}
-                        />
-                    </div>
-                ))}
-            </div>
-
-            {groups.length === 0 && (
-                <div className="text-center mt-5">
-                    <p>No groups found. Join some groups to get started!</p>
+                <div className="row">
+                    {/* map through groups and display each group */}
+                    {groups.map((group) => (
+                        <div key={group._id} className="col-md-4 mb-4">
+                            <GroupCard
+                                group={group}
+                                userId={currentUser.id}
+                                onJoin={handleJoinGroup}
+                                onLeave={handleLeaveGroup}
+                                showAdmin={true}
+                            />
+                        </div>
+                    ))}
                 </div>
-            )}
 
-            {/*navigation buttons */}
-            <div className="mt-4">
-                <MyButton
-                    variant="primary"
-                    className="me-2"
-                    onClick={() => setShowCreateGroup(true)}>
-                    Create New Group
-                </MyButton>
+                {groups.length === 0 && (
+                    <div className="text-center mt-5">
+                        <p>No groups found. Join some groups to get started!</p>
+                    </div>
+                )}
+
+                {/*navigation buttons */}
+                <div className="mt-4">
+                    <MyButton
+                        variant="primary"
+                        className="me-2"
+                        onClick={() => setShowCreateGroup(true)}>
+                        Create New Group
+                    </MyButton>
+                </div>
+
+                <CreateGroupForm
+                    show={showCreateGroup}
+                    onClose={() => setShowCreateGroup(false)}
+                    userId={currentUser.id}
+                    onGroupCreated={fetchGroups}
+                />
+
+                {/* MyAlert Component */}
+                <MyAlert
+                    show={alert.show}
+                    message={alert.message}
+                    type={alert.type}
+                    duration={alert.duration}
+                    onClose={hideAlert}
+                />
             </div>
 
-            <CreateGroupForm
-                show={showCreateGroup}
-                onClose={() => setShowCreateGroup(false)}
-                userId={currentUser.id}
-                onGroupCreated={fetchGroups}
-            />
-
-            {/* MyAlert Component */}
-            <MyAlert
-                show={alert.show}
-                message={alert.message}
-                type={alert.type}
-                duration={alert.duration}
-                onClose={hideAlert}
+            <SearchResultsOverlay
+                isVisible={showSearchOverlay}
+                onClose={handleCloseSearchOverlay}
+                searchData={searchData}
+                onUserClick={handleUserClick}
+                onGroupClick={handleGroupClick}
             />
         </div>
     )

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import NavBar from '../components/navBar';
 import SearchSideBar from '../components/SearchSideBar';
+import SearchResultsOverlay from '../components/SearchResultsOverlay';
 import MyButton from '../components/MyButton';
 import ThreeDotMenu from '../components/ThreeDotMenu';
 import CreateGroupForm from '../components/CreateGroupForm';
@@ -32,6 +33,8 @@ function GroupDetails() {
     const [hasPendingJoinRequest, setHasPendingJoinRequest] = useState(false);
     const [groupStats, setGroupStats] = useState(null);
     const [activeTab, setActiveTab] = useState('contributors');
+    const [showSearchOverlay, setShowSearchOverlay] = useState(false);
+    const [searchData, setSearchData] = useState(null);
     const { alert, showSuccess, showError, showInfo, hideAlert } = useMyAlert();
 
     // Redirect to login if not authenticated
@@ -209,10 +212,27 @@ function GroupDetails() {
                 navigate('/groups');
             }).catch(error => {
                 console.error('Error deleting group:', error);
-                showError('Failed to delete group: ' + (error.response?.data?.message || error.message));
             });
         }
     }
+
+    const handleSearchResults = (searchData) => {
+        setSearchData(searchData);
+        setShowSearchOverlay(true);
+    };
+
+    const handleCloseSearchOverlay = () => {
+        setShowSearchOverlay(false);
+        setSearchData(null);
+    };
+
+    const handleUserClick = (user) => {
+        navigate(`/profile/${user._id}`);
+    };
+
+    const handleGroupClick = (group) => {
+        navigate(`/group/${group._id}`);
+    };
 
     function handleLeaveGroup() {
         if (window.confirm('Are you sure you want to leave this group?')) {
@@ -258,10 +278,18 @@ function GroupDetails() {
         return (
             <div>
                 <NavBar />
-                <SearchSideBar />
-                <div style={{ marginLeft: '320px', marginTop: '100px', padding: '20px' }}>
+                <SearchSideBar onSearchResults={handleSearchResults} />
+                <div style={{ marginTop: '100px', padding: '20px', maxWidth: '1400px', marginLeft: '320px', marginRight: 'auto', minWidth: '600px' }}>
                     <div>Group not found or you don't have permission to view it.</div>
                 </div>
+
+                <SearchResultsOverlay
+                    isVisible={showSearchOverlay}
+                    onClose={handleCloseSearchOverlay}
+                    searchData={searchData}
+                    onUserClick={handleUserClick}
+                    onGroupClick={handleGroupClick}
+                />
             </div>
         );
     }
@@ -269,11 +297,11 @@ function GroupDetails() {
     return (
         <div>
             <NavBar />
-            <SearchSideBar />
-            <div style={{ marginLeft: '320px', marginTop: '100px', padding: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                        <h1 style={{ margin: 0 }}>{group?.name || 'Loading...'}</h1>
+            <SearchSideBar onSearchResults={handleSearchResults} />
+            <div style={{ marginTop: '120px', padding: '20px', maxWidth: '1400px', marginLeft: '320px', marginRight: 'auto', minWidth: '600px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: '1', minWidth: '300px' }}>
+                        <h1 style={{ margin: 0, wordBreak: 'break-word', maxWidth: '100%' }}>{group?.name || 'Loading...'}</h1>
                         {group && (
                             <MyButton onClick={() => setShowMembers(!showMembers)}>
                                 {showMembers ? 'Hide Members' : `View Members (${group.members ? group.members.length : 0})`}
@@ -465,6 +493,13 @@ function GroupDetails() {
                 onClose={hideAlert}
             />
 
+            <SearchResultsOverlay
+                isVisible={showSearchOverlay}
+                onClose={handleCloseSearchOverlay}
+                searchData={searchData}
+                onUserClick={handleUserClick}
+                onGroupClick={handleGroupClick}
+            />
         </div>
     )
 

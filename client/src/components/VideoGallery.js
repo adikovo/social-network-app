@@ -4,6 +4,8 @@ import VideoInPost from './VideoInPost';
 function VideoGallery({ videos, onVideoClick }) {
     if (!videos || videos.length === 0) return null;
 
+
+    //get the grid style
     const getGridStyle = (numVideos) => {
         if (numVideos === 1) {
             return { gridTemplateColumns: '1fr', maxWidth: '100%' };
@@ -14,6 +16,7 @@ function VideoGallery({ videos, onVideoClick }) {
         }
     };
 
+    //get the video container style
     const getVideoContainerStyle = (index, numVideos) => {
         if (numVideos === 1) {
             return { aspectRatio: '16/9', maxHeight: '400px', minHeight: '200px' };

@@ -21,7 +21,7 @@ function SearchResults({
             const getClickHandler = () => {
                 switch (searchType) {
                     case 'users': return onUserClick;
-                    case 'posts': return onPostClick;
+                    case 'posts': return null;
                     case 'groups': return onGroupClick;
                     default: return null;
                 }
