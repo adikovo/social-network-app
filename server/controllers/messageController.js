@@ -78,7 +78,7 @@ const sendMessage = async (messageData) => {
                 await conversation.save();
             }
 
-            // increment the receiver unread count
+            // increment the receiver unread count and remove both users from deletedBy array
             await Conversation.findOneAndUpdate(
                 { conversationId: conversationId },
                 {
@@ -89,6 +89,9 @@ const sendMessage = async (messageData) => {
                     },
                     $inc: {
                         'unreadCounts.$[elem].count': 1
+                    },
+                    $pull: {
+                        deletedBy: { $in: [senderId, receiverId] }
                     }
                 },
                 {

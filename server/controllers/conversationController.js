@@ -56,7 +56,8 @@ const getConversationMessages = async (conversationId) => {
 const getUserConversations = async (userId) => {
     try {
         const conversations = await Conversation.find({
-            participants: { $in: [userId] }
+            participants: { $in: [userId] },
+            deletedBy: { $nin: [userId] }
         })
             .populate('participants', 'name profilePicture')
             .populate('lastMessageSender', 'name')
@@ -86,20 +87,21 @@ const getUserConversations = async (userId) => {
     }
 };
 
-//delete conversation and all its messages
-const deleteConversation = async (conversationId) => {
+//soft delete conversation for a specific user
+const deleteConversation = async (conversationId, userId) => {
     try {
-        // delete all messages in the conversation
-        await Message.deleteMany({ conversationId });
-
-        // delete the conversation
-        const deletedConversation = await Conversation.findOneAndDelete({ conversationId });
+        // Add user to deletedBy array instead of actually deleting
+        await Conversation.findOneAndUpdate(
+            { conversationId: conversationId },
+            { $addToSet: { deletedBy: userId } }
+        );
 
         return {
             success: true,
-            conversation: deletedConversation
+            message: 'Conversation deleted successfully'
         };
     } catch (error) {
+        console.error('Error deleting conversation:', error);
         return {
             success: false,
             message: error.message

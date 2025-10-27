@@ -1,10 +1,12 @@
 import React from 'react';
 import ProfilePicture from './ProfilePicture';
+import ThreeDotMenu from './ThreeDotMenu';
 
 function ConvoChatCard({
     conversation,
     isSelected,
-    onSelect
+    onSelect,
+    onDelete
 }) {
     const formatTimestamp = (timestamp) => {
         if (!timestamp) return "";
@@ -128,6 +130,18 @@ function ConvoChatCard({
                     )}
                 </div>
             </div>
+
+            {/* 3 dot menu */}
+            <ThreeDotMenu
+                menuItems={[
+                    { id: 'delete', label: 'Delete Chat', action: 'delete', danger: true }
+                ]}
+                onItemClick={(item) => {
+                    if (item.action === 'delete' && onDelete) {
+                        onDelete(conversation);
+                    }
+                }}
+            />
         </div>
     );
 }

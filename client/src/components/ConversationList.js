@@ -4,7 +4,8 @@ import ConvoChatCard from './ConvoChatCard';
 function ConversationList({
     conversations = [],
     onConversationSelect,
-    selectedConversationId
+    selectedConversationId,
+    onDeleteConversation
 }) {
 
 
@@ -38,6 +39,7 @@ function ConversationList({
                             conversation={conversation}
                             isSelected={selectedConversationId === conversation.id}
                             onSelect={onConversationSelect}
+                            onDelete={onDeleteConversation}
                         />
                     ))}
                 </div>

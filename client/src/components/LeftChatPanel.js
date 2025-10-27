@@ -8,7 +8,8 @@ function LeftChatPanel({
     onConversationSelect,
     selectedConversationId,
     currentUserId,
-    userFriends = []
+    userFriends = [],
+    onDeleteConversation
 }) {
     const [filteredConversations, setFilteredConversations] = useState(conversations);
     const [searchMode, setSearchMode] = useState('conversations');
@@ -198,6 +199,7 @@ function LeftChatPanel({
                         conversations={filteredConversations}
                         onConversationSelect={onConversationSelect}
                         selectedConversationId={selectedConversationId}
+                        onDeleteConversation={onDeleteConversation}
                     />
                 )}
             </div>

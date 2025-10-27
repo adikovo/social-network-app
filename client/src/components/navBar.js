@@ -61,6 +61,24 @@ function NavBar() {
         };
     }, []);
 
+    //listen for conversation events to update chat notification badge
+    useEffect(() => {
+        const handleConversationRead = () => {
+            fetchUnreadChatCount();
+        };
+
+        const handleConversationDeleted = () => {
+            fetchUnreadChatCount();
+        };
+
+        window.addEventListener('conversationRead', handleConversationRead);
+        window.addEventListener('conversationDeleted', handleConversationDeleted);
+
+        return () => {
+            window.removeEventListener('conversationRead', handleConversationRead);
+            window.removeEventListener('conversationDeleted', handleConversationDeleted);
+        };
+    }, []);
 
     const handleLogout = () => {
         // Clear all local state first
@@ -88,8 +106,6 @@ function NavBar() {
 
     const handleChat = () => {
         navigate('/chat');
-        //refresh unread count when navigating to chat
-        fetchUnreadChatCount();
     };
 
     const handleStats = () => {

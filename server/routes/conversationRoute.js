@@ -33,11 +33,16 @@ router.get('/:userId', async (req, res) => {
 //delete conversation
 router.delete('/:conversationId', async (req, res) => {
     try {
-        const deletedConversation = await deleteConversation(req.params.conversationId);
-        if (!deletedConversation) {
-            return res.status(404).json({ error: 'Conversation not found' });
+        const { conversationId } = req.params;
+        const { userId } = req.body;
+
+        const result = await deleteConversation(conversationId, userId);
+
+        if (result.success) {
+            res.json(result);
+        } else {
+            res.status(400).json(result);
         }
-        res.json({ message: 'Conversation deleted successfully', conversation: deletedConversation });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

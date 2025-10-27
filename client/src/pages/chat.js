@@ -178,6 +178,11 @@ function Chat() {
                         if (newConversation) {
                             setSelectedConversation(newConversation);
                         }
+
+                        //dispatch event to update navbar badge for new conversations
+                        window.dispatchEvent(new CustomEvent('conversationRead', {
+                            detail: { conversationId: selectedConversation.conversationId }
+                        }));
                     });
                 } else {
                     // for existing conversations, update the last message
@@ -214,6 +219,44 @@ function Chat() {
         }
     };
 
+    const handleDeleteConversation = async (conversation) => {
+        if (!user) return;
+
+        //show confirmation dialog
+        const confirmed = window.confirm(`Are you sure you want to delete the conversation with ${conversation.name}? `);
+
+        if (!confirmed) return;
+
+        try {
+            const response = await axios.delete(`http://localhost:3001/api/conversations/${conversation.conversationId}`, {
+                data: { userId: user._id || user.id }
+            });
+
+            if (response.status === 200) {
+                //remove conversation from local state
+                setConversations(prevConversations =>
+                    prevConversations.filter(conv => conv.id !== conversation.id)
+                );
+
+                //if the deleted conversation was selected, clear selection
+                if (selectedConversation && selectedConversation.id === conversation.id) {
+                    setSelectedConversation(null);
+                    setMessages([]);
+                }
+
+                console.log('Conversation deleted successfully');
+
+                //dispatch event to update navbar badge
+                window.dispatchEvent(new CustomEvent('conversationDeleted', {
+                    detail: { conversationId: conversation.conversationId }
+                }));
+            }
+        } catch (error) {
+            console.error('Error deleting conversation:', error);
+            alert('Failed to delete conversation. Please try again.');
+        }
+    };
+
     const handleConversationSelect = async (conversation) => {
         if (!user) return;
 
@@ -237,6 +280,11 @@ function Chat() {
                             : conv
                     )
                 );
+
+                //dispatch event to update navbar badge
+                window.dispatchEvent(new CustomEvent('conversationRead', {
+                    detail: { conversationId: conversation.conversationId }
+                }));
             } catch (error) {
                 console.error('Error marking conversation as read:', error);
             }
@@ -296,6 +344,7 @@ function Chat() {
                                 selectedConversationId={selectedConversation?.id}
                                 currentUserId={user.id}
                                 userFriends={user.friends || []}
+                                onDeleteConversation={handleDeleteConversation}
                             />
                         )}
                     </div>
