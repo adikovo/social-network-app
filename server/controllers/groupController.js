@@ -6,11 +6,8 @@ const { emitNotification } = require("../socket");
 // Create a new group
 const createGroup = async (data) => {
     try {
-        console.log('Create group data received:', data);
-
         //get the creator name for easy searching
         const creator = await User.findById(data.createdBy);
-        console.log('Creator found:', creator ? creator.name : 'Not found');
         const creatorName = creator ? creator.name : 'Unknown';
 
         //create new group document
@@ -25,11 +22,8 @@ const createGroup = async (data) => {
             posts: data.posts
         })
 
-        console.log('New group document created:', newGroup);
-
         //save group to db
         await newGroup.save()
-        console.log('Group saved successfully');
 
         return { message: 'group inserted successfully', group: newGroup }
     } catch (error) {
@@ -432,9 +426,6 @@ const acceptJoinRequest = async (data) => {
 
     // Add notification to the user who requested to join
     const adminUser = await User.findById(data.userId);
-    console.log('Creating join group approval notification for user:', data.requestUserId);
-    console.log('Admin user:', adminUser?.name);
-    console.log('Group name:', acceptGroup.name);
 
     const notification = {
         type: 'joinGroupApproved',
@@ -454,7 +445,6 @@ const acceptJoinRequest = async (data) => {
             }
         }
     );
-    console.log('Join group approval notification created successfully');
 
     // Emit real-time notification to the user
     emitNotification(data.requestUserId, notification);
@@ -557,8 +547,6 @@ const getGroupStats = async (data) => {
 
     //process member join dates for timeline chart
     const joinDates = statGroup.memberJoinDates || [];
-    console.log('memberJoinDates:', joinDates);
-    console.log('Number of join dates:', joinDates.length);
 
     //group by month
     const joinDatesByMonth = {};
@@ -576,7 +564,6 @@ const getGroupStats = async (data) => {
         }))
         .sort((a, b) => a.date.localeCompare(b.date));
 
-    console.log('Timeline data:', timelineData);
 
     const statsResponse = {
         topContributors: topContributors,
@@ -585,7 +572,6 @@ const getGroupStats = async (data) => {
         memberJoinTimeline: timelineData
     };
 
-    console.log('Stats response being sent:', JSON.stringify(statsResponse, null, 2));
 
     return {
         message: 'group statistics retrieved successfully',

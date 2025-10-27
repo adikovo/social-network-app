@@ -118,8 +118,6 @@ const sendFriendRequest = async (data) => {
 
 // Accept friend request
 const acceptFriendRequest = async (data) => {
-    console.log('Accepting friend request:', data);
-
     //remove from requests & add to friends array
     const acceptor = await User.findByIdAndUpdate(
         //the user that accepted
@@ -130,7 +128,6 @@ const acceptFriendRequest = async (data) => {
         },
         { new: true }
     );
-    console.log('Acceptor updated:', acceptor?.friends);
 
     //remove from sender's pending array & add to their friends list
     const sender = await User.findByIdAndUpdate(
@@ -141,11 +138,8 @@ const acceptFriendRequest = async (data) => {
         },
         { new: true }
     );
-    console.log('Sender updated:', sender?.friends);
 
     // Add notification to the user who sent the friend request
-    console.log('Creating friend request acceptance notification for user:', data.friendId);
-    console.log('Acceptor user:', acceptor?.name);
 
     const notification = {
         type: 'friendRequestAccepted',
@@ -163,7 +157,6 @@ const acceptFriendRequest = async (data) => {
             }
         }
     );
-    console.log('Friend request acceptance notification created successfully');
 
     // Emit real-time notification to the user
     emitNotification(data.friendId, notification);
@@ -237,15 +230,12 @@ const removeFriend = async (data) => {
 // Get friends
 const getFriends = async (data) => {
     //get all friends of a user with their details
-    console.log('Getting friends for user:', data.userId);
     const user = await User.findById(data.userId)
     if (!user) {
         return { message: 'user not found' }
     }
-    console.log('User found, friends array:', user.friends);
     //get friend details
     const friends = await User.find({ _id: { $in: user.friends } })
-    console.log('Friends found:', friends.length, friends.map(f => f.name));
     return {
         message: 'friends retrieved successfully',
         friends: friends
@@ -365,13 +355,8 @@ const getNotifications = async (data) => {
         return { message: 'user not found' };
     }
 
-    console.log('Fetching notifications for user:', data.userId);
-    console.log('Total notifications found:', userWithNotifications.notifications.length);
-
     // Sort notifications by creation date (newest first)
     const sortedNotifications = userWithNotifications.notifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    console.log('Sorted notifications:', sortedNotifications.map(n => ({ type: n.type, message: n.message })));
 
     return {
         message: 'notifications retrieved successfully',

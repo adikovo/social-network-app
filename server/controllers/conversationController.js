@@ -112,13 +112,10 @@ const deleteConversation = async (conversationId, userId) => {
 //mark messages as read for a specific user in a conversation
 const markConversationAsRead = async (conversationId, userId) => {
     try {
-        console.log('markConversationAsRead called with:', conversationId, userId);
-
         // First ensure unreadCounts array exists
         const conversation = await Conversation.findOne({ conversationId: conversationId });
 
         if (!conversation.unreadCounts || conversation.unreadCounts.length === 0) {
-            console.log('Initializing unreadCounts for conversation:', conversationId);
             conversation.unreadCounts = [
                 { userId: conversation.participants[0], count: 0 },
                 { userId: conversation.participants[1], count: 0 }
@@ -138,7 +135,6 @@ const markConversationAsRead = async (conversationId, userId) => {
             }
         );
 
-        console.log('Conversation marked as read successfully');
         return {
             success: true,
             message: 'Messages marked as read'

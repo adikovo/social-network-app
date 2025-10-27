@@ -290,16 +290,6 @@ const uploadPostImage = async (req, res) => {
         const uploadedFile = req.file;
         const imageUrl = `/uploads/${uploadedFile.filename}`;
 
-        console.log('Image uploaded successfully:', {
-            originalName: uploadedFile.originalname,
-            filename: uploadedFile.filename,
-            size: uploadedFile.size,
-            mimetype: uploadedFile.mimetype,
-            imageUrl: imageUrl,
-            userId: req.body.userId,
-            groupId: req.body.groupId || null
-        });
-
         // Return success response with image URL
         res.json({
             success: true,
@@ -339,16 +329,6 @@ const uploadPostVideo = async (req, res) => {
         // Get the uploaded file information
         const uploadedFile = req.file;
         const videoUrl = `/uploads/${uploadedFile.filename}`;
-
-        console.log('Video uploaded successfully:', {
-            originalName: uploadedFile.originalname,
-            filename: uploadedFile.filename,
-            size: uploadedFile.size,
-            mimetype: uploadedFile.mimetype,
-            videoUrl: videoUrl,
-            userId: req.body.userId,
-            groupId: req.body.groupId || null
-        });
 
         // Return success response with video URL
         res.json({
