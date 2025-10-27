@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
     notifications: [{
         type: {
             type: String,
-            enum: ['joinGroupApproved', 'joinGroupDeclined', 'friendRequestAccepted']
+            enum: ['joinGroupApproved', 'joinGroupDeclined', 'friendRequestAccepted', 'adminPromoted']
         },
         fromUserId: String,
         fromUserName: String,

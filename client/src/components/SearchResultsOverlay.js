@@ -40,9 +40,8 @@ function SearchResultsOverlay({
                 });
             } else if (searchData.type === 'users') {
                 // Use the users search endpoint
-                res = await axios.post('http://localhost:3001/api/users', {
-                    command: 'search',
-                    data: { name: searchData.term }
+                res = await axios.post('http://localhost:3001/api/users/search', {
+                    name: searchData.term
                 });
             } else if (searchData.type === 'posts') {
                 // Use the posts search endpoint

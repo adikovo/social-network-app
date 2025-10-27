@@ -63,11 +63,8 @@ function Profile() {
         if (!currentUser || !userId) return;
 
         //check if already friends
-        axios.post('http://localhost:3001/api/users', {
-            command: 'getFriends',
-            data: {
-                userId: currentUser.id
-            }
+        axios.post('http://localhost:3001/api/users/friends', {
+            userId: currentUser.id
         })
             .then(res => {
                 const friends = res.data.friends || [];
@@ -86,12 +83,9 @@ function Profile() {
     }
 
     function checkPendingRequest() {
-        axios.post('http://localhost:3001/api/users', {
-            command: 'checkPendingRequest',
-            data: {
-                userId: currentUser.id,
-                friendId: userId
-            }
+        axios.post('http://localhost:3001/api/users/check-pending-request', {
+            userId: currentUser.id,
+            friendId: userId
         })
             .then(res => {
                 setHasPendingRequest(res.data.hasPendingRequest);
@@ -102,12 +96,9 @@ function Profile() {
     }
 
     function checkReceivedRequest() {
-        axios.post('http://localhost:3001/api/users', {
-            command: 'checkReceivedRequest',
-            data: {
-                userId: currentUser.id,
-                friendId: userId
-            }
+        axios.post('http://localhost:3001/api/users/check-received-request', {
+            userId: currentUser.id,
+            friendId: userId
         })
             .then(res => {
                 setHasReceivedRequest(res.data.hasReceivedRequest);
@@ -120,11 +111,8 @@ function Profile() {
 
     function handleDeleteUser() {
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'delete',
-            data: {
-                userId: userId
-            }
+        axios.post('http://localhost:3001/api/users/delete', {
+            userId: userId
         })
             .then(res => {
                 console.log('Delete response:', res.data);
@@ -137,11 +125,8 @@ function Profile() {
 
     function handleGetBio() {
         setCurrentMode('bio');
-        axios.post('http://localhost:3001/api/users', {
-            command: 'getBio',
-            data: {
-                userId: userId
-            }
+        axios.post('http://localhost:3001/api/users/bio', {
+            userId: userId
         })
             .then(res => {
                 console.log('Bio response:', res.data);
@@ -153,11 +138,8 @@ function Profile() {
     }
 
     function handleGetUser() {
-        axios.post('http://localhost:3001/api/users', {
-            command: 'getUser',
-            data: {
-                userId: userId
-            }
+        axios.post('http://localhost:3001/api/users/get', {
+            userId: userId
         })
             .then(res => {
                 console.log('User response:', res.data);
@@ -169,12 +151,9 @@ function Profile() {
     }
 
     function handleUpdateBio() {
-        axios.post('http://localhost:3001/api/users', {
-            command: 'updateBio',
-            data: {
-                userId: userId,
-                bio: userBio
-            }
+        axios.post('http://localhost:3001/api/users/update-bio', {
+            userId: userId,
+            bio: userBio
         })
             .then(res => {
                 console.log('Bio update response:', res.data);
@@ -193,12 +172,9 @@ function Profile() {
             return;
         }
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'sendFriendRequest',
-            data: {
-                userId: currentUser.id,
-                friendId: userId
-            }
+        axios.post('http://localhost:3001/api/users/send-friend-request', {
+            userId: currentUser.id,
+            friendId: userId
         })
             .then(res => {
                 console.log('Friend request sent successfully', res.data);
@@ -217,12 +193,9 @@ function Profile() {
             return;
         }
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'cancelFriendRequest',
-            data: {
-                userId: currentUser.id,
-                friendId: userId
-            }
+        axios.post('http://localhost:3001/api/users/cancel-friend-request', {
+            userId: currentUser.id,
+            friendId: userId
         })
             .then(res => {
                 console.log('Friend request cancelled successfully', res.data);
@@ -241,12 +214,9 @@ function Profile() {
             return;
         }
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'acceptFriendRequest',
-            data: {
-                userId: currentUser.id,
-                friendId: userId
-            }
+        axios.post('http://localhost:3001/api/users/accept-friend-request', {
+            userId: currentUser.id,
+            friendId: userId
         })
             .then(res => {
                 console.log('Friend request accepted successfully', res.data);
@@ -266,12 +236,9 @@ function Profile() {
             return;
         }
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'declineFriendRequest',
-            data: {
-                userId: currentUser.id,
-                friendId: userId
-            }
+        axios.post('http://localhost:3001/api/users/decline-friend-request', {
+            userId: currentUser.id,
+            friendId: userId
         })
             .then(res => {
                 console.log('Friend request rejected successfully', res.data);
@@ -341,11 +308,8 @@ function Profile() {
         }
 
         try {
-            const res = await axios.post('http://localhost:3001/api/users', {
-                command: 'deleteProfilePicture',
-                data: {
-                    userId: currentUser.id
-                }
+            const res = await axios.post('http://localhost:3001/api/users/delete-profile-picture', {
+                userId: currentUser.id
             });
 
             console.log('Profile picture delete response:', res.data);

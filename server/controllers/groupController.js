@@ -1,6 +1,7 @@
 const User = require("../models/User")
 const Group = require("../models/Group");
 const Post = require("../models/Post");
+const { emitNotification } = require("../socket");
 
 // Create a new group
 const createGroup = async (data) => {
@@ -214,22 +215,27 @@ const addAdmin = async (data) => {
     const promotingUser = await User.findById(data.requestingUserId);
     const promotedUser = await User.findById(data.userId);
 
+    const notification = {
+        type: 'adminPromoted',
+        fromUserId: data.requestingUserId,
+        fromUserName: promotingUser.name,
+        fromUserProfilePicture: promotingUser.profilePicture,
+        groupId: data.groupId,
+        groupName: addAdminGroup.name,
+        message: `You have been promoted to admin in "${addAdminGroup.name}"!`
+    };
+
     await User.findByIdAndUpdate(
         data.userId,
         {
             $push: {
-                notifications: {
-                    type: 'adminPromoted',
-                    fromUserId: data.requestingUserId,
-                    fromUserName: promotingUser.name,
-                    fromUserProfilePicture: promotingUser.profilePicture,
-                    groupId: data.groupId,
-                    groupName: addAdminGroup.name,
-                    message: `You have been promoted to admin in "${addAdminGroup.name}"!`
-                }
+                notifications: notification
             }
         }
     );
+
+    // Emit real-time notification to the user
+    emitNotification(data.userId, notification);
 
     return { message: 'admin added successfully', group: addAdminGroup }
 }
@@ -345,10 +351,13 @@ const checkAdmin = async (data) => {
         return { message: 'group not found', isAdmin: false }
     }
 
+    // Check if user is creator or in admins array
+    const isCreator = checkGroup.createdBy === data.userId;
     const isAdmin = checkGroup.admins && checkGroup.admins.includes(data.userId);
+
     return {
         message: 'admin check completed',
-        isAdmin: isAdmin
+        isAdmin: isCreator || isAdmin
     }
 }
 
@@ -416,23 +425,28 @@ const acceptJoinRequest = async (data) => {
     console.log('Admin user:', adminUser?.name);
     console.log('Group name:', acceptGroup.name);
 
+    const notification = {
+        type: 'joinGroupApproved',
+        fromUserId: data.userId,
+        fromUserName: adminUser.name,
+        fromUserProfilePicture: adminUser.profilePicture,
+        groupId: data.groupId,
+        groupName: acceptGroup.name,
+        message: `Your request to join "${acceptGroup.name}" was approved!`
+    };
+
     await User.findByIdAndUpdate(
         data.requestUserId,
         {
             $push: {
-                notifications: {
-                    type: 'joinGroupApproved',
-                    fromUserId: data.userId,
-                    fromUserName: adminUser.name,
-                    fromUserProfilePicture: adminUser.profilePicture,
-                    groupId: data.groupId,
-                    groupName: acceptGroup.name,
-                    message: `Your request to join "${acceptGroup.name}" was approved!`
-                }
+                notifications: notification
             }
         }
     );
     console.log('Join group approval notification created successfully');
+
+    // Emit real-time notification to the user
+    emitNotification(data.requestUserId, notification);
 
     return { message: 'join request accepted successfully', group: acceptGroup };
 }
@@ -452,22 +466,27 @@ const declineJoinRequest = async (data) => {
 
     // Add notification to the user who requested to join
     const declineAdminUser = await User.findById(data.userId);
+    const notification = {
+        type: 'joinGroupDeclined',
+        fromUserId: data.userId,
+        fromUserName: declineAdminUser.name,
+        fromUserProfilePicture: declineAdminUser.profilePicture,
+        groupId: data.groupId,
+        groupName: declineGroup.name,
+        message: `Your request to join "${declineGroup.name}" was declined.`
+    };
+
     await User.findByIdAndUpdate(
         data.requestUserId,
         {
             $push: {
-                notifications: {
-                    type: 'joinGroupDeclined',
-                    fromUserId: data.userId,
-                    fromUserName: declineAdminUser.name,
-                    fromUserProfilePicture: declineAdminUser.profilePicture,
-                    groupId: data.groupId,
-                    groupName: declineGroup.name,
-                    message: `Your request to join "${declineGroup.name}" was declined.`
-                }
+                notifications: notification
             }
         }
     );
+
+    // Emit real-time notification to the user
+    emitNotification(data.requestUserId, notification);
 
     return { message: 'join request declined successfully', group: declineGroup };
 }

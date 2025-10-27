@@ -43,11 +43,8 @@ function FriendsList({
         if (onModeChange) onModeChange('friends');
         setLoading(true);
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'getFriends',
-            data: {
-                userId: userId
-            }
+        axios.post('http://localhost:3001/api/users/friends', {
+            userId: userId
         })
             .then(res => {
                 console.log('Friends response:', res.data);
@@ -136,12 +133,9 @@ function FriendsList({
     }
 
     function handleRemoveFriend(friendId) {
-        axios.post('http://localhost:3001/api/users', {
-            command: 'removeFriend',
-            data: {
-                userId: currentUser.id,
-                friendId: friendId
-            }
+        axios.post('http://localhost:3001/api/users/remove-friend', {
+            userId: currentUser.id,
+            friendId: friendId
         })
             .then(res => {
                 console.log('Remove friend response:', res.data);

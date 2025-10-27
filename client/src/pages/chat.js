@@ -262,10 +262,9 @@ function Chat() {
 
             //handle new conversation case
             if (selectedConversation.isNewConversation) {
-                // For new conversations, refresh the conversations list from server
-                // This ensures we get the real conversation with proper database ID
+                //refresh the conversations list from server
                 fetchConversations((updatedConversations) => {
-                    // Find and select the newly created conversation
+                    //find and select the newly created conversation
                     const newConversation = updatedConversations.find(conv =>
                         conv.conversationId === selectedConversation.conversationId
                     );
@@ -274,7 +273,7 @@ function Chat() {
                         setSelectedConversation(newConversation);
                     }
 
-                    //dispatch event to update navbar badge for new conversations
+                    //dispatch event to update navbar badge
                     window.dispatchEvent(new CustomEvent('conversationRead', {
                         detail: { conversationId: selectedConversation.conversationId }
                     }));
@@ -319,8 +318,6 @@ function Chat() {
                     setSelectedConversation(null);
                     setMessages([]);
                 }
-
-                console.log('Conversation deleted successfully');
 
                 //dispatch event to update navbar badge
                 window.dispatchEvent(new CustomEvent('conversationDeleted', {

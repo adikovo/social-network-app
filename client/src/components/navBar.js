@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { data, useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import MyButton from './MyButton';
 import DropdownMenu from './DropdownMenu';
 import RoomieRequestCard from './RoomieRequestCard';
@@ -24,6 +25,7 @@ function NavBar() {
     const { alert, showSuccess, showError, hideAlert } = useMyAlert();
     const profileRef = useRef(null);
     const requestRef = useRef(null);
+    const socketRef = useRef(null);
 
 
     //fetch roomie requests, group join requests, notifications, and unread chat count when user is loaded
@@ -60,6 +62,35 @@ function NavBar() {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    //setup socket connection and listen for notifications
+    useEffect(() => {
+        if (user && !socketRef.current) {
+            //establish socket connection
+            socketRef.current = io('http://localhost:3001');
+
+            const socket = socketRef.current;
+            const userId = user?._id || user?.id;
+
+            //join user's personal room
+            socket.emit('join-user-room', { userId });
+
+            //listen for new notifications
+            socket.on('new-notification', (notificationData) => {
+                console.log('New notification received:', notificationData);
+                //fetch latest notifications
+                fetchNotifications();
+            });
+
+            //cleanup on unmount
+            return () => {
+                if (socketRef.current) {
+                    socketRef.current.disconnect();
+                    socketRef.current = null;
+                }
+            };
+        }
+    }, [user]);
 
     //listen for conversation events to update chat notification badge
     useEffect(() => {
@@ -117,11 +148,8 @@ function NavBar() {
     const fetchRoomiesRequests = () => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'getFriendRequests',
-            data: {
-                userId: user.id
-            }
+        axios.post('http://localhost:3001/api/users/friend-requests', {
+            userId: user.id
         })
             .then(res => {
                 console.log('Friend requests response:', res.data);
@@ -158,11 +186,8 @@ function NavBar() {
     const fetchNotifications = () => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'getNotifications',
-            data: {
-                userId: user.id
-            }
+        axios.post('http://localhost:3001/api/users/notifications', {
+            userId: user.id
         })
             .then(res => {
                 console.log('Notifications response:', res.data);
@@ -198,12 +223,9 @@ function NavBar() {
     const handleDismissNotification = (notificationId) => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/users', {
-            command: 'dismissNotification',
-            data: {
-                userId: user.id,
-                notificationId: notificationId
-            }
+        axios.post('http://localhost:3001/api/users/dismiss-notification', {
+            userId: user.id,
+            notificationId: notificationId
         })
             .then(res => {
                 console.log('Dismiss notification response:', res.data);
@@ -220,12 +242,9 @@ function NavBar() {
         if (!user) return;
 
         // TODO: Implement accept request logic
-        axios.post('http://localhost:3001/api/users', {
-            command: 'acceptFriendRequest',
-            data: {
-                userId: user.id,
-                friendId: requestId
-            }
+        axios.post('http://localhost:3001/api/users/accept-friend-request', {
+            userId: user.id,
+            friendId: requestId
         })
             .then(res => {
                 console.log('Accept request response:', res.data);

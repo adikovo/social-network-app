@@ -2,6 +2,9 @@ const { Server } = require("socket.io");
 const Message = require('./models/Message');
 const Conversation = require('./models/Conversation');
 
+// Store the io instance globally so it can be used in controllers
+let ioInstance = null;
+
 //initialize Socket.io server
 const initSocket = (server) => {
     const io = new Server(server, {
@@ -10,6 +13,9 @@ const initSocket = (server) => {
             methods: ["GET", "POST"]
         }
     });
+
+    // Store the io instance globally
+    ioInstance = io;
 
     //handle connection
     io.on('connection', (socket) => {
@@ -115,4 +121,15 @@ const initSocket = (server) => {
     return io;
 };
 
-module.exports = initSocket;
+// Function to emit notification to a specific user
+const emitNotification = (userId, notificationData) => {
+    if (ioInstance) {
+        ioInstance.to(`user-${userId}`).emit('new-notification', notificationData);
+        console.log(`Notification sent to user ${userId}`);
+    }
+};
+
+module.exports = {
+    initSocket,
+    emitNotification
+};
