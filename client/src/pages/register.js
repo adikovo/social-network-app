@@ -123,18 +123,26 @@ function Register() {
                 </div>
                 <div className="form-group">
                     <label htmlFor="email" style={{ textAlign: 'left', display: 'block', marginTop: '7px' }}>Email:</label>
-                    <input
-                        type="email"
-                        className="form-control"
-                        id="email"
-                        value={email}
-                        onChange={handleEmailChange}
-                        placeholder="Enter your email"
-                        maxLength="100"
-                    />
-                    <small style={{ color: '#6c757d', fontSize: '12px' }}>
-                        {email.length}/100 characters
-                    </small>
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            type="email"
+                            className="form-control"
+                            id="email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            placeholder="Enter your email"
+                            maxLength="100"
+                        />
+                        <small style={{
+                            color: '#6c757d',
+                            fontSize: '12px',
+                            position: 'absolute',
+                            bottom: '-18px',
+                            right: '0px'
+                        }}>
+                            {email.length}/100 characters
+                        </small>
+                    </div>
                     {emailError && (
                         <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '2px' }}>
                             {emailError}

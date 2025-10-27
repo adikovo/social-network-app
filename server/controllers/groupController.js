@@ -5,26 +5,37 @@ const { emitNotification } = require("../socket");
 
 // Create a new group
 const createGroup = async (data) => {
-    //get the creator name for easy searching
-    const creator = await User.findById(data.createdBy);
-    const creatorName = creator ? creator.name : 'Unknown';
+    try {
+        console.log('Create group data received:', data);
 
-    //create new group document
-    const newGroup = new Group({
-        name: data.name,
-        description: data.description,
-        members: data.members,
-        createdBy: data.createdBy,
-        createdByName: creatorName,
-        admins: [data.createdBy],
-        privacy: data.privacy,
-        posts: data.posts
-    })
+        //get the creator name for easy searching
+        const creator = await User.findById(data.createdBy);
+        console.log('Creator found:', creator ? creator.name : 'Not found');
+        const creatorName = creator ? creator.name : 'Unknown';
 
-    //save group to db
-    await newGroup.save()
+        //create new group document
+        const newGroup = new Group({
+            name: data.name,
+            description: data.description,
+            members: data.members,
+            createdBy: data.createdBy,
+            createdByName: creatorName,
+            admins: [data.createdBy],
+            privacy: data.privacy,
+            posts: data.posts
+        })
 
-    return { message: 'group inserted successfully', group: newGroup }
+        console.log('New group document created:', newGroup);
+
+        //save group to db
+        await newGroup.save()
+        console.log('Group saved successfully');
+
+        return { message: 'group inserted successfully', group: newGroup }
+    } catch (error) {
+        console.error('Error creating group:', error);
+        throw error;
+    }
 }
 
 // List all groups or groups for a specific user
