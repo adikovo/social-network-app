@@ -9,7 +9,7 @@ const postSchema = new mongoose.Schema({
     authorProfilePicture: String,
     groupId: String,
     images: [String],
-    videos: [String],
+    videos: [videoSchema],
     createdAt: { type: Date, default: Date.now },
     likes: { type: Number, default: 0 },
     likedBy: [String],
@@ -18,5 +18,15 @@ const postSchema = new mongoose.Schema({
 
 //post describes one document in db
 const Post = mongoose.model('Post', postSchema);
+
+
+// Video schema for embedded video objects
+const videoSchema = new mongoose.Schema({
+    url: String,
+    type: String, // 'youtube' or 'uploaded'
+    filename: String,
+    videoId: String,
+    originalUrl: String
+}, { _id: false });
 
 module.exports = Post;

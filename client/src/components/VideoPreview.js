@@ -1,26 +1,58 @@
 import React from 'react';
 
 function VideoPreview({ video, index, onRemove }) {
+    //check if this is an uploaded video or YouTube video
+    const isUploadedVideo = video.type === 'uploaded' || (!video.url.includes('youtube.com') && !video.url.includes('youtu.be'));
+    const isYouTubeVideo = video.videoId || video.url.includes('youtube.com/embed') || video.url.includes('youtu.be');
+
+    const handleRemove = (e) => {
+        e.stopPropagation();
+        onRemove(index);
+    };
+
     return (
         <div style={{
             position: 'relative',
-            display: 'inline-block'
+            display: 'inline-block',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            border: '1px solid #e9ecef',
+            backgroundColor: '#f8f9fa'
         }}>
-            <iframe
-                src={video.url}
-                title={`YouTube video ${index + 1}`}
-                style={{
-                    width: '200px',
-                    height: '113px',
-                    borderRadius: '8px',
-                    border: '1px solid #e9ecef'
-                }}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-            />
+            {/*render uploaded video */}
+            {isUploadedVideo ? (
+                <video
+                    src={`http://localhost:3001${video.url}`}
+                    style={{
+                        width: '200px',
+                        height: '113px',
+                        objectFit: 'cover',
+                        display: 'block'
+                    }}
+                    controls
+                    preload="metadata"
+                    poster=""
+                />
+            ) : (
+                /*render YouTube video */
+                <iframe
+                    src={video.url}
+                    title={`YouTube video ${index + 1}`}
+                    style={{
+                        width: '200px',
+                        height: '113px',
+                        borderRadius: '8px',
+                        border: '1px solid #e9ecef'
+                    }}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                />
+            )}
+
+            {/*remove button */}
             <button
-                onClick={() => onRemove(index)}
+                onClick={handleRemove}
                 style={{
                     position: 'absolute',
                     top: '-8px',
@@ -35,7 +67,8 @@ function VideoPreview({ video, index, onRemove }) {
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    zIndex: 2
                 }}
             >
                 ×

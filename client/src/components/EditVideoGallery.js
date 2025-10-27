@@ -32,6 +32,42 @@ function EditVideoGallery({ videos, removedVideos, onRemoveVideo }) {
         }
     };
 
+    // Helper function to normalize video data (same as VideoGallery)
+    const normalizeVideo = (video, index) => {
+        // If video is already an object with metadata, use it as is
+        if (typeof video === 'object' && video !== null) {
+            return video;
+        }
+
+        // If video is just a URL string, create a basic video object
+        // Check if it's a YouTube URL
+        if (typeof video === 'string') {
+            if (video.includes('youtube.com') || video.includes('youtu.be')) {
+                return {
+                    url: video,
+                    videoId: extractVideoId(video),
+                    originalUrl: video
+                };
+            } else {
+                // Assume it's an uploaded video
+                return {
+                    url: video,
+                    type: 'uploaded',
+                    filename: `Video ${index + 1}`
+                };
+            }
+        }
+
+        return video;
+    };
+
+    // Extract YouTube video ID from URL
+    const extractVideoId = (url) => {
+        const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    };
+
     return (
         <div style={{ marginTop: '12px' }}>
             <p style={{
@@ -46,18 +82,21 @@ function EditVideoGallery({ videos, removedVideos, onRemoveVideo }) {
                 gap: '8px',
                 ...getGridStyle(filteredVideos.length)
             }}>
-                {videos.map((video, index) => (
-                    !removedVideos.includes(index) && (
+                {videos.map((video, index) => {
+                    if (removedVideos.includes(index)) return null;
+
+                    const normalizedVideo = normalizeVideo(video, index);
+                    return (
                         <VideoInPost
                             key={index}
-                            video={{ url: video }}
+                            video={normalizedVideo}
                             index={index}
                             onRemoveVideo={onRemoveVideo}
                             variant="edit"
                             containerStyle={getVideoContainerStyle(index, filteredVideos.length)}
                         />
-                    )
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

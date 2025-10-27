@@ -1,7 +1,7 @@
 
 const express = require("express");
 const router = express.Router();
-const { handlePostCommand, uploadPostImage } = require("../controllers/postController");
+const { handlePostCommand, uploadPostImage, uploadPostVideo } = require("../controllers/postController");
 const multer = require("multer");
 
 //configure multer for file uploads
@@ -12,13 +12,14 @@ const storage = multer.diskStorage({
     },
 
     filename: function (req, file, cb) {
-        //create a unique file name for the uploaded image
+        //create a unique file name for the uploaded file
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, 'post-' + uniqueSuffix + '-' + file.originalname);
     }
 });
 
-const upload = multer({
+// Multer configuration for images
+const uploadImage = multer({
     storage: storage,
     limits: {
         // 5MB limit
@@ -34,10 +35,30 @@ const upload = multer({
     }
 });
 
+// Multer configuration for videos
+const uploadVideo = multer({
+    storage: storage,
+    limits: {
+        //50MB limit for videos
+        fileSize: 50 * 1024 * 1024
+    },
+    fileFilter: function (req, file, cb) {
+        //heck if file is a video
+        if (file.mimetype.startsWith('video/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only video files are allowed!'), false);
+        }
+    }
+});
+
 //endpoint for CRUD operations
 router.post("/", handlePostCommand);
 
 //endpoint for image uploads
-router.post("/upload-image", upload.single('image'), uploadPostImage);
+router.post("/upload-image", uploadImage.single('image'), uploadPostImage);
+
+//endpoint for video uploads
+router.post("/upload-video", uploadVideo.single('video'), uploadPostVideo);
 
 module.exports = router;

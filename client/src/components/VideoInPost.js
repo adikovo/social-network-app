@@ -2,7 +2,6 @@ import React from 'react';
 import MyButton from './MyButton';
 
 const VideoInPost = ({
-
     video,
     index,
     onVideoClick,
@@ -12,8 +11,11 @@ const VideoInPost = ({
 }) => {
     console.log('VideoInPost - video:', video, 'variant:', variant, 'index:', index);
 
+    // Check if this is an uploaded video or YouTube video
+    const isUploadedVideo = video.type === 'uploaded' || (!video.url.includes('youtube.com') && !video.url.includes('youtu.be'));
+
     const handleVideoClick = () => {
-        if (variant === 'edit') return; // Don't play in edit mode
+        if (variant === 'edit') return;
         if (onVideoClick) {
             onVideoClick(index);
         }
@@ -84,16 +86,31 @@ const VideoInPost = ({
                 }
             }}
         >
-            <iframe
-                src={`${video.url}?rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&fs=1`}
-                title={`YouTube video ${index + 1}`}
-                style={getVideoStyle()}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-            />
+            {/*render uploaded video */}
+            {isUploadedVideo ? (
+                <video
+                    src={`http://localhost:3001${video.url}`}
+                    style={{
+                        ...getVideoStyle(),
+                        objectFit: 'cover'
+                    }}
+                    controls
+                    preload="metadata"
+                    poster=""
+                />
+            ) : (
+                /*render YouTube video */
+                <iframe
+                    src={`${video.url}?rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&fs=1`}
+                    title={`YouTube video ${index + 1}`}
+                    style={getVideoStyle()}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                />
+            )}
 
-            {/* Remove Button (Edit Mode) */}
+            {/*remove button  */}
             {variant === 'edit' && onRemoveVideo && (
                 <div style={{
                     position: 'absolute',

@@ -96,20 +96,62 @@ function CreatePost({ onPostCreated, groupId = null }) {
         input.click();
     };
 
-    const handleVideoClick = () => {
+    const handleVideoClick = async () => {
+        //create file input element
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'video/*';
-        input.onchange = (e) => {
+
+        input.onchange = async (e) => {
             const file = e.target.files[0];
             if (file) {
-                // TODO: Implement actual video upload logic
-                if (groupId) {
-                    console.log('Uploading video for group post in group:', groupId);
-                } else {
-                    console.log('Uploading video for feed post');
+                try {
+                    //validate file size (limit of 50MB)
+                    if (file.size > 50 * 1024 * 1024) {
+                        showError('Video file is too large. Please select a video smaller than 50MB.');
+                        return;
+                    }
+
+                    //validate file type
+                    if (!file.type.startsWith('video/')) {
+                        showError('Please select a valid video file.');
+                        return;
+                    }
+
+                    //create FormData for server upload
+                    const formData = new FormData();
+                    formData.append('userId', user.id);
+                    formData.append('video', file);
+
+                    //add groupId if this is a group post
+                    if (groupId) {
+                        formData.append('groupId', groupId);
+                    }
+
+                    //upload to server
+                    const response = await axios.post('http://localhost:3001/api/posts/upload-video', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
+
+                    if (response.data.success) {
+                        showSuccess('Video uploaded successfully!');
+
+                        //add the uploaded video to the videos array
+                        const videoUrl = response.data.videoUrl;
+                        setUploadedVideos(prevVideos => [...prevVideos, {
+                            url: videoUrl,
+                            filename: response.data.filename,
+                            type: 'uploaded'
+                        }]);
+                    } else {
+                        showError('Failed to upload video: ' + (response.data.message || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Video upload error:', error);
+                    showError('Failed to upload video: ' + (error.response?.data?.message || error.message));
                 }
-                console.log('Selected video:', file);
             }
         };
         input.click();
@@ -148,7 +190,13 @@ function CreatePost({ onPostCreated, groupId = null }) {
                 //map the uploaded images to the post data
                 images: uploadedImages.map(img => img.url),
                 //map the uploaded videos to the post data
-                videos: uploadedVideos.map(video => video.url),
+                videos: uploadedVideos.map(video => ({
+                    url: video.url,
+                    type: video.type || (video.videoId ? 'youtube' : 'uploaded'),
+                    filename: video.filename,
+                    videoId: video.videoId,
+                    originalUrl: video.originalUrl
+                })),
             };
 
             if (groupId) {
@@ -282,7 +330,7 @@ function CreatePost({ onPostCreated, groupId = null }) {
                     </div>
                 )}
 
-                {/* youtube video previews */}
+                {/* video previews */}
                 {uploadedVideos.length > 0 && (
                     <div style={{
                         marginTop: '12px',

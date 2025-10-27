@@ -24,6 +24,39 @@ function VideoGallery({ videos, onVideoClick }) {
         }
     };
 
+    //arrange the video data
+    const normalizeVideo = (video, index) => {
+
+        if (typeof video === 'object' && video !== null) {
+            return video;
+        }
+        if (typeof video === 'string') {
+            if (video.includes('youtube.com') || video.includes('youtu.be')) {
+                return {
+                    url: video,
+                    videoId: extractVideoId(video),
+                    originalUrl: video
+                };
+            } else {
+                //assume it's an uploaded video
+                return {
+                    url: video,
+                    type: 'uploaded',
+                    filename: `Video ${index + 1}`
+                };
+            }
+        }
+
+        return video;
+    };
+
+    //extract YouTube video ID from URL
+    const extractVideoId = (url) => {
+        const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    };
+
     return (
         <div style={{
             marginBottom: '16px',
@@ -31,15 +64,18 @@ function VideoGallery({ videos, onVideoClick }) {
             gap: '8px',
             ...getGridStyle(videos.length)
         }}>
-            {videos.map((video, index) => (
-                <VideoInPost
-                    key={index}
-                    video={{ url: video }}
-                    index={index}
-                    onVideoClick={onVideoClick}
-                    containerStyle={getVideoContainerStyle(index, videos.length)}
-                />
-            ))}
+            {videos.map((video, index) => {
+                const normalizedVideo = normalizeVideo(video, index);
+                return (
+                    <VideoInPost
+                        key={index}
+                        video={normalizedVideo}
+                        index={index}
+                        onVideoClick={onVideoClick}
+                        containerStyle={getVideoContainerStyle(index, videos.length)}
+                    />
+                );
+            })}
         </div>
     );
 }

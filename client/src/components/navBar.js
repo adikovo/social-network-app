@@ -337,7 +337,8 @@ function NavBar() {
                     fontSize: '1.5rem',
                     fontWeight: '600',
                     color: '#1f2937',
-                    fontFamily: 'system-ui, -apple-system, sans-serif'
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.1)'
                 }}>
                     Roomies
                 </h1>

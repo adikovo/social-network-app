@@ -90,13 +90,8 @@ function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }
                 justifyContent: 'space-between',
                 alignItems: 'center'
             }}>
-                {/* left side - attachment and formatting icons */}
-                <ExtraInput
-                    onImageClick={handleImageClick}
-                    onVideoClick={handleVideoClick}
-                />
 
-                {/* right side - action buttons */}
+                {/* action buttons */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',

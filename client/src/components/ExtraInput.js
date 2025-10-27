@@ -8,7 +8,7 @@ function ExtraInput({ onImageClick, onVideoClick, onYouTubeClick }) {
             alignItems: 'center',
             gap: '16px'
         }}>
-            {/* image/media icon */}
+            {/* image icon */}
             <button
                 style={{
                     background: 'none',
@@ -30,7 +30,7 @@ function ExtraInput({ onImageClick, onVideoClick, onYouTubeClick }) {
                 🖼️
             </button>
 
-            {/* video icon */}
+            {/*video icon */}
             <button
                 style={{
                     background: 'none',

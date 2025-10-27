@@ -53,7 +53,10 @@ function Feed() {
         })
             .then(res => {
                 console.log('Posts response:', res.data);
-                setPosts(res.data.posts || []);
+                const posts = res.data.posts || [];
+                console.log('Posts array:', posts);
+                console.log('First post:', posts[0]);
+                setPosts(posts);
             })
             .catch(err => {
                 console.error('Posts fetch error:', err);
@@ -107,7 +110,7 @@ function Feed() {
 
                 <div style={{ marginTop: '20px' }}>
                     {posts.length > 0 ? (
-                        posts.map((post) => (
+                        posts.filter(post => post && post._id).map((post) => (
                             <Post
                                 key={post._id}
                                 post={post}

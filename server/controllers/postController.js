@@ -320,4 +320,54 @@ const uploadPostImage = async (req, res) => {
     }
 };
 
-module.exports = { handlePostCommand, uploadPostImage }
+//handle video upload for posts
+const uploadPostVideo = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No video file provided'
+            });
+        }
+
+        if (!req.body.userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required'
+            });
+        }
+
+        //get the uploaded file information
+        const uploadedFile = req.file;
+        const videoUrl = `/uploads/${uploadedFile.filename}`;
+
+        console.log('Video uploaded successfully:', {
+            originalName: uploadedFile.originalname,
+            filename: uploadedFile.filename,
+            size: uploadedFile.size,
+            mimetype: uploadedFile.mimetype,
+            videoUrl: videoUrl,
+            userId: req.body.userId,
+            groupId: req.body.groupId || null
+        });
+
+        //return success response with video URL
+        res.json({
+            success: true,
+            message: 'Video uploaded successfully',
+            videoUrl: videoUrl,
+            filename: uploadedFile.filename,
+            size: uploadedFile.size,
+            mimetype: uploadedFile.mimetype
+        });
+
+    } catch (error) {
+        console.error('Video upload error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to upload video: ' + error.message
+        });
+    }
+};
+
+module.exports = { handlePostCommand, uploadPostImage, uploadPostVideo }
