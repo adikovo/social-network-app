@@ -18,6 +18,8 @@ function SelectField({
         textAlign: 'left',
         fontSize: '0.9rem',
         padding: '0.5rem',
+        width: '100%',
+        border: '1px solid #d1d5db',
         ...style
     };
 

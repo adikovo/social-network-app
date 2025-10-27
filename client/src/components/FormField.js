@@ -20,6 +20,7 @@ function FormField({
         borderRadius: '6px',
         fontSize: '14px',
         boxSizing: 'border-box',
+        textAlign: 'left',
         ...style
     };
 
@@ -51,6 +52,7 @@ function FormField({
         if (type === 'select') {
             return (
                 <select
+                    className="form-select"
                     id={id}
                     value={value || ''}
                     onChange={(e) => onChange(e.target.value)}
@@ -69,6 +71,7 @@ function FormField({
         return (
             <input
                 type={type}
+                className="form-control"
                 id={id}
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
@@ -84,7 +87,8 @@ function FormField({
                 display: 'block',
                 marginBottom: '5px',
                 fontWeight: '500',
-                fontSize: '14px'
+                fontSize: '14px',
+                textAlign: 'left'
             }}>
                 {label}
             </label>
