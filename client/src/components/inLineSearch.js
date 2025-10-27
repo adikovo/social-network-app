@@ -58,15 +58,14 @@ function InLineSearch({
     //load friends when switching to friends mode
     useEffect(() => {
         if (searchMode === 'friends' && userFriends.length > 0) {
-            console.log('All friends from user context:', userFriends);
             // Check if friends are just IDs or full objects
-            if (typeof userFriends[0] === 'string') {
+            // Friends from user context are ObjectIds (not strings), so we need to fetch details
+            if (userFriends[0] && !userFriends[0].name) {
                 // Friends are just IDs, need to fetch details
                 fetchFriendsDetails(userFriends);
             } else {
                 // Friends are already objects with details
-                const validFriends = userFriends.filter(friend => friend.name);
-                console.log('Valid friends (with names):', validFriends);
+                const validFriends = userFriends.filter(friend => friend && friend.name);
                 setFriendsWithDetails(validFriends);
                 setFilteredFriends(validFriends);
                 if (onFriendResults) {
@@ -83,14 +82,15 @@ function InLineSearch({
         }
         try {
             const friendsPromises = friendIds.map(async (friendId) => {
-                const response = await axios.get(`http://localhost:3001/api/users/${friendId}`);
+                // Convert ObjectId to string if needed
+                const idString = friendId.toString ? friendId.toString() : friendId;
+                const response = await axios.get(`http://localhost:3001/api/users/${idString}`);
                 return response.data.success ? response.data.user : null;
             });
 
             const friends = await Promise.all(friendsPromises);
             const validFriends = friends.filter(friend => friend && friend.name);
 
-            console.log('Fetched friends with details:', validFriends);
             setFriendsWithDetails(validFriends);
             setFilteredFriends(validFriends);
             if (onFriendResults) {

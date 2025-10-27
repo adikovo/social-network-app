@@ -61,6 +61,12 @@ const initSocket = (server) => {
                     { upsert: true, new: true }
                 )
 
+                // Remove both users from deletedBy array when they send a message
+                await Conversation.findOneAndUpdate(
+                    { conversationId: conversationId },
+                    { $pull: { deletedBy: { $in: [senderId, receiverId] } } }
+                );
+
                 // Update unread counts for the receiver
                 if (conversation.unreadCounts && conversation.unreadCounts.length > 0) {
                     // Find receiver's unread count entry
@@ -103,8 +109,9 @@ const initSocket = (server) => {
                     conversationId: conversationId
                 }
 
-                //send message to the receiver's personal room
+                //send message to both sender and receiver
                 socket.to(`user-${receiverId}`).emit('receive-message', messageData)
+                socket.to(`user-${senderId}`).emit('receive-message', messageData)
                 console.log(`Private message from ${senderName} (${senderId}) to user ${receiverId}: ${message}`)
             } catch (error) {
                 console.error('Error sending message:', error)

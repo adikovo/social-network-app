@@ -59,10 +59,10 @@ function Chat() {
 
             //listen for incoming messages
             socket.on('receive-message', (messageData) => {
-                //only process messages from other users (not our own)
-                if (messageData.senderId !== userId) {
-                    //add the new message to the current conversation if it matches
-                    if (selectedConversation && selectedConversation.conversationId === messageData.conversationId) {
+                //add the new message to the current conversation if it matches (for both sender and receiver)
+                if (selectedConversation && selectedConversation.conversationId === messageData.conversationId) {
+                    //only add messages from other users to avoid duplicates (sender already added optimistically)
+                    if (messageData.senderId !== userId) {
                         const newMessage = {
                             id: `temp_${Date.now()}`, //temporary ID for real-time messages
                             senderId: messageData.senderId,
@@ -262,22 +262,24 @@ function Chat() {
 
             //handle new conversation case
             if (selectedConversation.isNewConversation) {
-                //refresh the conversations list from server
-                fetchConversations((updatedConversations) => {
-                    //find and select the newly created conversation
-                    const newConversation = updatedConversations.find(conv =>
-                        conv.conversationId === selectedConversation.conversationId
-                    );
+                //refresh the conversations list from server after a short delay to ensure conversation is created
+                setTimeout(() => {
+                    fetchConversations((updatedConversations) => {
+                        //find and select the newly created conversation
+                        const newConversation = updatedConversations.find(conv =>
+                            conv.conversationId === selectedConversation.conversationId
+                        );
 
-                    if (newConversation) {
-                        setSelectedConversation(newConversation);
-                    }
+                        if (newConversation) {
+                            setSelectedConversation(newConversation);
+                        }
 
-                    //dispatch event to update navbar badge
-                    window.dispatchEvent(new CustomEvent('conversationRead', {
-                        detail: { conversationId: selectedConversation.conversationId }
-                    }));
-                });
+                        //dispatch event to update navbar badge
+                        window.dispatchEvent(new CustomEvent('conversationRead', {
+                            detail: { conversationId: selectedConversation.conversationId }
+                        }));
+                    });
+                }, 100);
             }
 
         } catch (error) {
@@ -339,27 +341,29 @@ function Chat() {
         if (conversation.conversationId) {
             fetchMessages(conversation.conversationId);
 
-            //mark conversation as read
-            try {
-                await axios.put(`http://localhost:3001/api/conversations/${conversation.conversationId}/read`, {
-                    userId: user?._id || user?.id
-                });
+            //mark conversation as read 
+            if (!conversation.isNewConversation) {
+                try {
+                    await axios.put(`http://localhost:3001/api/conversations/${conversation.conversationId}/read`, {
+                        userId: user?._id || user?.id
+                    });
 
-                //update local state to remove unread count
-                setConversations(prevConversations =>
-                    prevConversations.map(conv =>
-                        conv.id === conversation.id
-                            ? { ...conv, unreadCount: 0 }
-                            : conv
-                    )
-                );
+                    //update local state to remove unread count
+                    setConversations(prevConversations =>
+                        prevConversations.map(conv =>
+                            conv.id === conversation.id
+                                ? { ...conv, unreadCount: 0 }
+                                : conv
+                        )
+                    );
 
-                //dispatch event to update navbar badge
-                window.dispatchEvent(new CustomEvent('conversationRead', {
-                    detail: { conversationId: conversation.conversationId }
-                }));
-            } catch (error) {
-                console.error('Error marking conversation as read:', error);
+                    //dispatch event to update navbar badge
+                    window.dispatchEvent(new CustomEvent('conversationRead', {
+                        detail: { conversationId: conversation.conversationId }
+                    }));
+                } catch (error) {
+                    console.error('Error marking conversation as read:', error);
+                }
             }
         }
     };
