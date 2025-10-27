@@ -247,7 +247,7 @@ function CreatePost({ onPostCreated, groupId = null }) {
                 alignItems: 'center',
                 gap: '12px'
             }}>
-                {/* User Profile Picture */}
+                {/*user profile picture */}
                 <ProfilePicture
                     currentImage={user?.profilePicture}
                     size="small"
@@ -255,14 +255,15 @@ function CreatePost({ onPostCreated, groupId = null }) {
                     userId={user?.id}
                 />
 
-                {/* Text Input */}
-                <div style={{ flex: 1 }}>
+                {/* text input */}
+                <div style={{ flex: 1, position: 'relative' }}>
                     <input
                         type="text"
                         value={postText}
                         onChange={(e) => setPostText(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder="What's on your mind?"
+                        maxLength="2000"
                         style={{
                             width: '100%',
                             padding: '12px 16px',
@@ -276,6 +277,15 @@ function CreatePost({ onPostCreated, groupId = null }) {
                             boxSizing: 'border-box'
                         }}
                     />
+                    <small style={{
+                        color: '#6c757d',
+                        fontSize: '12px',
+                        position: 'absolute',
+                        bottom: '5px',
+                        right: '10px'
+                    }}>
+                        {postText.length}/2000
+                    </small>
                 </div>
 
                 {/*image previews */}

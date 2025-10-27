@@ -17,6 +17,19 @@ function Login() {
     function handleLogin(event) {
         event.preventDefault();
 
+        //validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError('Please enter a valid email address!');
+            return;
+        }
+
+        //check if fields are filled
+        if (!email || !password) {
+            showError('Please fill in all fields!');
+            return;
+        }
+
         const userData = {
             command: 'login',
             data: {

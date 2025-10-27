@@ -105,8 +105,12 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="Enter group name"
+                                    maxLength="100"
                                     required
                                 />
+                                <small style={{ color: '#6c757d', fontSize: '12px' }}>
+                                    {name.length}/100 characters
+                                </small>
                             </div>
 
                             <div className="mb-3">
@@ -118,8 +122,12 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Enter group description"
+                                    maxLength="1000"
                                     required
                                 ></textarea>
+                                <small style={{ color: '#6c757d', fontSize: '12px' }}>
+                                    {description.length}/1000 characters
+                                </small>
                             </div>
 
                             <div className="mb-3">

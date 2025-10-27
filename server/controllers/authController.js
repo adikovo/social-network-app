@@ -7,6 +7,12 @@ const handleAuthCommand = async (req, res) => {
     try {
         switch (command) {
             case 'login':
+                //validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(data.email)) {
+                    return res.json({ message: 'invalid email format' })
+                }
+
                 //find user by email and check password
                 const loginUser = await User.findOne({ email: data.email })
                 if (!loginUser) {
@@ -26,6 +32,22 @@ const handleAuthCommand = async (req, res) => {
                 })
 
             case 'register':
+                //validate email format
+                const registerEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!registerEmailRegex.test(data.email)) {
+                    return res.json({ message: 'invalid email format' })
+                }
+
+                //validate required fields
+                if (!data.name || !data.email || !data.password) {
+                    return res.json({ message: 'all fields are required' })
+                }
+
+                //validate password length
+                if (data.password.length < 6) {
+                    return res.json({ message: 'password must be at least 6 characters' })
+                }
+
                 //check if email already in use
                 const existingUser = await User.findOne({ email: data.email })
                 if (existingUser) {

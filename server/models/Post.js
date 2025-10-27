@@ -12,11 +12,30 @@ const videoSchema = new mongoose.Schema({
 
 //structure of post document in the db
 const postSchema = new mongoose.Schema({
-    content: String,
-    author: String,
-    authorId: String,
-    authorProfilePicture: String,
-    groupId: String,
+    content: {
+        type: String,
+        maxlength: 2000,
+        trim: true
+    },
+    author: {
+        type: String,
+        required: true,
+        maxlength: 100,
+        trim: true
+    },
+    authorId: {
+        type: String,
+        required: true,
+        maxlength: 50
+    },
+    authorProfilePicture: {
+        type: String,
+        maxlength: 200
+    },
+    groupId: {
+        type: String,
+        maxlength: 50
+    },
     images: [String],
     videos: [videoSchema],
     createdAt: { type: Date, default: Date.now },
