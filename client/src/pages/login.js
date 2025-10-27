@@ -31,15 +31,12 @@ function Login() {
         }
 
         const userData = {
-            command: 'login',
-            data: {
-                email: email,
-                password: password
-            }
+            email: email,
+            password: password
         };
 
         // API call using axios
-        axios.post('http://localhost:3001/api/auth', userData)
+        axios.post('http://localhost:3001/api/auth/login', userData)
             .then(res => {
                 console.log('Login response:', res.data);
 

@@ -78,16 +78,13 @@ function Register() {
         }
 
         const userData = {
-            command: 'register',
-            data: {
-                name: name,
-                email: email,
-                password: password
-            }
+            name: name,
+            email: email,
+            password: password
         };
 
         //API call using axios
-        axios.post('http://localhost:3001/api/auth', userData)
+        axios.post('http://localhost:3001/api/auth/register', userData)
             .then(response => {
                 console.log('Register successful:', response.data);
                 showSuccess('Registration successful! You can now login.');
