@@ -26,30 +26,46 @@ function SearchResultsOverlay({
 
     const performSearch = async (searchData) => {
         setSearchType(searchData.type);
-        setSearchTerm(searchData.term);
+        // For multi-parameter search, create a display string from the search parameters
+        const searchTermDisplay = searchData.data ?
+            Object.entries(searchData.data).map(([key, value]) => `${key}: ${value}`).join(', ') :
+            searchData.field && searchData.term ?
+                `${searchData.field}: ${searchData.term}` :
+                searchData.term;
+        setSearchTerm(searchTermDisplay);
         setIsSearching(true);
 
         try {
             let res;
 
-            // Use different endpoints based on search type
+            //use different endpoints based on search type
             if (searchData.type === 'groups') {
-                // Use the new groups search endpoint
+                //handle both SearchForm and MultiSearchForm data formats
+                let searchParams;
+                if (searchData.data) {
+                    //multiSearchForm format
+                    searchParams = searchData.data;
+                } else if (searchData.field && searchData.term) {
+                    //searchForm format - use the selected field
+                    searchParams = { [searchData.field]: searchData.term };
+                } else {
+                    //fallback to name search
+                    searchParams = { name: searchData.term };
+                }
+
                 res = await axios.get('http://localhost:3001/api/groups/search', {
-                    params: {
-                        name: searchData.term
-                    }
+                    params: searchParams
                 });
             } else if (searchData.type === 'users') {
-                // Use the users search endpoint
+                //for multi-parameter search, use searchData.data, otherwise use searchData.term
+                const searchParams = searchData.data ? searchData.data : { name: searchData.term };
+
                 res = await axios.get('http://localhost:3001/api/users/search', {
-                    params: {
-                        name: searchData.term
-                    }
+                    params: searchParams
                 });
             } else if (searchData.type === 'posts') {
-                // Use the posts search endpoint
-                const searchParams = { content: searchData.term };
+                //for multi-parameter search, use searchData.data, otherwise use searchData.term
+                const searchParams = searchData.data ? searchData.data : { content: searchData.term };
 
                 //if searching posts and have a groupId, add it to the search
                 if (searchData.groupId) {
