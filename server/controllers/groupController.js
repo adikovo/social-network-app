@@ -1,5 +1,6 @@
 const User = require("../models/User")
 const Group = require("../models/Group");
+const Post = require("../models/Post");
 
 //api endpoint to handle all CRUD operations
 const handleGroupCommand = async (req, res) => {
@@ -283,7 +284,6 @@ const handleGroupCommand = async (req, res) => {
 
             case 'getGroupPosts':
                 //get all posts in a specific group with privacy check
-                const Post = require("../models/Post")
                 const group = await Group.findById(data.groupId)
 
                 if (!group) {
@@ -438,6 +438,53 @@ const handleGroupCommand = async (req, res) => {
                 return res.json({
                     message: 'join request status checked',
                     hasPendingRequest: !!checkJoinRequestGroup
+                });
+
+            case 'getGroupStats':
+                //get statistics for a specific group (only for admins)
+                const statGroup = await Group.findById(data.groupId);
+
+                if (!statGroup) {
+                    return res.json({ message: 'group not found' });
+                }
+
+                //check if user is admin
+                const isStatAdmin = statGroup.admins && statGroup.admins.includes(data.userId);
+                if (!isStatAdmin) {
+                    return res.status(403).json({ message: 'unauthorized: only group admins can view statistics' });
+                }
+
+                //get all posts in the group
+                const allPosts = await Post.find({ groupId: data.groupId });
+
+                //calculate top contributors (users with most posts)
+                const contributorCounts = {};
+                allPosts.forEach(post => {
+                    if (contributorCounts[post.authorId]) {
+                        contributorCounts[post.authorId].count++;
+                    } else {
+                        contributorCounts[post.authorId] = {
+                            userId: post.authorId,
+                            authorName: post.author,
+                            count: 1,
+                            profilePicture: post.authorProfilePicture
+                        };
+                    }
+                });
+
+                //convert to array and sort by count
+                const topContributors = Object.values(contributorCounts)
+                    .sort((a, b) => b.count - a.count)
+                     //top 5 contributors
+                    .slice(0, 5);
+
+                return res.json({
+                    message: 'group statistics retrieved successfully',
+                    stats: {
+                        topContributors: topContributors,
+                        totalPosts: allPosts.length,
+                        totalMembers: statGroup.members.length
+                    }
                 });
 
             //if command is not recognized

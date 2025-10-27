@@ -99,11 +99,6 @@ const MyAlert = ({
                         justifyContent: 'center',
                         flexShrink: 0
                     }}>
-                        <span style={{
-                            color: '#fff',
-                            fontSize: '14px',
-                            fontWeight: 'bold'
-                        }}>?</span>
                     </div>
                 );
             default:

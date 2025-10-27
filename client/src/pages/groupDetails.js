@@ -10,6 +10,8 @@ import GroupInfo from '../components/GroupInfo';
 import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
 import FriendsList from '../components/FriendsList';
+import TopContributorsChart from '../components/TopContributorsChart';
+import StatsCard from '../components/StatsCard';
 import { useUserContext } from '../context/UserContext';
 import MyAlert from '../components/MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
@@ -23,8 +25,10 @@ function GroupDetails() {
     const [group, setGroup] = useState(null);
     const [showEditForm, setShowEditForm] = useState(false);
     const [showMembers, setShowMembers] = useState(false);
+    const [showStats, setShowStats] = useState(false);
     const [groupPosts, setGroupPosts] = useState([]);
     const [hasPendingJoinRequest, setHasPendingJoinRequest] = useState(false);
+    const [groupStats, setGroupStats] = useState(null);
     const { alert, showSuccess, showError, showInfo, hideAlert } = useMyAlert();
 
     // Redirect to login if not authenticated
@@ -87,6 +91,28 @@ function GroupDetails() {
         }
     };
 
+    const fetchGroupStats = async () => {
+        try {
+            const res = await axios.post('http://localhost:3001/api/groups', {
+                command: 'getGroupStats',
+                data: {
+                    groupId: groupId,
+                    userId: user?.id
+                }
+            });
+            console.log('Group stats response:', res.data);
+            setGroupStats(res.data.stats);
+        } catch (error) {
+            console.error('Error fetching group stats:', error);
+            if (error.response?.status === 403) {
+                showError('Only group admins can view statistics');
+            } else {
+                showError('Failed to fetch group statistics');
+            }
+            setGroupStats(null);
+        }
+    };
+
     useEffect(() => {
         if (user?.id) {
             fetchGroup();
@@ -129,6 +155,12 @@ function GroupDetails() {
 
     function handleEditGroup() {
         setShowEditForm(true);
+    }
+
+    function handleViewStats() {
+        setShowStats(true);
+        setShowMembers(false);
+        fetchGroupStats();
     }
 
     function handleGroupUpdated() {
@@ -249,11 +281,14 @@ function GroupDetails() {
                         <ThreeDotMenu
                             menuItems={[
                                 { id: 'edit', label: 'Edit Group', action: 'edit' },
+                                { id: 'stats', label: 'Stats', action: 'stats' },
                                 { id: 'delete', label: 'Delete Group', action: 'delete', danger: true }
                             ]}
                             onItemClick={(item) => {
                                 if (item.action === 'edit') {
                                     handleEditGroup();
+                                } else if (item.action === 'stats') {
+                                    handleViewStats();
                                 } else if (item.action === 'delete') {
                                     handleDeleteGroup();
                                 }
@@ -270,71 +305,112 @@ function GroupDetails() {
                     ) : null}
                 </div>
 
-                {user && group && !isMember && (
-                    <MyButton
-                        variant={hasPendingJoinRequest ? 'secondary' : 'success'}
-                        onClick={hasPendingJoinRequest ? null : handleJoinGroup}
-                        disabled={hasPendingJoinRequest}
-                    >
-                        {hasPendingJoinRequest ? 'Pending' : 'Join Group'}
-                    </MyButton>
-                )}
-                {group && <GroupInfo group={group} />}
-
-                {/* show create post for members only - hide when showing members */}
-                {isMember && !showMembers && (
-                    <CreatePost
-                        onPostCreated={handlePostCreated}
-                        groupId={groupId}
-                    />
-                )}
-
-                {/* show members list or posts based on state */}
-                {showMembers ? (
+                {/* Show stats view */}
+                {showStats ? (
                     <div style={{ marginTop: '20px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
                             <MyButton
                                 variant='secondary'
-                                onClick={() => setShowMembers(false)}
+                                onClick={() => setShowStats(false)}
                                 style={{ marginRight: '15px' }}
                             >
                                 ← Back to Feed
                             </MyButton>
                         </div>
-                        {group.privacy === 'private' && !isMember ? null : (
-                            <FriendsList
-                                type="groupMembers"
-                                groupId={groupId}
-                                showInModal={false}
-                            />
+                        {/*stats content with charts */}
+                        {groupStats ? (
+                            <div>
+                                {/*summary cards */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+                                    <StatsCard label="Total Posts" value={groupStats.totalPosts} />
+                                    <StatsCard label="Total Members" value={groupStats.totalMembers} />
+                                    <StatsCard label="Active Contributors" value={groupStats.topContributors.length} />
+                                </div>
+
+                                {/*top contributors chart */}
+                                {groupStats.topContributors && groupStats.topContributors.length > 0 ? (
+                                    <TopContributorsChart data={groupStats.topContributors} />
+                                ) : (
+                                    <div style={{ padding: '40px', textAlign: 'center', color: '#666', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                                        <p>No contributors data available yet. Posts will appear here as members create content.</p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+                                <p>Loading statistics...</p>
+                            </div>
                         )}
                     </div>
                 ) : (
-                    /*show posts based on group privacy */
-                    <div style={{ marginTop: '20px' }}>
-                        {group?.privacy === 'private' && !isMember ? null : (
-                            <>
-                                {groupPosts.length > 0 ? (
-                                    groupPosts.map((post) => (
-                                        <Post
-                                            key={post._id}
-                                            post={post}
-                                            onPostUpdated={handlePostUpdated}
-                                        />
-                                    ))
-                                ) : (
-                                    <div style={{
-                                        textAlign: 'center',
-                                        padding: '40px',
-                                        color: '#666'
-                                    }}>
-                                        <p>No posts in this group yet.</p>
-                                        {isMember && <p>Be the first to share something!</p>}
-                                    </div>
-                                )}
-                            </>
+                    <>
+                        {user && group && !isMember && (
+                            <MyButton
+                                variant={hasPendingJoinRequest ? 'secondary' : 'success'}
+                                onClick={hasPendingJoinRequest ? null : handleJoinGroup}
+                                disabled={hasPendingJoinRequest}
+                            >
+                                {hasPendingJoinRequest ? 'Pending' : 'Join Group'}
+                            </MyButton>
                         )}
-                    </div>
+                        {group && <GroupInfo group={group} />}
+
+                        {/* show create post for members only - hide when showing members */}
+                        {isMember && !showMembers && (
+                            <CreatePost
+                                onPostCreated={handlePostCreated}
+                                groupId={groupId}
+                            />
+                        )}
+
+                        {/* show members list or posts based on state */}
+                        {showMembers ? (
+                            <div style={{ marginTop: '20px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                                    <MyButton
+                                        variant='secondary'
+                                        onClick={() => setShowMembers(false)}
+                                        style={{ marginRight: '15px' }}
+                                    >
+                                        ← Back to Feed
+                                    </MyButton>
+                                </div>
+                                {group.privacy === 'private' && !isMember ? null : (
+                                    <FriendsList
+                                        type="groupMembers"
+                                        groupId={groupId}
+                                        showInModal={false}
+                                    />
+                                )}
+                            </div>
+                        ) : (
+                            /*show posts based on group privacy */
+                            <div style={{ marginTop: '20px' }}>
+                                {group?.privacy === 'private' && !isMember ? null : (
+                                    <>
+                                        {groupPosts.length > 0 ? (
+                                            groupPosts.map((post) => (
+                                                <Post
+                                                    key={post._id}
+                                                    post={post}
+                                                    onPostUpdated={handlePostUpdated}
+                                                />
+                                            ))
+                                        ) : (
+                                            <div style={{
+                                                textAlign: 'center',
+                                                padding: '40px',
+                                                color: '#666'
+                                            }}>
+                                                <p>No posts in this group yet.</p>
+                                                {isMember && <p>Be the first to share something!</p>}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 

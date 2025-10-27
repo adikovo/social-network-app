@@ -78,7 +78,8 @@ function ConvoChatCard({
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        flex: 1
+                        flex: 1,
+                        textAlign: 'left'
                     }}>
                         {conversation.name}
                     </h4>
@@ -107,7 +108,8 @@ function ConvoChatCard({
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        flex: 1
+                        flex: 1,
+                        textAlign: 'left'
                     }}>
                         {conversation.lastMessage || "No messages yet"}
                     </p>
