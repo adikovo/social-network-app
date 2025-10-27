@@ -206,6 +206,28 @@ const handleGroupCommand = async (req, res) => {
                     },
                     { new: true }
                 )
+
+                //add notification to the user who was promoted to admin
+                const promotingUser = await User.findById(data.requestingUserId);
+                const promotedUser = await User.findById(data.userId);
+
+                await User.findByIdAndUpdate(
+                    data.userId,
+                    {
+                        $push: {
+                            notifications: {
+                                type: 'adminPromoted',
+                                fromUserId: data.requestingUserId,
+                                fromUserName: promotingUser.name,
+                                fromUserProfilePicture: promotingUser.profilePicture,
+                                groupId: data.groupId,
+                                groupName: addAdminGroup.name,
+                                message: `You have been promoted to admin in "${addAdminGroup.name}"!`
+                            }
+                        }
+                    }
+                );
+
                 return res.json({ message: 'admin added successfully', group: addAdminGroup })
 
             case 'removeAdmin':

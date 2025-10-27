@@ -10,6 +10,8 @@ function ResultNotification({ notification, onDismiss, isLast }) {
             navigate(`/group/${notification.groupId}`);
         } else if (notification.type === 'friendRequestAccepted' && notification.fromUserId) {
             navigate(`/profile/${notification.fromUserId}`);
+        } else if (notification.type === 'adminPromoted' && notification.groupId) {
+            navigate(`/group/${notification.groupId}`);
         }
     };
 
@@ -21,6 +23,8 @@ function ResultNotification({ notification, onDismiss, isLast }) {
                 return `Your request to join "${notification.groupName}" was declined.`;
             case 'friendRequestAccepted':
                 return `accepted your friend request`;
+            case 'adminPromoted':
+                return `You have been promoted to admin in "${notification.groupName}"!`;
             default:
                 return 'Notification';
         }
@@ -34,6 +38,7 @@ function ResultNotification({ notification, onDismiss, isLast }) {
         switch (notification.type) {
             case 'joinGroupApproved':
             case 'friendRequestAccepted':
+            case 'adminPromoted':
                 return {
                     ...baseStyle,
                     borderLeft: '4px solid #10b981', // green
@@ -58,6 +63,7 @@ function ResultNotification({ notification, onDismiss, isLast }) {
         switch (notification.type) {
             case 'joinGroupApproved':
             case 'friendRequestAccepted':
+            case 'adminPromoted':
                 return '✓';
             case 'joinGroupDeclined':
                 return '✗';
@@ -68,11 +74,13 @@ function ResultNotification({ notification, onDismiss, isLast }) {
 
     return (
         <div
-            onClick={(notification.type === 'joinGroupApproved' || notification.type === 'friendRequestAccepted') ? handleNotificationClick : undefined}
+            onClick={(notification.type === 'joinGroupApproved' || notification.type === 'friendRequestAccepted' || notification.type === 'adminPromoted') ? handleNotificationClick : undefined}
             onMouseEnter={(e) => {
                 if (notification.type === 'joinGroupApproved') {
                     e.target.style.backgroundColor = '#e6fffa';
                 } else if (notification.type === 'friendRequestAccepted') {
+                    e.target.style.backgroundColor = '#e6fffa';
+                } else if (notification.type === 'adminPromoted') {
                     e.target.style.backgroundColor = '#e6fffa';
                 }
             }}
@@ -81,12 +89,14 @@ function ResultNotification({ notification, onDismiss, isLast }) {
                     e.target.style.backgroundColor = '#f0fdf4';
                 } else if (notification.type === 'friendRequestAccepted') {
                     e.target.style.backgroundColor = '#f0fdf4';
+                } else if (notification.type === 'adminPromoted') {
+                    e.target.style.backgroundColor = '#f0fdf4';
                 }
             }}
             style={{
                 padding: '12px 16px',
                 borderBottom: isLast ? 'none' : '1px solid #e5e7eb',
-                cursor: (notification.type === 'joinGroupApproved' || notification.type === 'friendRequestAccepted') ? 'pointer' : 'default',
+                cursor: (notification.type === 'joinGroupApproved' || notification.type === 'friendRequestAccepted' || notification.type === 'adminPromoted') ? 'pointer' : 'default',
                 ...getNotificationStyle()
             }}
         >
