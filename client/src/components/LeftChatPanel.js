@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import InLineSearch from './inLineSearch';
+import InLineSearch from './InlineSearch';
 import ConversationList from './ConversationList';
-import MyButton from './myButton';
+import MyButton from './MyButton';
 
 function LeftChatPanel({
     conversations = [],

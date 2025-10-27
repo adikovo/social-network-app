@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import NavBar from '../components/navBar';
-import SearchSideBar from '../components/searchSideBar';
+import SearchSideBar from '../components/SearchSideBar';
 import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 import { useUserContext } from '../context/UserContext';

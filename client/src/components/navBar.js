@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { data, useNavigate } from 'react-router-dom';
-import MyButton from './myButton';
+import MyButton from './MyButton';
 import DropdownMenu from './DropdownMenu';
 import RoomieRequestCard from './RoomieRequestCard';
 import ResultNotification from './ResultNotification';

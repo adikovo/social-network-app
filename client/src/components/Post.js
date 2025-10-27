@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import CommentInput from './CommentInput';
 import CommentsModel from './CommentsModel';
 import ThreeDotMenu from './ThreeDotMenu';
-import MyButton from './myButton';
+import MyButton from './MyButton';
 import UserInfo from './UserInfo';
 import ImageView from './ImageView';
 import ImageGallery from './ImageGallery';

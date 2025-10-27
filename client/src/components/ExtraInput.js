@@ -1,5 +1,5 @@
 import React from 'react';
-import MyButton from './myButton';
+import MyButton from './MyButton';
 
 function ExtraInput({ onImageClick, onVideoClick, onYouTubeClick }) {
     return (

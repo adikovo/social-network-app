@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MyCard from './MyCard';
-import MyButton from './myButton';
+import MyButton from './MyButton';
 import { useUserContext } from '../context/UserContext';
 import MyAlert from './MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
