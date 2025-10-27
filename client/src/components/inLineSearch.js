@@ -58,19 +58,12 @@ function InLineSearch({
     //load friends when switching to friends mode
     useEffect(() => {
         if (searchMode === 'friends' && userFriends.length > 0) {
-            // Check if friends are just IDs or full objects
-            // Friends from user context are ObjectIds (not strings), so we need to fetch details
-            if (userFriends[0] && !userFriends[0].name) {
-                // Friends are just IDs, need to fetch details
-                fetchFriendsDetails(userFriends);
-            } else {
-                // Friends are already objects with details
-                const validFriends = userFriends.filter(friend => friend && friend.name);
-                setFriendsWithDetails(validFriends);
-                setFilteredFriends(validFriends);
-                if (onFriendResults) {
-                    onFriendResults(validFriends);
-                }
+
+            const validFriends = userFriends.filter(friend => friend && friend.name);
+            setFriendsWithDetails(validFriends);
+            setFilteredFriends(validFriends);
+            if (onFriendResults) {
+                onFriendResults(validFriends);
             }
         }
     }, [searchMode, userFriends]);
@@ -91,6 +84,7 @@ function InLineSearch({
             const friends = await Promise.all(friendsPromises);
             const validFriends = friends.filter(friend => friend && friend.name);
 
+            console.log('InlineSearch: Fetched friends with details:', validFriends);
             setFriendsWithDetails(validFriends);
             setFilteredFriends(validFriends);
             if (onFriendResults) {

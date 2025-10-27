@@ -17,6 +17,7 @@ function Chat() {
     const [messagesLoading, setMessagesLoading] = useState(false);
     const [messageInput, setMessageInput] = useState('');
     const [sendingMessage, setSendingMessage] = useState(false);
+    const [userFriends, setUserFriends] = useState([]);
     const socketRef = useRef(null);
 
     //redirect to login if user is not authenticated
@@ -38,12 +39,13 @@ function Chat() {
         }
     }, [user]);
 
-    //fetch conversations when user is loaded
+    //fetch conversations and friends when user is loaded
     useEffect(() => {
         if (user) {
             fetchConversations();
+            fetchUserFriends();
         }
-    }, [user]);
+    }, [user?.id]);
 
     //setup WebSocket connection when user is loaded
     useEffect(() => {
@@ -117,6 +119,8 @@ function Chat() {
 
             //handle connection events
             socket.on('connect', () => {
+                // Rejoin room when reconnected
+                socket.emit('join-user-room', { userId });
             });
 
             socket.on('disconnect', () => {
@@ -131,7 +135,23 @@ function Chat() {
                 socketRef.current = null;
             }
         };
-    }, [user, selectedConversation]);
+    }, [user?.id]);
+
+    const fetchUserFriends = async () => {
+        if (!user) return;
+
+        try {
+            const response = await axios.get('http://localhost:3001/api/users/friends', {
+                params: { userId: user.id }
+            });
+
+            if (response.data.friends) {
+                setUserFriends(response.data.friends);
+            }
+        } catch (error) {
+            console.error('Error fetching user friends:', error);
+        }
+    };
 
     const fetchConversations = async (onComplete) => {
         if (!user) return;
@@ -251,35 +271,52 @@ function Chat() {
             setMessages(prevMessages => [...prevMessages, newMessage]);
             setMessageInput('');
 
-            //update conversations list immediately with new message
-            setConversations(prevConversations =>
-                prevConversations.map(conv =>
-                    conv.id === selectedConversation.id
-                        ? { ...conv, lastMessage: messageContent, lastMessageTime: new Date() }
-                        : conv
-                )
-            );
+            // If this is a new conversation, add it to the conversations list immediately
+            if (selectedConversation.isNewConversation) {
+                const newConversation = {
+                    id: selectedConversation.id,
+                    conversationId: selectedConversation.conversationId,
+                    name: selectedConversation.name,
+                    lastMessage: messageContent,
+                    lastMessageTime: new Date(),
+                    unreadCount: 0,
+                    isNewConversation: false
+                };
+
+                setConversations(prevConversations => {
+                    // Check if conversation already exists
+                    const existingIndex = prevConversations.findIndex(conv => conv.conversationId === selectedConversation.conversationId);
+
+                    if (existingIndex === -1) {
+                        // Add new conversation to the beginning of the list
+                        return [newConversation, ...prevConversations];
+                    } else {
+                        // Update existing conversation
+                        return prevConversations.map((conv, index) =>
+                            index === existingIndex ? newConversation : conv
+                        );
+                    }
+                });
+
+                // Update the selected conversation to mark it as no longer new
+                setSelectedConversation(newConversation);
+            } else {
+                //update conversations list immediately with new message for existing conversations
+                setConversations(prevConversations =>
+                    prevConversations.map(conv =>
+                        conv.id === selectedConversation.id
+                            ? { ...conv, lastMessage: messageContent, lastMessageTime: new Date() }
+                            : conv
+                    )
+                );
+            }
 
             //handle new conversation case
             if (selectedConversation.isNewConversation) {
-                //refresh the conversations list from server after a short delay to ensure conversation is created
-                setTimeout(() => {
-                    fetchConversations((updatedConversations) => {
-                        //find and select the newly created conversation
-                        const newConversation = updatedConversations.find(conv =>
-                            conv.conversationId === selectedConversation.conversationId
-                        );
-
-                        if (newConversation) {
-                            setSelectedConversation(newConversation);
-                        }
-
-                        //dispatch event to update navbar badge
-                        window.dispatchEvent(new CustomEvent('conversationRead', {
-                            detail: { conversationId: selectedConversation.conversationId }
-                        }));
-                    });
-                }, 100);
+                //dispatch event to update navbar badge
+                window.dispatchEvent(new CustomEvent('conversationRead', {
+                    detail: { conversationId: selectedConversation.conversationId }
+                }));
             }
 
         } catch (error) {
@@ -420,7 +457,7 @@ function Chat() {
                                 onConversationSelect={handleConversationSelect}
                                 selectedConversationId={selectedConversation?.id}
                                 currentUserId={user?.id}
-                                userFriends={user?.friends || []}
+                                userFriends={userFriends}
                                 onDeleteConversation={handleDeleteConversation}
                             />
                         )}
