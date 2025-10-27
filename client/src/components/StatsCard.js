@@ -1,4 +1,4 @@
-const StatsCard = ({ label, value }) => {
+function StatsCard({ label, value }) {
     return (
         <div style={{
             padding: '20px',
@@ -24,6 +24,6 @@ const StatsCard = ({ label, value }) => {
             </p>
         </div>
     );
-};
+}
 
 export default StatsCard;

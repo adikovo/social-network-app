@@ -1,7 +1,7 @@
 import React from 'react';
 import VideoInPost from './VideoInPost';
 
-const VideoGallery = ({ videos, onVideoClick }) => {
+function VideoGallery({ videos, onVideoClick }) {
     if (!videos || videos.length === 0) return null;
 
     const getGridStyle = (numVideos) => {
@@ -42,6 +42,6 @@ const VideoGallery = ({ videos, onVideoClick }) => {
             ))}
         </div>
     );
-};
+}
 
 export default VideoGallery;

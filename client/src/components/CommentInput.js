@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ExtraInput from './ExtraInput';
 
-const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment..." }) => {
+function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }) {
     const [commentText, setCommentText] = useState('');
 
     const handleImageClick = () => {
@@ -154,6 +154,6 @@ const CommentInput = ({ onCancel, onSubmit, placeholder = "Write a comment..." }
             </div>
         </div>
     );
-};
+}
 
 export default CommentInput;

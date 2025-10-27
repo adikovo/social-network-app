@@ -4,7 +4,7 @@ import UserInfo from './UserInfo';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
-const Comment = ({ comment, onEdit, onDelete, post }) => {
+function Comment({ comment, onEdit, onDelete, post }) {
     const { user } = useUserContext();
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(comment.content || '');
@@ -206,6 +206,6 @@ const Comment = ({ comment, onEdit, onDelete, post }) => {
             )}
         </div>
     );
-};
+}
 
 export default Comment;

@@ -7,7 +7,7 @@ import useMyAlert from '../hooks/useMyAlert';
 import ExtraInput from './ExtraInput';
 import VideoPreview from './VideoPreview';
 
-const CreatePost = ({ onPostCreated, groupId = null }) => {
+function CreatePost({ onPostCreated, groupId = null }) {
     const { user } = useUserContext();
     const [postText, setPostText] = useState('');
     const [uploadedImages, setUploadedImages] = useState([]);
@@ -357,6 +357,6 @@ const CreatePost = ({ onPostCreated, groupId = null }) => {
             />
         </div>
     );
-};
+}
 
 export default CreatePost;

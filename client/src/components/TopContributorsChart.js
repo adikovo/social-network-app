@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const TopContributorsChart = ({ data }) => {
+function TopContributorsChart({ data }) {
     const svgRef = useRef();
     const containerRef = useRef();
 
@@ -53,7 +53,7 @@ const TopContributorsChart = ({ data }) => {
             .style("pointer-events", "none")
             .style("z-index", "1000");
 
-        // create bars
+        //create bars
         const maxBarWidth = 100;
         const barWidth = Math.min(xScale.bandwidth(), maxBarWidth);
         const barOffset = (xScale.bandwidth() - barWidth) / 2;
@@ -70,14 +70,14 @@ const TopContributorsChart = ({ data }) => {
             .attr("rx", 4)
             .attr("cursor", "pointer");
 
-        // add hover effect
+        //add hover effect
         bars.on("mouseover", function (event, d) {
             d3.select(this)
                 .transition()
                 .duration(200)
                 .attr("opacity", 0.8);
 
-            // show tooltip
+            //show tooltip
             tooltip
                 .style("opacity", 1)
                 .html(`<strong>${d.authorName}</strong><br/>Posts: ${d.count}`)
@@ -185,6 +185,6 @@ const TopContributorsChart = ({ data }) => {
             <svg ref={svgRef} style={{ display: 'block', width: '100%', height: 'auto' }}></svg>
         </div>
     );
-};
+}
 
 export default TopContributorsChart;

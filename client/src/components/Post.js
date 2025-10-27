@@ -14,7 +14,7 @@ import axios from 'axios';
 import MyAlert from './MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
 
-const Post = ({ post, onPostUpdated }) => {
+function Post({ post, onPostUpdated }) {
     const { user } = useUserContext();
     const [currentPost, setCurrentPost] = useState(post);
     const [isLiked, setIsLiked] = useState(post.likedBy && post.likedBy.includes(user?.id));
@@ -507,6 +507,6 @@ const Post = ({ post, onPostUpdated }) => {
             />
         </div>
     );
-};
+}
 
 export default Post;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const VideoPreview = ({ video, index, onRemove }) => {
+function VideoPreview({ video, index, onRemove }) {
     return (
         <div style={{
             position: 'relative',
@@ -42,6 +42,6 @@ const VideoPreview = ({ video, index, onRemove }) => {
             </button>
         </div>
     );
-};
+}
 
 export default VideoPreview;

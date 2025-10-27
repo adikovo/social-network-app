@@ -1,7 +1,7 @@
 import React from 'react';
 import VideoInPost from './VideoInPost';
 
-const EditVideoGallery = ({ videos, removedVideos, onRemoveVideo }) => {
+function EditVideoGallery({ videos, removedVideos, onRemoveVideo }) {
 
     console.log('EditVideoGallery - videos:', videos, 'removedVideos:', removedVideos);
 
@@ -61,6 +61,6 @@ const EditVideoGallery = ({ videos, removedVideos, onRemoveVideo }) => {
             </div>
         </div>
     );
-};
+}
 
 export default EditVideoGallery;

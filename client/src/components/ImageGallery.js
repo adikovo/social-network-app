@@ -1,7 +1,7 @@
 import React from 'react';
 import ImageInPost from './ImageInPost';
 
-const ImageGallery = ({ images, onImageClick }) => {
+function ImageGallery({ images, onImageClick }) {
     if (!images || images.length === 0) return null;
 
 
@@ -57,6 +57,6 @@ const ImageGallery = ({ images, onImageClick }) => {
             ))}
         </div>
     );
-};
+}
 
 export default ImageGallery;

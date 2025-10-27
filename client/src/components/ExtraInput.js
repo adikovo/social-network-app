@@ -1,7 +1,7 @@
 import React from 'react';
 import MyButton from './myButton';
 
-const ExtraInput = ({ onImageClick, onVideoClick, onYouTubeClick }) => {
+function ExtraInput({ onImageClick, onVideoClick, onYouTubeClick }) {
     return (
         <div style={{
             display: 'flex',
@@ -70,6 +70,6 @@ const ExtraInput = ({ onImageClick, onVideoClick, onYouTubeClick }) => {
             </MyButton>
         </div>
     );
-};
+}
 
 export default ExtraInput;

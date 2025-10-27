@@ -1,4 +1,4 @@
-const Tab = ({ label, isActive, onClick }) => {
+function Tab({ label, isActive, onClick }) {
     return (
         <button
             onClick={onClick}
@@ -17,6 +17,6 @@ const Tab = ({ label, isActive, onClick }) => {
             {label}
         </button>
     );
-};
+}
 
 export default Tab;

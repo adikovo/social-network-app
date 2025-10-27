@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const MemberJoinTimelineChart = ({ data }) => {
+function MemberJoinTimelineChart({ data }) {
     const svgRef = useRef();
     const containerRef = useRef();
 
@@ -18,6 +18,7 @@ const MemberJoinTimelineChart = ({ data }) => {
         const width = containerWidth - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
 
+        //create svg element
         const svg = d3.select(svgRef.current)
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom);
@@ -85,6 +86,7 @@ const MemberJoinTimelineChart = ({ data }) => {
         const xAxis = d3.axisBottom(xScale)
             .tickFormat(d3.timeFormat("%b %Y"));
 
+        //add x axis to the chart
         g.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(xAxis)
@@ -100,6 +102,7 @@ const MemberJoinTimelineChart = ({ data }) => {
         const yAxis = d3.axisLeft(yScale)
             .tickFormat(d3.format("d"));
 
+        //add y axis to the chart
         g.append("g")
             .call(yAxis)
             .selectAll("text")
@@ -162,6 +165,6 @@ const MemberJoinTimelineChart = ({ data }) => {
             <svg ref={svgRef} style={{ display: 'block', width: '100%', height: 'auto' }}></svg>
         </div>
     );
-};
+}
 
 export default MemberJoinTimelineChart;

@@ -1,7 +1,7 @@
 import React from 'react';
 import ImageInPost from './ImageInPost';
 
-const EditImageGallery = ({ images, removedImages, onRemoveImage }) => {
+function EditImageGallery({ images, removedImages, onRemoveImage }) {
     if (!images || images.length === 0) return null;
 
     const getImageContainerStyle = (index, totalImages) => {
@@ -71,6 +71,6 @@ const EditImageGallery = ({ images, removedImages, onRemoveImage }) => {
             </div>
         </div>
     );
-};
+}
 
 export default EditImageGallery;

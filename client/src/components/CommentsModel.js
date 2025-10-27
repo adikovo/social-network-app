@@ -3,7 +3,7 @@ import CommentInput from './CommentInput';
 import Comment from './Comment';
 import UserInfo from './UserInfo';
 
-const CommentsModel = ({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, onCommentDelete }) => {
+function CommentsModel({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, onCommentDelete }) {
     const [showCommentInput, setShowCommentInput] = useState(false);
 
 
@@ -171,6 +171,6 @@ const CommentsModel = ({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, 
             </div>
         </div>
     );
-};
+}
 
 export default CommentsModel;

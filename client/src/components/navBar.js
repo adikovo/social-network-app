@@ -108,12 +108,6 @@ function NavBar() {
         navigate('/chat');
     };
 
-    const handleStats = () => {
-        //TODO:
-        // Add stats navigation logic here
-        console.log('Navigate to stats');
-    };
-
     const fetchRoomiesRequests = () => {
         if (!user) return;
 
@@ -368,8 +362,6 @@ function NavBar() {
                         <MyButton variant="nav" onClick={handleChat}> Chat </MyButton>
                         <NotificationBadge count={unreadChatCount} />
                     </div>
-
-                    <MyButton variant="nav" onClick={handleStats}> Stats </MyButton>
                 </div>
 
                 {/*notifications dropdown */}
