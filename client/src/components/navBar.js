@@ -148,8 +148,10 @@ function NavBar() {
     const fetchRoomiesRequests = () => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/users/friend-requests', {
-            userId: user.id
+        axios.get('http://localhost:3001/api/users/friend-requests', {
+            params: {
+                userId: user.id
+            }
         })
             .then(res => {
                 console.log('Friend requests response:', res.data);
@@ -167,8 +169,10 @@ function NavBar() {
     const fetchGroupJoinRequests = () => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/groups/join-requests', {
-            userId: user.id
+        axios.get('http://localhost:3001/api/groups/join-requests', {
+            params: {
+                userId: user.id
+            }
         })
             .then(res => {
                 console.log('Group join requests response:', res.data);
@@ -186,8 +190,10 @@ function NavBar() {
     const fetchNotifications = () => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/users/notifications', {
-            userId: user.id
+        axios.get('http://localhost:3001/api/users/notifications', {
+            params: {
+                userId: user.id
+            }
         })
             .then(res => {
                 console.log('Notifications response:', res.data);
@@ -223,9 +229,11 @@ function NavBar() {
     const handleDismissNotification = (notificationId) => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/users/dismiss-notification', {
-            userId: user.id,
-            notificationId: notificationId
+        axios.delete('http://localhost:3001/api/users/dismiss-notification', {
+            data: {
+                userId: user.id,
+                notificationId: notificationId
+            }
         })
             .then(res => {
                 console.log('Dismiss notification response:', res.data);
@@ -242,7 +250,7 @@ function NavBar() {
         if (!user) return;
 
         // TODO: Implement accept request logic
-        axios.post('http://localhost:3001/api/users/accept-friend-request', {
+        axios.put('http://localhost:3001/api/users/accept-friend-request', {
             userId: user.id,
             friendId: requestId
         })
@@ -299,10 +307,12 @@ function NavBar() {
     const handleDeclineGroupJoinRequest = (request) => {
         if (!user) return;
 
-        axios.post('http://localhost:3001/api/groups/decline-join-request', {
-            userId: user.id,
-            groupId: request.groupId,
-            requestUserId: request.id
+        axios.delete('http://localhost:3001/api/groups/decline-join-request', {
+            data: {
+                userId: user.id,
+                groupId: request.groupId,
+                requestUserId: request.id
+            }
         })
             .then(res => {
                 console.log('Decline group join request response:', res.data);

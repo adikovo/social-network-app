@@ -35,13 +35,17 @@ function SearchResultsOverlay({
             // Use different endpoints based on search type
             if (searchData.type === 'groups') {
                 // Use the new groups search endpoint
-                res = await axios.post('http://localhost:3001/api/groups/search', {
-                    name: searchData.term
+                res = await axios.get('http://localhost:3001/api/groups/search', {
+                    params: {
+                        name: searchData.term
+                    }
                 });
             } else if (searchData.type === 'users') {
                 // Use the users search endpoint
-                res = await axios.post('http://localhost:3001/api/users/search', {
-                    name: searchData.term
+                res = await axios.get('http://localhost:3001/api/users/search', {
+                    params: {
+                        name: searchData.term
+                    }
                 });
             } else if (searchData.type === 'posts') {
                 // Use the posts search endpoint

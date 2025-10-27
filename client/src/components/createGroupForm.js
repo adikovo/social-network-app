@@ -37,7 +37,7 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
                 userId: userId
             };
 
-            axios.post('http://localhost:3001/api/groups/update', groupData)
+            axios.put('http://localhost:3001/api/groups/update', groupData)
                 .then(res => {
                     console.log('Update group response:', res.data);
                     showSuccess('Group updated successfully!');

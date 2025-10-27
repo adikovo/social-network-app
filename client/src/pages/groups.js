@@ -41,7 +41,9 @@ function Groups() {
         const data = showAll ? {} : { userId: currentUser?.id }
 
         //fetch all user's groups from the server
-        axios.post('http://localhost:3001/api/groups/list', data)
+        axios.get('http://localhost:3001/api/groups/list', {
+            params: data
+        })
             .then(res => {
                 console.log('Groups response:', res.data);
                 setGroups(res.data.groups);
@@ -62,8 +64,10 @@ function Groups() {
 
         setSearchTerm(trimmed);
         setIsSearching(true);
-        axios.post('http://localhost:3001/api/groups/search', {
-            name: trimmed
+        axios.get('http://localhost:3001/api/groups/search', {
+            params: {
+                name: trimmed
+            }
         })
             .then(res => {
                 setSearchResults(res.data.groups || []);
@@ -111,9 +115,11 @@ function Groups() {
     }
 
     function handleLeaveGroup(groupId) {
-        axios.post('http://localhost:3001/api/groups/leave', {
-            userId: currentUser?.id,
-            groupId: groupId
+        axios.delete('http://localhost:3001/api/groups/leave', {
+            data: {
+                userId: currentUser?.id,
+                groupId: groupId
+            }
         })
             .then(res => {
                 console.log('leave group response:', res.data);

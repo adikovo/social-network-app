@@ -63,8 +63,10 @@ function Profile() {
         if (!currentUser || !userId) return;
 
         //check if already friends
-        axios.post('http://localhost:3001/api/users/friends', {
-            userId: currentUser.id
+        axios.get('http://localhost:3001/api/users/friends', {
+            params: {
+                userId: currentUser.id
+            }
         })
             .then(res => {
                 const friends = res.data.friends || [];
@@ -83,9 +85,11 @@ function Profile() {
     }
 
     function checkPendingRequest() {
-        axios.post('http://localhost:3001/api/users/check-pending-request', {
-            userId: currentUser.id,
-            friendId: userId
+        axios.get('http://localhost:3001/api/users/check-pending-request', {
+            params: {
+                userId: currentUser.id,
+                friendId: userId
+            }
         })
             .then(res => {
                 setHasPendingRequest(res.data.hasPendingRequest);
@@ -96,9 +100,11 @@ function Profile() {
     }
 
     function checkReceivedRequest() {
-        axios.post('http://localhost:3001/api/users/check-received-request', {
-            userId: currentUser.id,
-            friendId: userId
+        axios.get('http://localhost:3001/api/users/check-received-request', {
+            params: {
+                userId: currentUser.id,
+                friendId: userId
+            }
         })
             .then(res => {
                 setHasReceivedRequest(res.data.hasReceivedRequest);
@@ -111,8 +117,10 @@ function Profile() {
 
     function handleDeleteUser() {
 
-        axios.post('http://localhost:3001/api/users/delete', {
-            userId: userId
+        axios.delete('http://localhost:3001/api/users/delete', {
+            data: {
+                userId: userId
+            }
         })
             .then(res => {
                 console.log('Delete response:', res.data);
@@ -125,8 +133,10 @@ function Profile() {
 
     function handleGetBio() {
         setCurrentMode('bio');
-        axios.post('http://localhost:3001/api/users/bio', {
-            userId: userId
+        axios.get('http://localhost:3001/api/users/bio', {
+            params: {
+                userId: userId
+            }
         })
             .then(res => {
                 console.log('Bio response:', res.data);
@@ -138,8 +148,10 @@ function Profile() {
     }
 
     function handleGetUser() {
-        axios.post('http://localhost:3001/api/users/get', {
-            userId: userId
+        axios.get('http://localhost:3001/api/users/get', {
+            params: {
+                userId: userId
+            }
         })
             .then(res => {
                 console.log('User response:', res.data);
@@ -151,7 +163,7 @@ function Profile() {
     }
 
     function handleUpdateBio() {
-        axios.post('http://localhost:3001/api/users/update-bio', {
+        axios.put('http://localhost:3001/api/users/update-bio', {
             userId: userId,
             bio: userBio
         })
@@ -193,9 +205,11 @@ function Profile() {
             return;
         }
 
-        axios.post('http://localhost:3001/api/users/cancel-friend-request', {
-            userId: currentUser.id,
-            friendId: userId
+        axios.delete('http://localhost:3001/api/users/cancel-friend-request', {
+            data: {
+                userId: currentUser.id,
+                friendId: userId
+            }
         })
             .then(res => {
                 console.log('Friend request cancelled successfully', res.data);
@@ -214,7 +228,7 @@ function Profile() {
             return;
         }
 
-        axios.post('http://localhost:3001/api/users/accept-friend-request', {
+        axios.put('http://localhost:3001/api/users/accept-friend-request', {
             userId: currentUser.id,
             friendId: userId
         })
@@ -236,9 +250,11 @@ function Profile() {
             return;
         }
 
-        axios.post('http://localhost:3001/api/users/decline-friend-request', {
-            userId: currentUser.id,
-            friendId: userId
+        axios.delete('http://localhost:3001/api/users/decline-friend-request', {
+            data: {
+                userId: currentUser.id,
+                friendId: userId
+            }
         })
             .then(res => {
                 console.log('Friend request rejected successfully', res.data);
@@ -308,8 +324,10 @@ function Profile() {
         }
 
         try {
-            const res = await axios.post('http://localhost:3001/api/users/delete-profile-picture', {
-                userId: currentUser.id
+            const res = await axios.delete('http://localhost:3001/api/users/delete-profile-picture', {
+                data: {
+                    userId: currentUser.id
+                }
             });
 
             console.log('Profile picture delete response:', res.data);

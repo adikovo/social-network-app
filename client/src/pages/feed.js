@@ -28,7 +28,9 @@ function Feed() {
     useEffect(() => {
         if (user) {
             //fetch user data from the server
-            axios.post('http://localhost:3001/api/users/get', { userId: user.id })
+            axios.get('http://localhost:3001/api/users/get', {
+                params: { userId: user.id }
+            })
                 .then(res => {
                     console.log('User response:', res.data);
                     setUserData(res.data.user);

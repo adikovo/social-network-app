@@ -21,7 +21,7 @@ const {
     getGroupStats
 } = require("../controllers/groupController");
 
-// Individual route handlers for each group operation
+//endpoint to create a new group
 router.post("/create", async (req, res) => {
     try {
         const result = await createGroup(req.body);
@@ -34,25 +34,28 @@ router.post("/create", async (req, res) => {
     }
 });
 
-router.post("/list", async (req, res) => {
+//endpoint to list all groups
+router.get("/list", async (req, res) => {
     try {
-        const result = await listGroups(req.body);
+        const result = await listGroups(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error listing groups:', error: error.message });
     }
 });
 
-router.post("/search", async (req, res) => {
+//endpoint to search for groups
+router.get("/search", async (req, res) => {
     try {
-        const result = await searchGroups(req.body);
+        const result = await searchGroups(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error searching groups:', error: error.message });
     }
 });
 
-router.post("/update", async (req, res) => {
+//endpoint to update a group
+router.put("/update", async (req, res) => {
     try {
         const result = await updateGroup(req.body);
         if (result.status) {
@@ -64,7 +67,8 @@ router.post("/update", async (req, res) => {
     }
 });
 
-router.post("/delete", async (req, res) => {
+//endpoint to delete a group
+router.delete("/delete", async (req, res) => {
     try {
         const result = await deleteGroup(req.body);
         if (result.status) {
@@ -76,6 +80,7 @@ router.post("/delete", async (req, res) => {
     }
 });
 
+//endpoint to join a group
 router.post("/join", async (req, res) => {
     try {
         const result = await joinGroup(req.body);
@@ -85,7 +90,8 @@ router.post("/join", async (req, res) => {
     }
 });
 
-router.post("/leave", async (req, res) => {
+//endpoint to leave a group
+router.delete("/leave", async (req, res) => {
     try {
         const result = await leaveGroup(req.body);
         res.json(result);
@@ -94,7 +100,8 @@ router.post("/leave", async (req, res) => {
     }
 });
 
-router.post("/add-admin", async (req, res) => {
+//endpoint to add an admin to a group
+router.put("/add-admin", async (req, res) => {
     try {
         const result = await addAdmin(req.body);
         if (result.status) {
@@ -106,7 +113,8 @@ router.post("/add-admin", async (req, res) => {
     }
 });
 
-router.post("/remove-admin", async (req, res) => {
+//endpoint to remove an admin from a group
+router.delete("/remove-admin", async (req, res) => {
     try {
         const result = await removeAdmin(req.body);
         if (result.status) {
@@ -118,42 +126,47 @@ router.post("/remove-admin", async (req, res) => {
     }
 });
 
-router.post("/get", async (req, res) => {
+//endpoint to get a group
+router.get("/get", async (req, res) => {
     try {
-        const result = await getGroup(req.body);
+        const result = await getGroup(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting group:', error: error.message });
     }
 });
 
-router.post("/posts", async (req, res) => {
+//endpoint to get posts for a group
+router.get("/posts", async (req, res) => {
     try {
-        const result = await getGroupPosts(req.body);
+        const result = await getGroupPosts(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting group posts:', error: error.message });
     }
 });
 
-router.post("/check-admin", async (req, res) => {
+//endpoint to check if a user is an admin of a group
+router.get("/check-admin", async (req, res) => {
     try {
-        const result = await checkAdmin(req.body);
+        const result = await checkAdmin(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error checking admin status:', error: error.message });
     }
 });
 
-router.post("/join-requests", async (req, res) => {
+//endpoint to get join requests for a group
+router.get("/join-requests", async (req, res) => {
     try {
-        const result = await getJoinRequests(req.body);
+        const result = await getJoinRequests(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting join requests:', error: error.message });
     }
 });
 
+//endpoint to accept a join request for a group
 router.post("/accept-join-request", async (req, res) => {
     try {
         const result = await acceptJoinRequest(req.body);
@@ -163,7 +176,8 @@ router.post("/accept-join-request", async (req, res) => {
     }
 });
 
-router.post("/decline-join-request", async (req, res) => {
+//endpoint to decline a join request for a group
+router.delete("/decline-join-request", async (req, res) => {
     try {
         const result = await declineJoinRequest(req.body);
         res.json(result);
@@ -172,18 +186,20 @@ router.post("/decline-join-request", async (req, res) => {
     }
 });
 
-router.post("/check-join-request-status", async (req, res) => {
+//endpoint to check if a user has a pending join request for a group
+router.get("/check-join-request-status", async (req, res) => {
     try {
-        const result = await checkJoinRequestStatus(req.body);
+        const result = await checkJoinRequestStatus(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error checking join request status:', error: error.message });
     }
 });
 
-router.post("/stats", async (req, res) => {
+//endpoint to get statistics for a group
+router.get("/stats", async (req, res) => {
     try {
-        const result = await getGroupStats(req.body);
+        const result = await getGroupStats(req.query);
         if (result.status) {
             return res.status(result.status).json(result);
         }

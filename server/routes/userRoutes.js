@@ -55,34 +55,6 @@ const upload = multer({
     }
 });
 
-//endpoint to get user by ID
-router.get("/:userId", async (req, res) => {
-    try {
-        const { userId } = req.params;
-
-        const user = await User.findById(userId).select('name email profilePicture');
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            user: user
-        });
-
-    } catch (error) {
-        console.error('Get user error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error fetching user',
-            error: error.message
-        });
-    }
-});
 
 //endpoint for profile picture upload
 router.post("/upload-profile-picture", upload.single('profilePicture'), async (req, res) => {
@@ -138,9 +110,9 @@ router.post("/create", async (req, res) => {
 });
 
 //endpoint to list all users
-router.post("/list", async (req, res) => {
+router.get("/list", async (req, res) => {
     try {
-        const result = await listUsers(req.body);
+        const result = await listUsers(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error listing users:', error: error.message });
@@ -148,9 +120,9 @@ router.post("/list", async (req, res) => {
 });
 
 //endpoint to search for users
-router.post("/search", async (req, res) => {
+router.get("/search", async (req, res) => {
     try {
-        const result = await searchUsers(req.body);
+        const result = await searchUsers(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error searching users:', error: error.message });
@@ -158,7 +130,7 @@ router.post("/search", async (req, res) => {
 });
 
 //endpoint to update a user
-router.post("/update", async (req, res) => {
+router.put("/update", async (req, res) => {
     try {
         const result = await updateUser(req.body);
         res.json(result);
@@ -168,7 +140,7 @@ router.post("/update", async (req, res) => {
 });
 
 //endpoint to delete a user
-router.post("/delete", async (req, res) => {
+router.delete("/delete", async (req, res) => {
     try {
         const result = await deleteUser(req.body);
         res.json(result);
@@ -188,7 +160,7 @@ router.post("/send-friend-request", async (req, res) => {
 });
 
 //endpoint to accept a friend request
-router.post("/accept-friend-request", async (req, res) => {
+router.put("/accept-friend-request", async (req, res) => {
     try {
         const result = await acceptFriendRequest(req.body);
         res.json(result);
@@ -198,7 +170,7 @@ router.post("/accept-friend-request", async (req, res) => {
 });
 
 //endpoint to decline a friend request
-router.post("/decline-friend-request", async (req, res) => {
+router.delete("/decline-friend-request", async (req, res) => {
     try {
         const result = await declineFriendRequest(req.body);
         res.json(result);
@@ -208,7 +180,7 @@ router.post("/decline-friend-request", async (req, res) => {
 });
 
 //endpoint to cancel a friend request
-router.post("/cancel-friend-request", async (req, res) => {
+router.delete("/cancel-friend-request", async (req, res) => {
     try {
         const result = await cancelFriendRequest(req.body);
         res.json(result);
@@ -218,9 +190,9 @@ router.post("/cancel-friend-request", async (req, res) => {
 });
 
 //endpoint to get all friend requests
-router.post("/friend-requests", async (req, res) => {
+router.get("/friend-requests", async (req, res) => {
     try {
-        const result = await getFriendRequests(req.body);
+        const result = await getFriendRequests(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting friend requests:', error: error.message });
@@ -228,7 +200,7 @@ router.post("/friend-requests", async (req, res) => {
 });
 
 //endpoint to remove a friend
-router.post("/remove-friend", async (req, res) => {
+router.delete("/remove-friend", async (req, res) => {
     try {
         const result = await removeFriend(req.body);
         res.json(result);
@@ -238,9 +210,9 @@ router.post("/remove-friend", async (req, res) => {
 });
 
 //endpoint to get all friends
-router.post("/friends", async (req, res) => {
+router.get("/friends", async (req, res) => {
     try {
-        const result = await getFriends(req.body);
+        const result = await getFriends(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting friends:', error: error.message });
@@ -248,9 +220,9 @@ router.post("/friends", async (req, res) => {
 });
 
 //endpoint to get a user by ID
-router.post("/get", async (req, res) => {
+router.get("/get", async (req, res) => {
     try {
-        const result = await getUser(req.body);
+        const result = await getUser(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting user:', error: error.message });
@@ -258,7 +230,7 @@ router.post("/get", async (req, res) => {
 });
 
 //endpoint to update a user's bio
-router.post("/update-bio", async (req, res) => {
+router.put("/update-bio", async (req, res) => {
     try {
         const result = await updateBio(req.body);
         res.json(result);
@@ -268,9 +240,9 @@ router.post("/update-bio", async (req, res) => {
 });
 
 //endpoint to get a user's bio
-router.post("/bio", async (req, res) => {
+router.get("/bio", async (req, res) => {
     try {
-        const result = await getBio(req.body);
+        const result = await getBio(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting bio:', error: error.message });
@@ -278,9 +250,9 @@ router.post("/bio", async (req, res) => {
 });
 
 //endpoint to check for pending friend requests
-router.post("/check-pending-request", async (req, res) => {
+router.get("/check-pending-request", async (req, res) => {
     try {
-        const result = await checkPendingRequest(req.body);
+        const result = await checkPendingRequest(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error checking pending request:', error: error.message });
@@ -288,9 +260,9 @@ router.post("/check-pending-request", async (req, res) => {
 });
 
 //endpoint to check for received friend requests
-router.post("/check-received-request", async (req, res) => {
+router.get("/check-received-request", async (req, res) => {
     try {
-        const result = await checkReceivedRequest(req.body);
+        const result = await checkReceivedRequest(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error checking received request:', error: error.message });
@@ -298,7 +270,7 @@ router.post("/check-received-request", async (req, res) => {
 });
 
 //endpoint to upload a profile picture
-router.post("/upload-profile-picture-url", async (req, res) => {
+router.put("/upload-profile-picture-url", async (req, res) => {
     try {
         const result = await uploadProfilePicture(req.body);
         res.json(result);
@@ -308,7 +280,7 @@ router.post("/upload-profile-picture-url", async (req, res) => {
 });
 
 //endpoint to delete a profile picture
-router.post("/delete-profile-picture", async (req, res) => {
+router.delete("/delete-profile-picture", async (req, res) => {
     try {
         const result = await deleteProfilePicture(req.body);
         res.json(result);
@@ -318,9 +290,9 @@ router.post("/delete-profile-picture", async (req, res) => {
 });
 
 //endpoint to get all notifications
-router.post("/notifications", async (req, res) => {
+router.get("/notifications", async (req, res) => {
     try {
-        const result = await getNotifications(req.body);
+        const result = await getNotifications(req.query);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error getting notifications:', error: error.message });
@@ -328,12 +300,41 @@ router.post("/notifications", async (req, res) => {
 });
 
 //endpoint to dismiss a notification
-router.post("/dismiss-notification", async (req, res) => {
+router.delete("/dismiss-notification", async (req, res) => {
     try {
         const result = await dismissNotification(req.body);
         res.json(result);
     } catch (error) {
         res.status(500).json({ message: 'Error dismissing notification:', error: error.message });
+    }
+});
+
+//endpoint to get user by ID (must be last to avoid conflicts with specific routes)
+router.get("/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId).select('name email profilePicture');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            user: user
+        });
+
+    } catch (error) {
+        console.error('Get user error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user',
+            error: error.message
+        });
     }
 });
 

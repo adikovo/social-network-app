@@ -11,7 +11,9 @@ export const UserProvider = ({ children }) => {
         const storedUserId = localStorage.getItem('userId');
         if (storedUserId) {
             // Fetch user data from server using stored ID
-            axios.post('http://localhost:3001/api/users/get', { userId: storedUserId })
+            axios.get('http://localhost:3001/api/users/get', {
+                params: { userId: storedUserId }
+            })
                 .then(res => {
                     if (res.data.user) {
                         setUser(res.data.user);

@@ -48,9 +48,11 @@ function GroupDetails() {
     const fetchGroup = async () => {
         try {
             console.log('Fetching group with ID:', groupId);
-            const res = await axios.post('http://localhost:3001/api/groups/get', {
-                groupId: groupId,
-                userId: user?.id
+            const res = await axios.get('http://localhost:3001/api/groups/get', {
+                params: {
+                    groupId: groupId,
+                    userId: user?.id
+                }
             });
             console.log('API Response:', res.data);
             setGroup(res.data.group);
@@ -62,9 +64,11 @@ function GroupDetails() {
 
     const fetchGroupPosts = async () => {
         try {
-            const res = await axios.post('http://localhost:3001/api/groups/posts', {
-                groupId: groupId,
-                userId: user?.id
+            const res = await axios.get('http://localhost:3001/api/groups/posts', {
+                params: {
+                    groupId: groupId,
+                    userId: user?.id
+                }
             });
             console.log('Group posts response:', res.data);
             setGroupPosts(res.data.posts || []);
@@ -76,9 +80,11 @@ function GroupDetails() {
 
     const checkJoinRequestStatus = async () => {
         try {
-            const res = await axios.post('http://localhost:3001/api/groups/check-join-request-status', {
-                groupId: groupId,
-                userId: user?.id
+            const res = await axios.get('http://localhost:3001/api/groups/check-join-request-status', {
+                params: {
+                    groupId: groupId,
+                    userId: user?.id
+                }
             });
             console.log('Join request status response:', res.data);
             setHasPendingJoinRequest(res.data.hasPendingRequest);
@@ -90,9 +96,11 @@ function GroupDetails() {
 
     const fetchGroupStats = async () => {
         try {
-            const res = await axios.post('http://localhost:3001/api/groups/stats', {
-                groupId: groupId,
-                userId: user?.id
+            const res = await axios.get('http://localhost:3001/api/groups/stats', {
+                params: {
+                    groupId: groupId,
+                    userId: user?.id
+                }
             });
             console.log('Group stats response:', res.data);
             setGroupStats(res.data.stats);
@@ -185,9 +193,11 @@ function GroupDetails() {
 
     function handleDeleteGroup() {
         if (window.confirm('Are you sure you want to delete this group? This action cannot be undone.')) {
-            axios.post('http://localhost:3001/api/groups/delete', {
-                groupId: groupId,
-                userId: user.id
+            axios.delete('http://localhost:3001/api/groups/delete', {
+                data: {
+                    groupId: groupId,
+                    userId: user.id
+                }
             }).then(response => {
                 console.log('Group deleted successfully:', response.data);
                 showSuccess('Group deleted successfully!');
@@ -218,9 +228,11 @@ function GroupDetails() {
 
     function handleLeaveGroup() {
         if (window.confirm('Are you sure you want to leave this group?')) {
-            axios.post('http://localhost:3001/api/groups/leave', {
-                userId: user.id,
-                groupId: groupId
+            axios.delete('http://localhost:3001/api/groups/leave', {
+                data: {
+                    userId: user.id,
+                    groupId: groupId
+                }
             }).then(response => {
                 console.log('Left group successfully:', response.data);
                 //update the group members array after leaving the group

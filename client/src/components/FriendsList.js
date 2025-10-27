@@ -43,8 +43,10 @@ function FriendsList({
         if (onModeChange) onModeChange('friends');
         setLoading(true);
 
-        axios.post('http://localhost:3001/api/users/friends', {
-            userId: userId
+        axios.get('http://localhost:3001/api/users/friends', {
+            params: {
+                userId: userId
+            }
         })
             .then(res => {
                 console.log('Friends response:', res.data);
@@ -59,9 +61,11 @@ function FriendsList({
     function handleGetGroupMembers() {
         setLoading(true);
 
-        axios.post('http://localhost:3001/api/groups/get', {
-            groupId: groupId,
-            userId: currentUser?.id
+        axios.get('http://localhost:3001/api/groups/get', {
+            params: {
+                groupId: groupId,
+                userId: currentUser?.id
+            }
         })
             .then(res => {
                 console.log('Group members response:', res.data);
@@ -78,9 +82,11 @@ function FriendsList({
     function checkAdminStatus() {
         if (!groupId || !currentUser?.id) return;
 
-        axios.post('http://localhost:3001/api/groups/check-admin', {
-            groupId: groupId,
-            userId: currentUser.id
+        axios.get('http://localhost:3001/api/groups/check-admin', {
+            params: {
+                groupId: groupId,
+                userId: currentUser.id
+            }
         })
             .then(res => {
                 console.log('Admin check response:', res.data);
@@ -95,7 +101,7 @@ function FriendsList({
     function handlePromoteToAdmin(memberId) {
         if (!groupId || !currentUser?.id) return;
 
-        axios.post('http://localhost:3001/api/groups/add-admin', {
+        axios.put('http://localhost:3001/api/groups/add-admin', {
             groupId: groupId,
             userId: memberId,
             requestingUserId: currentUser.id
@@ -115,10 +121,12 @@ function FriendsList({
     function handleRemoveAdmin(memberId) {
         if (!groupId || !currentUser?.id) return;
 
-        axios.post('http://localhost:3001/api/groups/remove-admin', {
-            groupId: groupId,
-            userId: memberId,
-            requestingUserId: currentUser.id
+        axios.delete('http://localhost:3001/api/groups/remove-admin', {
+            data: {
+                groupId: groupId,
+                userId: memberId,
+                requestingUserId: currentUser.id
+            }
         })
             .then(res => {
                 console.log('Remove admin response:', res.data);
@@ -133,9 +141,11 @@ function FriendsList({
     }
 
     function handleRemoveFriend(friendId) {
-        axios.post('http://localhost:3001/api/users/remove-friend', {
-            userId: currentUser.id,
-            friendId: friendId
+        axios.delete('http://localhost:3001/api/users/remove-friend', {
+            data: {
+                userId: currentUser.id,
+                friendId: friendId
+            }
         })
             .then(res => {
                 console.log('Remove friend response:', res.data);
