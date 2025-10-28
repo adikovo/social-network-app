@@ -389,7 +389,8 @@ function Post({ post, onPostUpdated }) {
                         color: '#333',
                         marginBottom: '16px',
                         wordWrap: 'break-word',
-                        textAlign: 'left'
+                        textAlign: 'left',
+                        whiteSpace: 'pre-wrap'
                     }}>
                         {currentPost.content}
                     </div>

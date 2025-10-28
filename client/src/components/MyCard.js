@@ -67,7 +67,8 @@ function MyCard({ type, data, onClick, button, compact = false, profilePictureSi
                             color: '#1f2937',
                             marginBottom: '4px',
                             textAlign: 'center',
-                            lineHeight: '1.4'
+                            lineHeight: '1.4',
+                            whiteSpace: 'pre-wrap'
                         }}>
                             {data.content.length > 100 ? `${data.content.substring(0, 100)}...` : data.content}
                         </div>
@@ -78,10 +79,25 @@ function MyCard({ type, data, onClick, button, compact = false, profilePictureSi
                 );
 
             case 'groups':
+                //dynamic font size based on group name length
+                const getGroupNameFontSize = (name) => {
+                    if (!name) return '14px';
+                    const length = name.length;
+                    if (length <= 15) return '14px';
+                    if (length <= 25) return '13px';
+                    if (length <= 35) return '12px';
+                    return '11px';
+                };
+
                 return (
                     <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <div style={{ fontWeight: '500', color: '#1f2937' }}>
+                            <div style={{
+                                fontWeight: '500',
+                                color: '#1f2937',
+                                fontSize: getGroupNameFontSize(data.name),
+                                lineHeight: '1.3'
+                            }}>
                                 {data.name}
                             </div>
                         </div>

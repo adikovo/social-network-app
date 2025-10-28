@@ -20,6 +20,16 @@ function GroupCard({ group, userId, onJoin, onLeave, showAdmin }) {
         return description.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
     };
 
+    //dynamic font size based on group name length
+    const getTitleFontSize = (name) => {
+        if (!name) return '1.1rem';
+        const length = name.length;
+        if (length <= 15) return '1.1rem';
+        if (length <= 25) return '1rem';
+        if (length <= 35) return '0.9rem';
+        return '0.8rem';
+    };
+
     // Style objects for cleaner code
     const cardStyles = {
         cursor: 'pointer',
@@ -29,14 +39,15 @@ function GroupCard({ group, userId, onJoin, onLeave, showAdmin }) {
     };
 
     const titleStyles = {
-        fontSize: '1.1rem',
+        fontSize: getTitleFontSize(group.name),
         marginBottom: '12px',
         lineHeight: '1.3',
         height: '2.6rem',
         overflow: 'hidden',
         display: '-webkit-box',
         WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical'
+        WebkitBoxOrient: 'vertical',
+        transition: 'font-size 0.2s ease'
     };
 
     const descriptionStyles = {

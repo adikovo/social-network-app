@@ -204,7 +204,8 @@ function Comment({ comment, onEdit, onDelete, post }) {
                     color: '#333',
                     lineHeight: '1.4',
                     marginLeft: '44px',
-                    textAlign: 'left'
+                    textAlign: 'left',
+                    whiteSpace: 'pre-wrap'
                 }}>
                     {comment.content}
                 </div>

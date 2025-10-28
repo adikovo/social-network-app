@@ -327,12 +327,6 @@ function Chat() {
         }
     };
 
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    };
 
     const handleDeleteConversation = async (conversation) => {
         if (!user) return;
@@ -535,7 +529,8 @@ function Chat() {
                                                     backgroundColor: message.isOwn ? '#8B5CF6' : '#E9D5FF',
                                                     color: message.isOwn ? 'white' : '#1E293B',
                                                     fontSize: '14px',
-                                                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+                                                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                                                    whiteSpace: 'pre-wrap'
                                                 }}>
                                                     {message.content}
                                                 </div>
@@ -573,13 +568,12 @@ function Chat() {
                                         gap: '12px',
                                         alignItems: 'center'
                                     }}>
-                                        <input
-                                            type="text"
+                                        <textarea
                                             placeholder="Type a message..."
                                             value={messageInput}
                                             onChange={(e) => setMessageInput(e.target.value)}
-                                            onKeyPress={handleKeyPress}
                                             disabled={sendingMessage}
+                                            rows="1"
                                             style={{
                                                 flex: 1,
                                                 padding: '12px 16px',
@@ -588,7 +582,12 @@ function Chat() {
                                                 fontSize: '14px',
                                                 outline: 'none',
                                                 backgroundColor: '#f9fafb',
-                                                opacity: sendingMessage ? 0.6 : 1
+                                                opacity: sendingMessage ? 0.6 : 1,
+                                                resize: 'vertical',
+                                                minHeight: '44px',
+                                                maxHeight: '120px',
+                                                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif',
+                                                lineHeight: '1.4'
                                             }}
                                         />
                                         <button

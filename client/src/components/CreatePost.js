@@ -223,12 +223,6 @@ function CreatePost({ onPostCreated, groupId = null }) {
         }
     };
 
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit();
-        }
-    };
 
 
     return (
@@ -255,13 +249,12 @@ function CreatePost({ onPostCreated, groupId = null }) {
 
                 {/* text input */}
                 <div style={{ flex: 1, position: 'relative' }}>
-                    <input
-                        type="text"
+                    <textarea
                         value={postText}
                         onChange={(e) => setPostText(e.target.value)}
-                        onKeyPress={handleKeyPress}
                         placeholder="What's on your mind?"
                         maxLength="2000"
+                        rows="3"
                         style={{
                             width: '100%',
                             padding: '12px 16px',
@@ -272,7 +265,9 @@ function CreatePost({ onPostCreated, groupId = null }) {
                             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif',
                             backgroundColor: '#f1f3f4',
                             color: '#333',
-                            boxSizing: 'border-box'
+                            boxSizing: 'border-box',
+                            resize: 'vertical',
+                            minHeight: '50px'
                         }}
                     />
                     <small style={{

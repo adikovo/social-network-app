@@ -118,7 +118,8 @@ function CommentsModel({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, 
                             lineHeight: '1.5',
                             color: '#333',
                             marginLeft: '52px',
-                            marginBottom: '16px'
+                            marginBottom: '16px',
+                            whiteSpace: 'pre-wrap'
                         }}>
                             {post.content}
                         </div>

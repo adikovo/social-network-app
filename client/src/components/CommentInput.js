@@ -45,12 +45,6 @@ function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }
         onCancel();
     };
 
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit();
-        }
-    };
 
     return (
         <div style={{
@@ -65,7 +59,6 @@ function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }
             <textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                onKeyPress={handleKeyPress}
                 placeholder={placeholder}
                 style={{
                     width: '100%',

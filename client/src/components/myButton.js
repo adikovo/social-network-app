@@ -97,7 +97,7 @@ function MyButton({
                 opacity: disabled ? 0.6 : 1,
                 ...(variant === 'nav' && {
                     background: 'none',
-                    color: '#374151',
+                    color: 'white',
                     border: 'none',
                     padding: '0.5rem',
                     borderRadius: '0.5rem',
@@ -246,7 +246,7 @@ function MyButton({
                     cursor: 'pointer',
                     transition: 'background-color 0.2s ease',
                     fontSize: '20px',
-                    color: '#374151',
+                    color: 'white',
                     padding: '0',
                     fontFamily: 'system-ui, -apple-system, sans-serif',
                     boxShadow: 'none',
@@ -269,8 +269,11 @@ function MyButton({
             }}
             onMouseEnter={(e) => {
                 if (!disabled) {
-                    if (variant === 'nav' || variant === 'dropdown' || variant === 'notification') {
-                        //nav, dropdown, and notification variants hover just change background
+                    if (variant === 'nav' || variant === 'notification') {
+                        //nav and notification variants hover with lighter purple background
+                        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                    } else if (variant === 'dropdown') {
+                        //dropdown variant hover just change background
                         e.target.style.backgroundColor = '#f3f4f6';
                     } else if (variant === 'youtube') {
                         //youtube variant hover effect
@@ -301,7 +304,9 @@ function MyButton({
             }}
             onMouseLeave={(e) => {
                 if (!disabled) {
-                    if (variant === 'nav' || variant === 'dropdown' || variant === 'notification') {
+                    if (variant === 'nav' || variant === 'notification') {
+                        e.target.style.backgroundColor = 'transparent';
+                    } else if (variant === 'dropdown') {
                         e.target.style.backgroundColor = 'transparent';
                     } else if (variant === 'youtube') {
                         e.target.style.backgroundColor = 'transparent';

@@ -3,6 +3,9 @@ import axios from 'axios';
 import SearchResults from './SearchResults';
 import MyAlert from './MyAlert';
 import MyButton from './MyButton';
+import CommentsModel from './CommentsModel';
+import { useUserContext } from '../context/UserContext';
+import useMyAlert from '../hooks/useMyAlert';
 import { theme } from '../theme/colors';
 
 function SearchResultsOverlay({
@@ -12,11 +15,14 @@ function SearchResultsOverlay({
     onUserClick,
     onGroupClick
 }) {
+    const { user } = useUserContext();
+    const { alert, showError, hideAlert } = useMyAlert();
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchType, setSearchType] = useState('');
-    const [alert, setAlert] = useState({ show: false, message: '', type: '' });
+    const [selectedPost, setSelectedPost] = useState(null);
+    const [showCommentsModal, setShowCommentsModal] = useState(false);
 
     //search when component becomes visible and searchData is provided
     useEffect(() => {
@@ -84,11 +90,7 @@ function SearchResultsOverlay({
         } catch (error) {
             console.error('Search error:', error);
             setSearchResults([]);
-            setAlert({
-                show: true,
-                message: 'Error performing search. Please try again.',
-                type: 'error'
-            });
+            showError('Error performing search. Please try again.');
         } finally {
             setIsSearching(false);
         }
@@ -98,8 +100,80 @@ function SearchResultsOverlay({
         setSearchResults([]);
         setSearchTerm('');
         setSearchType('');
-        setAlert({ show: false, message: '', type: '' });
+        setSelectedPost(null);
+        setShowCommentsModal(false);
         onClose();
+    };
+
+    const handlePostClick = (post) => {
+        setSelectedPost(post);
+        setShowCommentsModal(true);
+    };
+
+    const handleModalCommentSubmit = (commentText) => {
+        if (!selectedPost || !user) return;
+
+        // API call to add comment
+        axios.post('http://localhost:3001/api/posts/comment', {
+            postId: selectedPost._id,
+            commentText: commentText,
+            author: user?.username || user?.name || 'You',
+            userId: user.id,
+            authorProfilePicture: user?.profilePicture
+        })
+            .then(res => {
+                // Update the selected post with the new comment
+                if (res.data.post) {
+                    setSelectedPost(res.data.post);
+                }
+            })
+            .catch(err => {
+                console.error('Error adding comment:', err);
+                showError('Failed to add comment. Please try again.');
+            });
+    };
+
+    const handleCommentEdit = (comment, newText) => {
+        if (!selectedPost || !user) return;
+
+        // API call to edit comment
+        axios.put('http://localhost:3001/api/posts/comment', {
+            postId: selectedPost._id,
+            commentId: comment._id || comment.createdAt,
+            newContent: newText
+        })
+            .then(res => {
+                // Update the selected post with the edited comment
+                if (res.data.post) {
+                    setSelectedPost(res.data.post);
+                }
+            })
+            .catch(err => {
+                console.error('Edit comment error:', err);
+                showError('Failed to edit comment. Please try again.');
+            });
+    };
+
+    const handleCommentDelete = (comment) => {
+        if (!selectedPost || !user) return;
+
+        // API call to delete comment
+        axios.delete('http://localhost:3001/api/posts/comment', {
+            data: {
+                postId: selectedPost._id,
+                commentId: comment._id || comment.createdAt
+            }
+        })
+            .then(res => {
+                // Update the selected post with the deleted comment
+                if (res.data.post) {
+                    setSelectedPost(res.data.post);
+                }
+            })
+            .catch(err => {
+                console.error('Delete comment error:', err);
+                showError('Failed to delete comment. Please try again.');
+            });
     };
 
     const getSearchTitle = () => {
@@ -110,6 +184,7 @@ function SearchResultsOverlay({
             default: return 'Search Results';
         }
     };
+
 
     if (!isVisible) {
         return null;
@@ -130,58 +205,70 @@ function SearchResultsOverlay({
             padding: '20px'
         }}>
             <div style={{
-                background: `linear-gradient(135deg, ${theme.primary}15, ${theme.primary}25)`,
-                backgroundColor: '#f8f7ff',
+                backgroundColor: 'white',
                 borderRadius: '12px',
-                padding: '30px',
                 maxWidth: '900px',
                 width: '100%',
                 maxHeight: '80vh',
-                overflowY: 'auto',
-                boxShadow: `0 25px 50px -12px ${theme.primaryShadow}`,
-                border: `1px solid ${theme.primaryBorder}30`
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
             }}>
                 {/*header */}
                 <div style={{
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginBottom: '20px',
-                    borderBottom: '1px solid #e5e7eb',
-                    paddingBottom: '15px'
+                    justifyContent: 'space-between',
+                    padding: '20px 24px',
+                    borderBottom: `1px solid ${theme.primaryBorder}`,
+                    background: theme.primaryGradient
                 }}>
                     <div>
-                        <h2 style={{ color: '#1f2937', margin: 0 }}>
+                        <h2 style={{
+                            margin: 0,
+                            fontSize: '20px',
+                            fontWeight: '600',
+                            color: 'white'
+                        }}>
                             {getSearchTitle()}
                         </h2>
                         {searchTerm && (
-                            <p style={{ color: '#6b7280', fontSize: '14px', margin: '5px 0 0 0' }}>
+                            <p style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '14px', margin: '5px 0 0 0' }}>
                                 Search term: "{searchTerm}"
                             </p>
                         )}
                     </div>
-                    <MyButton
+                    <button
                         onClick={handleClose}
-                        variant="close"
                         style={{
-                            position: 'static',
-                            top: 'auto',
-                            right: 'auto',
-                            color: '#6b7280',
-                            fontSize: '18px',
-                            width: 'auto',
-                            height: 'auto',
-                            padding: '2px 6px',
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                            color: 'white',
+                            padding: '4px',
                             borderRadius: '4px',
-                            minWidth: 'auto'
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '32px',
+                            height: '32px',
+                            transition: 'background-color 0.2s ease'
                         }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                     >
                         ×
-                    </MyButton>
+                    </button>
                 </div>
 
                 {/*content */}
-                <div>
+                <div style={{
+                    flex: 1,
+                    overflow: 'auto',
+                    padding: '24px'
+                }}>
                     {isSearching && (
                         <div style={{ textAlign: 'center', padding: '40px' }}>
                             <div style={{ color: '#6b7280' }}>Searching...</div>
@@ -200,6 +287,7 @@ function SearchResultsOverlay({
                                 onGroupClick(group);
                                 handleClose();
                             }}
+                            onPostClick={handlePostClick}
                             searchTerm={searchTerm}
                         />
                     )}
@@ -219,14 +307,31 @@ function SearchResultsOverlay({
                     )}
                 </div>
 
-                {/*alert */}
-                <MyAlert
-                    show={alert.show}
-                    message={alert.message}
-                    type={alert.type}
-                    onClose={() => setAlert({ show: false, message: '', type: '' })}
-                />
             </div>
+
+            {/*comments modal */}
+            {selectedPost && (
+                <CommentsModel
+                    post={selectedPost}
+                    isOpen={showCommentsModal}
+                    onClose={() => {
+                        setShowCommentsModal(false);
+                        setSelectedPost(null);
+                    }}
+                    onCommentSubmit={handleModalCommentSubmit}
+                    onCommentEdit={handleCommentEdit}
+                    onCommentDelete={handleCommentDelete}
+                />
+            )}
+
+            {/*alert */}
+            <MyAlert
+                show={alert.show}
+                message={alert.message}
+                type={alert.type}
+                duration={alert.duration}
+                onClose={hideAlert}
+            />
         </div>
     );
 }
