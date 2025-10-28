@@ -25,6 +25,7 @@ function Groups() {
     const [isSearching, setIsSearching] = useState(false);
     const [showSearchOverlay, setShowSearchOverlay] = useState(false);
     const [searchData, setSearchData] = useState(null);
+    const [showAllGroups, setShowAllGroups] = useState(false);
     const { alert, showSuccess, showError, hideAlert } = useMyAlert();
 
     //if user is not loaded yet, redirect to login
@@ -51,6 +52,16 @@ function Groups() {
             .catch(err => {
                 console.error('Groups error:', err);
             })
+    }
+
+    function handleShowAllGroups() {
+        setShowAllGroups(true);
+        fetchGroups(true);
+    }
+
+    function handleShowMyGroups() {
+        setShowAllGroups(false);
+        fetchGroups(false);
     }
 
     function handleSearch(searchTerm) {
@@ -154,14 +165,29 @@ function Groups() {
             <NavBar></NavBar>
             <SearchSideBar onSearchResults={handleSearchResults} />
             <div style={{ padding: '20px', maxWidth: '800px', marginLeft: '320px', marginRight: 'auto', marginTop: '70px' }}>
-                {/*header with title and create button */}
+                {/*header with title and buttons */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <p style={{ margin: 0 }}>Your Groups:</p>
-                    <MyButton
-                        variant="primary"
-                        onClick={() => setShowCreateGroup(true)}>
-                        Create New Group
-                    </MyButton>
+                    <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>{showAllGroups ? 'All Groups:' : 'Your Groups:'}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {!showAllGroups ? (
+                            <MyButton
+                                variant="outline-secondary"
+                                onClick={handleShowAllGroups}>
+                                Show All Groups
+                            </MyButton>
+                        ) : (
+                            <MyButton
+                                variant="outline-secondary"
+                                onClick={handleShowMyGroups}>
+                                Show My Groups
+                            </MyButton>
+                        )}
+                        <MyButton
+                            variant="primary"
+                            onClick={() => setShowCreateGroup(true)}>
+                            Create New Group
+                        </MyButton>
+                    </div>
                 </div>
 
                 <div className="row">
@@ -181,7 +207,7 @@ function Groups() {
 
                 {groups.length === 0 && (
                     <div className="text-center mt-5">
-                        <p>No groups found. Join some groups to get started!</p>
+                        <p>{showAllGroups ? 'No groups found.' : 'No groups found. Join some groups to get started!'}</p>
                     </div>
                 )}
 
