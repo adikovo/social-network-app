@@ -284,8 +284,6 @@ function Profile() {
                 }
             });
 
-            console.log('Profile picture upload response:', res.data);
-
             //update the profile user state with the new picture
             if (res.data.success && res.data.user) {
                 setProfileUser(prevUser => ({
@@ -329,8 +327,6 @@ function Profile() {
                     userId: currentUser.id
                 }
             });
-
-            console.log('Profile picture delete response:', res.data);
 
             if (res.data.success) {
                 setProfileUser(prevUser => ({
@@ -377,7 +373,7 @@ function Profile() {
                 marginLeft: '320px',
                 marginRight: 'auto'
             }}>
-                {/* Profile Header with Picture, Name, and Options Menu */}
+                {/*profile header */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -397,7 +393,7 @@ function Profile() {
                         </h1>
                     </div>
 
-                    {/* Profile Options Menu - only show when viewing own profile */}
+                    {/*profile options menu show only when viewing own profile */}
                     {isOwnProfile && (
                         <ThreeDotMenu
                             menuItems={[
@@ -425,7 +421,7 @@ function Profile() {
                     {!isOwnProfile && currentUser && !isAlreadyFriend && (
                         <>
                             {hasReceivedRequest ? (
-                                // Show accept/decline buttons when user has received a request
+                                //show accept/decline buttons when user has received a request
                                 <>
                                     <MyButton
                                         variant='success'
@@ -443,7 +439,7 @@ function Profile() {
                                     </MyButton>
                                 </>
                             ) : (
-                                // show add roomie or cancel request button
+                                //show add roomie or cancel request button
                                 <MyButton
                                     variant={hasPendingRequest ? 'secondary' : 'primary'}
                                     onClick={hasPendingRequest ? handleCancelFriendRequest : handleSendFriendRequest}
@@ -459,26 +455,24 @@ function Profile() {
                         </>
                     )}
 
-                    {/* bio button - only show when viewing own profile */}
+                    {/*bio and roomies buttons only show when viewing own profile */}
                     {isOwnProfile && (
-                        <MyButton
-                            variant='secondary'
-                            onClick={handleGetBio}
-                            style={{ marginRight: '10px' }}
-                        >
-                            Bio
-                        </MyButton>
-                    )}
-
-                    {/*my roomies button only show if viewing own profile */}
-                    {isOwnProfile && (
-                        <MyButton
-                            variant='secondary'
-                            onClick={() => setCurrentMode('friends')}
-                            style={{ marginRight: '10px' }}
-                        >
-                            My Roomies
-                        </MyButton>
+                        <>
+                            <MyButton
+                                variant='secondary'
+                                onClick={handleGetBio}
+                                style={{ marginRight: '10px' }}
+                            >
+                                Bio
+                            </MyButton>
+                            <MyButton
+                                variant='secondary'
+                                onClick={() => setCurrentMode('friends')}
+                                style={{ marginRight: '10px' }}
+                            >
+                                My Roomies
+                            </MyButton>
+                        </>
                     )}
 
                 </div>
@@ -490,7 +484,7 @@ function Profile() {
                     onModeChange={setCurrentMode}
                 />
 
-                {/*bio section - always show */}
+                {/*bio section always show */}
                 {currentMode === 'bio' && <div className="mt-4">
                     <div>
                         {/*bio form buttons */}
@@ -527,7 +521,7 @@ function Profile() {
                 <br />
             </div>
 
-            {/* MyAlert Component */}
+            {/*myAlert component */}
             <MyAlert
                 show={alert.show}
                 message={alert.message}

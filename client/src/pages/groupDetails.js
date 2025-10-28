@@ -21,7 +21,6 @@ function GroupDetails() {
     const groupId = useParams().groupId;
     const navigate = useNavigate();
     const { user, isLoading } = useUserContext();
-
     const [group, setGroup] = useState(null);
     const [showEditForm, setShowEditForm] = useState(false);
     const [showMembers, setShowMembers] = useState(false);
@@ -33,7 +32,7 @@ function GroupDetails() {
     const [searchData, setSearchData] = useState(null);
     const { alert, showSuccess, showError, showInfo, hideAlert } = useMyAlert();
 
-    // Redirect to login if not authenticated
+    //redirect to login if not authenticated
     useEffect(() => {
         if (!isLoading && !user) {
             navigate('/login');

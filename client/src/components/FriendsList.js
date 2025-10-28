@@ -159,12 +159,12 @@ function FriendsList({
             })
     }
 
-    // Don't render if not in the right mode
+    //dont render if not in the right mode
     if (type === 'friends' && (currentMode !== 'friends' || !isOwnProfile)) {
         return null;
     }
 
-    // For group members, always render if groupId is provided
+    //for group members, always render if groupId is provided
     if (type === 'groupMembers' && !groupId) {
         return null;
     }
@@ -194,7 +194,6 @@ function FriendsList({
                     key={member._id}
                     type="users"
                     data={member}
-                    compact={true}
                     profilePictureSize="medium"
                     onClick={(friendData) => {
                         navigate(`/profile/${friendData._id}`);
@@ -304,7 +303,12 @@ function FriendsList({
             {members.length > 0 ? (
                 <>
                     <h3>{getTitle()}</h3>
-                    <div>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: '20px',
+                        maxWidth: '100%'
+                    }}>
                         {members.map((member) => renderMemberCard(member))}
                     </div>
                 </>
