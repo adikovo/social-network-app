@@ -3,6 +3,7 @@ import axios from 'axios';
 import SearchResults from './SearchResults';
 import MyAlert from './MyAlert';
 import MyButton from './MyButton';
+import { theme } from '../theme/colors';
 
 function SearchResultsOverlay({
     isVisible,
@@ -129,14 +130,16 @@ function SearchResultsOverlay({
             padding: '20px'
         }}>
             <div style={{
-                backgroundColor: 'white',
+                background: `linear-gradient(135deg, ${theme.primary}15, ${theme.primary}25)`,
+                backgroundColor: '#f8f7ff',
                 borderRadius: '12px',
                 padding: '30px',
                 maxWidth: '900px',
                 width: '100%',
                 maxHeight: '80vh',
                 overflowY: 'auto',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                boxShadow: `0 25px 50px -12px ${theme.primaryShadow}`,
+                border: `1px solid ${theme.primaryBorder}30`
             }}>
                 {/*header */}
                 <div style={{

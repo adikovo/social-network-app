@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MyAlert from './MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
+import { theme } from '../theme/colors';
 
 function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = false, groupToEdit = null }) {
 
@@ -78,7 +79,12 @@ function CreateGroupForm({ show, onClose, userId, onGroupCreated, editMode = fal
     return (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
             <div className="modal-dialog">
-                <div className="modal-content">
+                <div className="modal-content" style={{
+                    background: `linear-gradient(135deg, ${theme.primary}15, ${theme.primary}25)`,
+                    backgroundColor: '#f8f7ff',
+                    boxShadow: `0 25px 50px -12px ${theme.primaryShadow}`,
+                    border: `1px solid ${theme.primaryBorder}30`
+                }}>
                     <div className="modal-header">
                         <h5 className="modal-title">{editMode ? 'Edit Group' : 'Create New Group'}</h5>
                         <button

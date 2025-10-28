@@ -59,14 +59,14 @@ function MemberJoinTimelineChart({ data }) {
         //add area
         g.append("path")
             .datum(parsedData)
-            .attr("fill", "rgba(37, 99, 235, 0.1)")
+            .attr("fill", "rgba(139, 92, 246, 0.1)")
             .attr("d", area);
 
         //add line
         g.append("path")
             .datum(parsedData)
             .attr("fill", "none")
-            .attr("stroke", "#2563eb")
+            .attr("stroke", "#8B5CF6")
             .attr("stroke-width", 3)
             .attr("d", line);
 
@@ -78,7 +78,7 @@ function MemberJoinTimelineChart({ data }) {
             .attr("cx", d => xScale(d.date))
             .attr("cy", d => yScale(d.joins))
             .attr("r", 5)
-            .attr("fill", "#2563eb")
+            .attr("fill", "#8B5CF6")
             .attr("stroke", "#fff")
             .attr("stroke-width", 2);
 

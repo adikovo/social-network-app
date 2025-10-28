@@ -78,7 +78,7 @@ function GroupCard({ group, userId, onJoin, onLeave, showAdmin }) {
                     {group.members?.includes(userId) ? (
                         <button
                             className="btn w-100"
-                            style={{ backgroundColor: '#495057', borderColor: '#495057', color: 'white' }}
+                            style={{ backgroundColor: '#8B5CF6', borderColor: '#8B5CF6', color: 'white' }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onLeave(group._id);

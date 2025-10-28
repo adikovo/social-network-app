@@ -12,6 +12,7 @@ import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 import MyAlert from './MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
+import { theme } from '../theme/colors';
 
 function NavBar() {
     const navigate = useNavigate();
@@ -36,7 +37,7 @@ function NavBar() {
             fetchNotifications();
             fetchUnreadChatCount();
         } else {
-            // Clear requests when user logs out
+            //clear requests when user logs out
             setRoomiesRequests([]);
             setGroupJoinRequests([]);
             setNotifications([]);
@@ -125,7 +126,7 @@ function NavBar() {
         setShowProfileDropdown(false);
         setShowRequestDropdown(false);
 
-        // Then logout and navigate
+        //then logout and navigate
         logout(); // This will clear localStorage and set user to null
         navigate('/login');
     };
@@ -357,13 +358,13 @@ function NavBar() {
             left: 0,
             right: 0,
             zIndex: 100,
-            backgroundColor: 'white',
-            borderBottom: '1px solid #e5e7eb',
+            background: theme.primaryGradient,
+            borderBottom: `1px solid ${theme.primaryBorder}`,
             padding: '0.75rem 1.5rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)'
+            boxShadow: `0 4px 12px ${theme.primaryShadow}`
         }}>
             {/*left side: logo and social network name */}
             <div style={{
@@ -380,9 +381,9 @@ function NavBar() {
                     margin: 0,
                     fontSize: '1.5rem',
                     fontWeight: '600',
-                    color: '#1f2937',
+                    color: 'white',
                     fontFamily: 'system-ui, -apple-system, sans-serif',
-                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.1)'
+                    textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3)'
                 }}>
                     Roomies
                 </h1>
@@ -435,7 +436,7 @@ function NavBar() {
                                 right: '-4px',
                                 height: '20px',
                                 minWidth: '20px',
-                                backgroundColor: '#ef4444',
+                                backgroundColor: theme.danger,
                                 color: 'white',
                                 borderRadius: '10px',
                                 display: 'flex',
@@ -444,7 +445,8 @@ function NavBar() {
                                 fontSize: '12px',
                                 fontWeight: 'bold',
                                 padding: '0 6px',
-                                boxSizing: 'border-box'
+                                boxSizing: 'border-box',
+                                boxShadow: `0 2px 4px ${theme.dangerShadow}`
                             }}>
                                 {(roomiesRequests?.length || 0) + (groupJoinRequests?.length || 0) + (notifications?.length || 0)}
                             </div>
@@ -526,7 +528,7 @@ function NavBar() {
                     >
                         {/*show profile button*/}
                         <MyButton
-                            variant="nav"
+                            variant="dropdown"
                             onClick={handleProfile}
                             style={{
                                 width: '100%',
@@ -542,7 +544,7 @@ function NavBar() {
 
                         {/*logout button */}
                         <MyButton
-                            variant="nav"
+                            variant="dropdown"
                             onClick={handleLogout}
                             style={{
                                 width: '100%',

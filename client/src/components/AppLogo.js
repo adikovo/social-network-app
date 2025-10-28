@@ -1,9 +1,10 @@
 import React from 'react';
+import { theme } from '../theme/colors';
 
 function AppLogo({
     size = '32px',
-    backgroundColor = '#1f2937',
-    textColor = 'white',
+    backgroundColor = 'white',
+    textColor = theme.primary,
     borderRadius = '6px',
     fontSize = '16px',
     letter = 'R',

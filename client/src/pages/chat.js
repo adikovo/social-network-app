@@ -6,6 +6,7 @@ import ProfilePicture from '../components/ProfilePicture';
 import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 import io from 'socket.io-client';
+import { theme } from '../theme/colors';
 
 function Chat() {
     const navigate = useNavigate();
@@ -479,8 +480,8 @@ function Chat() {
                                 {/* chat header */}
                                 <div style={{
                                     padding: '20px',
-                                    borderBottom: '1px solid #e5e7eb',
-                                    backgroundColor: 'white',
+                                    borderBottom: `1px solid ${theme.primaryBorder}`,
+                                    background: theme.primaryGradient,
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '12px'
@@ -495,7 +496,7 @@ function Chat() {
                                             margin: '0',
                                             fontSize: '18px',
                                             fontWeight: '600',
-                                            color: '#111827'
+                                            color: 'white'
                                         }}>
                                             {selectedConversation.name}
                                         </h3>

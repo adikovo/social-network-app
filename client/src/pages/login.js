@@ -66,7 +66,16 @@ function Login() {
 
     return (
         <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
-            <h1>Login</h1>
+            <h1 style={{
+                fontSize: '2.5rem',
+                fontWeight: '700',
+                color: '#8B5CF6',
+                textAlign: 'center',
+                marginBottom: '2rem',
+                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                textShadow: '2px 2px 4px rgba(139, 92, 246, 0.3)',
+                letterSpacing: '-0.02em'
+            }}>Login</h1>
             <form onSubmit={handleLogin} style={{ marginTop: '20px' }}>
                 <div className="mb-3">
                     <label htmlFor="email" className="form-label" style={{ textAlign: 'left', display: 'block', marginBottom: '5px' }}>Email:</label>

@@ -2,15 +2,17 @@ function StatsCard({ label, value }) {
     return (
         <div style={{
             padding: '20px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: '#8B5CF6',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            boxShadow: '0 2px 4px rgba(139, 92, 246, 0.2)',
+            border: '1px solid #7C3AED'
         }}>
             <h3 style={{
                 margin: 0,
-                color: '#666',
+                color: 'white',
                 fontSize: '14px',
-                textTransform: 'uppercase'
+                textTransform: 'uppercase',
+                fontWeight: '600'
             }}>
                 {label}
             </h3>
@@ -18,7 +20,7 @@ function StatsCard({ label, value }) {
                 margin: '10px 0 0 0',
                 fontSize: '32px',
                 fontWeight: 'bold',
-                color: '#333'
+                color: 'white'
             }}>
                 {value}
             </p>

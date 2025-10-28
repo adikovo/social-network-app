@@ -3,6 +3,7 @@ import InLineSearch from './InlineSearch';
 import ConversationList from './ConversationList';
 import MyButton from './MyButton';
 import ProfilePicture from './ProfilePicture';
+import { theme } from '../theme/colors';
 
 function LeftChatPanel({
     conversations = [],
@@ -78,15 +79,15 @@ function LeftChatPanel({
             {/* header */}
             <div style={{
                 padding: '20px',
-                borderBottom: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb'
+                borderBottom: `1px solid ${theme.primaryBorder}`,
+                background: theme.primaryGradient
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <h2 style={{
                         margin: '0',
                         fontSize: '24px',
                         fontWeight: '700',
-                        color: '#111827'
+                        color: 'white'
                     }}>
                         Messages
                     </h2>
@@ -94,6 +95,7 @@ function LeftChatPanel({
                     {/* new conversation button */}
                     <MyButton
                         variant="primary"
+                        className="light-chat-button"
                         onClick={searchMode === 'conversations' ? handleNewConversationClick : handleBackToConversations}
                         style={{
                             display: 'flex',

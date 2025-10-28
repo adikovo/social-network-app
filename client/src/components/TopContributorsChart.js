@@ -36,8 +36,8 @@ function TopContributorsChart({ data }) {
             .domain([0, d3.max(data, d => d.count)])
             .range([height, 0]);
 
-        // color scale for post counts
-        const colorScale = d3.scaleSequential(d3.interpolateBlues)
+        // color scale for post counts 
+        const colorScale = d3.scaleSequential(d3.interpolatePurples)
             .domain([0, d3.max(data, d => d.count)]);
 
         //show info when hovering over a bar

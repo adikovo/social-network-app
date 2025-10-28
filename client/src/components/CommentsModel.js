@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import CommentInput from './CommentInput';
 import Comment from './Comment';
 import UserInfo from './UserInfo';
+import { theme } from '../theme/colors';
 
 function CommentsModel({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, onCommentDelete }) {
     const [showCommentInput, setShowCommentInput] = useState(false);
@@ -56,14 +57,14 @@ function CommentsModel({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, 
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '20px 24px',
-                    borderBottom: '1px solid #e9ecef',
-                    backgroundColor: '#f8f9fa'
+                    borderBottom: `1px solid ${theme.primaryBorder}`,
+                    background: theme.primaryGradient
                 }}>
                     <h2 style={{
                         margin: 0,
                         fontSize: '20px',
                         fontWeight: '600',
-                        color: '#333'
+                        color: 'white'
                     }}>
                         Comments
                     </h2>
@@ -74,16 +75,17 @@ function CommentsModel({ post, isOpen, onClose, onCommentSubmit, onCommentEdit, 
                             border: 'none',
                             fontSize: '24px',
                             cursor: 'pointer',
-                            color: '#666',
+                            color: 'white',
                             padding: '4px',
                             borderRadius: '4px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             width: '32px',
-                            height: '32px'
+                            height: '32px',
+                            transition: 'background-color 0.2s ease'
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
                         onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                     >
                         ×

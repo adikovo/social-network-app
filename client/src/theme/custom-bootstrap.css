@@ -56,3 +56,92 @@
     border-color: #ef4444 !important;
     color: white !important;
 }
+
+/* Nav button styles for navbar */
+.btn-nav {
+    background: none !important;
+    color: white !important;
+    border: none !important;
+    padding: 0.5rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-nav:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+/* Notification button styles for navbar */
+.btn-notification {
+    position: relative !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-color: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    font-size: 20px !important;
+    color: white !important;
+    padding: 0 !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    box-shadow: none !important;
+    line-height: 1 !important;
+}
+
+.btn-notification:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+/* Modal content purple background */
+.modal-content {
+    background: linear-gradient(135deg, #8B5CF615, #8B5CF625) !important;
+    background-color: #f8f7ff !important;
+    box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.3) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Modal header purple background with white text */
+.modal-header {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED) !important;
+    border-bottom: 1px solid #8B5CF6 !important;
+}
+
+.modal-title {
+    color: white !important;
+}
+
+.btn-close {
+    filter: invert(1) !important;
+    opacity: 1 !important;
+}
+
+.btn-close:hover {
+    filter: invert(1) brightness(0.8) !important;
+}
+
+.btn-primary.light-chat-button {
+    background-color: #E9D5FF !important;
+    border-color: #E9D5FF !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    font-weight: 600 !important;
+}
+
+.btn-primary.light-chat-button:hover {
+    background-color: #DDD6FE !important;
+    border-color: #DDD6FE !important;
+    color: white !important;
+}
