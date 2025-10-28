@@ -265,6 +265,22 @@ function MyButton({
                     fontSize: '18px',
                     transition: 'background-color 0.2s ease',
                     fontFamily: 'system-ui, -apple-system, sans-serif'
+                }),
+                ...(variant === 'close' && {
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '24px',
+                    cursor: 'pointer',
+                    color: 'white',
+                    padding: '4px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '32px',
+                    height: '32px',
+                    transition: 'background-color 0.2s ease',
+                    filter: 'none'
                 })
             }}
             onMouseEnter={(e) => {

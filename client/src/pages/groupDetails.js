@@ -246,6 +246,7 @@ function GroupDetails() {
 
     //check if current user is the creator of the group
     const isCreator = user && group && user.id === group.createdBy;
+
     //check if current user is a member of the group 
     const isMember = user && group && (
         group.members?.includes(user.id) ||
@@ -302,6 +303,7 @@ function GroupDetails() {
                             menuItems={[
                                 { id: 'edit', label: 'Edit Group', action: 'edit' },
                                 { id: 'stats', label: 'Stats', action: 'stats' },
+                                /*if user is creator show delete button*/
                                 ...(isCreator ? [{ id: 'delete', label: 'Delete Group', action: 'delete', danger: true }] : [])
                             ]}
                             onItemClick={(item) => {

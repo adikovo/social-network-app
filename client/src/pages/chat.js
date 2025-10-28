@@ -85,7 +85,7 @@ function Chat() {
                     const existingConversation = prevConversations.find(conv => conv.conversationId === messageData.conversationId);
 
                     if (existingConversation) {
-                        // Update existing conversation with correct unread count logic
+
                         return prevConversations.map(conv => {
                             if (conv.conversationId === messageData.conversationId) {
                                 const isCurrentConversation = conv.id === selectedConversation?.id;
@@ -101,7 +101,7 @@ function Chat() {
                             return conv;
                         });
                     } else {
-                        // If conversation doesn't exist in the list, refresh from server
+                        //if conversation doesnt exist in the list refresh from server
                         fetchConversations();
                         return prevConversations;
                     }
@@ -120,12 +120,12 @@ function Chat() {
 
             //handle connection events
             socket.on('connect', () => {
-                // Rejoin room when reconnected
+                //rejoin room when reconnected
                 socket.emit('join-user-room', { userId });
             });
 
             socket.on('disconnect', () => {
-                // Disconnected from WebSocket server
+                //disconnected from WebSocket server
             });
         }
 
@@ -186,7 +186,7 @@ function Chat() {
 
                 setConversations(formattedConversations);
 
-                // Call the callback with the updated conversations
+                //call the callback with the updated conversations
                 if (onComplete) {
                     onComplete(formattedConversations);
                 }
@@ -272,7 +272,7 @@ function Chat() {
             setMessages(prevMessages => [...prevMessages, newMessage]);
             setMessageInput('');
 
-            // If this is a new conversation, add it to the conversations list immediately
+            //if this is a new conversation add it to the conversations list immediately
             if (selectedConversation.isNewConversation) {
                 const newConversation = {
                     id: selectedConversation.id,
@@ -285,21 +285,21 @@ function Chat() {
                 };
 
                 setConversations(prevConversations => {
-                    // Check if conversation already exists
+                    //check if conversation already exists
                     const existingIndex = prevConversations.findIndex(conv => conv.conversationId === selectedConversation.conversationId);
 
                     if (existingIndex === -1) {
-                        // Add new conversation to the beginning of the list
+                        //add new conversation to the beginning of the list
                         return [newConversation, ...prevConversations];
                     } else {
-                        // Update existing conversation
+                        //update existing conversation
                         return prevConversations.map((conv, index) =>
                             index === existingIndex ? newConversation : conv
                         );
                     }
                 });
 
-                // Update the selected conversation to mark it as no longer new
+                //update the selected conversation to mark it as no longer new
                 setSelectedConversation(newConversation);
             } else {
                 //update conversations list immediately with new message for existing conversations
@@ -346,13 +346,11 @@ function Chat() {
                 setConversations(prevConversations =>
                     prevConversations.filter(conv => conv.id !== conversation.id)
                 );
-
                 //if the deleted conversation was selected, clear selection
                 if (selectedConversation && selectedConversation.id === conversation.id) {
                     setSelectedConversation(null);
                     setMessages([]);
                 }
-
                 //dispatch event to update navbar badge
                 window.dispatchEvent(new CustomEvent('conversationDeleted', {
                     detail: { conversationId: conversation.conversationId }

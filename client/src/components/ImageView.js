@@ -25,15 +25,19 @@ const ImageView = ({
             justifyContent: 'center',
             padding: '20px'
         }}>
-            {/* Close button */}
+            {/*close button */}
             <MyButton
                 variant="close"
                 onClick={onClose}
-            >
-                ×
-            </MyButton>
+                style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    zIndex: 10000
+                }}
+            />
 
-            {/* Previous button */}
+            {/*previous button */}
             {images.length > 1 && (
                 <MyButton
                     variant="navPrev"
@@ -43,7 +47,7 @@ const ImageView = ({
                 </MyButton>
             )}
 
-            {/* Next button */}
+            {/*next button */}
             {images.length > 1 && (
                 <MyButton
                     variant="navNext"
@@ -53,7 +57,7 @@ const ImageView = ({
                 </MyButton>
             )}
 
-            {/* Image */}
+            {/*image */}
             <img
                 src={`http://localhost:3001${images[currentIndex]}`}
                 alt={`Post image ${currentIndex + 1}`}
@@ -65,7 +69,7 @@ const ImageView = ({
                 }}
             />
 
-            {/* Image counter */}
+            {/*image counter */}
             {images.length > 1 && (
                 <div style={{
                     position: 'absolute',

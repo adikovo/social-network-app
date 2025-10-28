@@ -250,7 +250,6 @@ function NavBar() {
     const handleAcceptRequest = (requestId) => {
         if (!user) return;
 
-        // TODO: Implement accept request logic
         axios.put('http://localhost:3001/api/users/accept-friend-request', {
             userId: user.id,
             friendId: requestId

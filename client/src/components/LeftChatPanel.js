@@ -92,7 +92,7 @@ function LeftChatPanel({
                         Messages
                     </h2>
 
-                    {/* new conversation button */}
+                    {/*new conversation button */}
                     <MyButton
                         variant="primary"
                         className="light-chat-button"
@@ -110,7 +110,7 @@ function LeftChatPanel({
                     </MyButton>
                 </div>
 
-                {/* search component */}
+                {/*search component */}
                 <InLineSearch
                     placeholder="Search conversations..."
                     conversations={conversations}
@@ -123,7 +123,7 @@ function LeftChatPanel({
                 />
             </div>
 
-            {/* conversation list or friend search */}
+            {/*conversation list or friend search */}
             <div style={{ flex: 1, overflow: 'hidden' }}>
                 {searchMode === 'friends' ? (
                     <div style={{ padding: '20px' }}>

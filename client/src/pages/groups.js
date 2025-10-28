@@ -20,9 +20,6 @@ function Groups() {
     const navigate = useNavigate();
     const [groups, setGroups] = useState([]);
     const [showCreateGroup, setShowCreateGroup] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [searchResults, setSearchResults] = useState(null);
-    const [isSearching, setIsSearching] = useState(false);
     const [showSearchOverlay, setShowSearchOverlay] = useState(false);
     const [searchData, setSearchData] = useState(null);
     const [showAllGroups, setShowAllGroups] = useState(false);
@@ -64,31 +61,6 @@ function Groups() {
         fetchGroups(false);
     }
 
-    function handleSearch(searchTerm) {
-        const trimmed = searchTerm.trim();
-        if (!trimmed) {
-            //hide results section if submitting with empty input
-            setSearchResults(null);
-            setSearchTerm('');
-            return;
-        }
-
-        setSearchTerm(trimmed);
-        setIsSearching(true);
-        axios.get('http://localhost:3001/api/groups/search', {
-            params: {
-                name: trimmed
-            }
-        })
-            .then(res => {
-                setSearchResults(res.data.groups || []);
-            })
-            .catch(err => {
-                console.error('Group search error:', err);
-                setSearchResults([]);
-            })
-            .finally(() => setIsSearching(false));
-    }
 
     const handleSearchResults = (searchData) => {
         setSearchData(searchData);

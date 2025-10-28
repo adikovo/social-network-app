@@ -85,7 +85,7 @@ function InLineSearch({
 
     return (
         <div>
-            {/* search input */}
+            {/*search input */}
             <div style={{ position: 'relative', marginBottom: '16px' }}>
                 <svg
                     style={{
