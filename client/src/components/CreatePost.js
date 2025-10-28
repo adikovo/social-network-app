@@ -6,6 +6,7 @@ import MyAlert from './MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
 import ExtraInput from './ExtraInput';
 import VideoPreview from './VideoPreview';
+import MyButton from './MyButton';
 
 function CreatePost({ onPostCreated, groupId = null }) {
     const { user } = useUserContext();
@@ -359,34 +360,16 @@ function CreatePost({ onPostCreated, groupId = null }) {
                 )}
 
                 {/*post button */}
-                <button
+                <MyButton
+                    variant="primary"
                     onClick={handleSubmit}
                     disabled={!postText.trim() && uploadedImages.length === 0 && uploadedVideos.length === 0}
                     style={{
-                        background: (postText.trim() || uploadedImages.length > 0 || uploadedVideos.length > 0) ? '#495057' : '#6c757d',
-                        border: 'none',
-                        borderRadius: '8px',
-                        padding: '12px 20px',
-                        cursor: (postText.trim() || uploadedImages.length > 0 || uploadedVideos.length > 0) ? 'pointer' : 'not-allowed',
-                        color: 'white',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        transition: 'background-color 0.2s ease',
                         flexShrink: 0
-                    }}
-                    onMouseEnter={(e) => {
-                        if (postText.trim() || uploadedImages.length > 0 || uploadedVideos.length > 0) {
-                            e.target.style.backgroundColor = '#343a40';
-                        }
-                    }}
-                    onMouseLeave={(e) => {
-                        if (postText.trim() || uploadedImages.length > 0 || uploadedVideos.length > 0) {
-                            e.target.style.backgroundColor = '#495057';
-                        }
                     }}
                 >
                     Post
-                </button>
+                </MyButton>
             </div>
 
             {/*extra input options */}

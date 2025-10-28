@@ -1,4 +1,5 @@
 import React from 'react';
+import { theme } from '../theme/colors';
 
 function MyButton({
     children,
@@ -74,6 +75,7 @@ function MyButton({
         youtube: 'rgb(255 0 0 / 0.3)'
     };
 
+
     return (
         <button
             type={type}
@@ -93,35 +95,6 @@ function MyButton({
                 borderRadius: '0.5rem',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 opacity: disabled ? 0.6 : 1,
-                ...(variant === 'primary' && {
-                    background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-                    color: 'white',
-                    borderColor: '#6366f1',
-                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
-                }),
-                ...(variant === 'secondary' && {
-                    backgroundColor: '#f8fafc',
-                    color: '#475569',
-                    borderColor: '#e2e8f0',
-                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
-                }),
-                ...(variant === 'outline' && {
-                    backgroundColor: 'transparent',
-                    color: '#6366f1',
-                    borderColor: '#6366f1'
-                }),
-                ...(variant === 'success' && {
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
-                    color: 'white',
-                    borderColor: '#10b981',
-                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
-                }),
-                ...(variant === 'danger' && {
-                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                    color: 'white',
-                    borderColor: '#ef4444',
-                    boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)'
-                }),
                 ...(variant === 'nav' && {
                     background: 'none',
                     color: '#374151',

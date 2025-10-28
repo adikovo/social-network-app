@@ -13,6 +13,7 @@ import FriendsList from '../components/FriendsList';
 import { useUserContext } from '../context/UserContext';
 import MyAlert from '../components/MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
+import { theme } from '../theme/colors';
 
 
 function Profile() {
@@ -416,66 +417,74 @@ function Profile() {
                         />
                     )}
                 </div>
-                <div className="mb-3">
-                    {/*add roomie button only show if viewing someone else profile */}
-                    {!isOwnProfile && currentUser && !isAlreadyFriend && (
-                        <>
-                            {hasReceivedRequest ? (
-                                //show accept/decline buttons when user has received a request
-                                <>
-                                    <MyButton
-                                        variant='success'
-                                        onClick={handleAcceptFriendRequest}
-                                        style={{ marginRight: '10px' }}
-                                    >
-                                        Accept
-                                    </MyButton>
-                                    <MyButton
-                                        variant='danger'
-                                        onClick={handleDeclineFriendRequest}
-                                        style={{ marginRight: '10px' }}
-                                    >
-                                        Decline
-                                    </MyButton>
-                                </>
-                            ) : (
-                                //show add roomie or cancel request button
-                                <MyButton
-                                    variant={hasPendingRequest ? 'secondary' : 'primary'}
-                                    onClick={hasPendingRequest ? handleCancelFriendRequest : handleSendFriendRequest}
-                                    style={{
-                                        marginRight: '10px',
-                                        backgroundColor: hasPendingRequest ? '#6c757d' : undefined,
-                                        borderColor: hasPendingRequest ? '#6c757d' : undefined
-                                    }}
-                                >
-                                    {hasPendingRequest ? 'Cancel Request' : 'Add Roomie'}
-                                </MyButton>
-                            )}
-                        </>
-                    )}
 
-                    {/*bio and roomies buttons only show when viewing own profile */}
-                    {isOwnProfile && (
-                        <>
+                {/*bio and roomies buttons only show when viewing own profile */}
+                {isOwnProfile && (
+                    <div className="mb-3">
+                        <div style={{ display: 'flex', gap: '10px' }}>
                             <MyButton
-                                variant='secondary'
+                                variant={currentMode === 'bio' ? 'primary' : 'secondary'}
                                 onClick={handleGetBio}
-                                style={{ marginRight: '10px' }}
+                                style={{
+                                    transition: 'all 0.2s ease',
+                                    transform: currentMode === 'bio' ? 'scale(1.05)' : 'scale(1)',
+                                    boxShadow: currentMode === 'bio' ? `0 4px 8px ${theme.primaryShadow}` : 'none'
+                                }}
                             >
                                 Bio
                             </MyButton>
                             <MyButton
-                                variant='secondary'
+                                variant={currentMode === 'friends' ? 'primary' : 'secondary'}
                                 onClick={() => setCurrentMode('friends')}
-                                style={{ marginRight: '10px' }}
+                                style={{
+                                    transition: 'all 0.2s ease',
+                                    transform: currentMode === 'friends' ? 'scale(1.05)' : 'scale(1)',
+                                    boxShadow: currentMode === 'friends' ? `0 4px 8px ${theme.primaryShadow}` : 'none'
+                                }}
                             >
                                 My Roomies
                             </MyButton>
-                        </>
-                    )}
+                        </div>
+                    </div>
+                )}
 
-                </div>
+                {/*add roomie button only show if viewing someone else profile */}
+                {!isOwnProfile && currentUser && !isAlreadyFriend && (
+                    <div className="mb-3">
+                        {hasReceivedRequest ? (
+                            //show accept/decline buttons when user has received a request
+                            <>
+                                <MyButton
+                                    variant='success'
+                                    onClick={handleAcceptFriendRequest}
+                                    style={{ marginRight: '10px' }}
+                                >
+                                    Accept
+                                </MyButton>
+                                <MyButton
+                                    variant='danger'
+                                    onClick={handleDeclineFriendRequest}
+                                    style={{ marginRight: '10px' }}
+                                >
+                                    Decline
+                                </MyButton>
+                            </>
+                        ) : (
+                            //show add roomie or cancel request button
+                            <MyButton
+                                variant={hasPendingRequest ? 'secondary' : 'primary'}
+                                onClick={hasPendingRequest ? handleCancelFriendRequest : handleSendFriendRequest}
+                                style={{
+                                    marginRight: '10px',
+                                    backgroundColor: hasPendingRequest ? '#6c757d' : undefined,
+                                    borderColor: hasPendingRequest ? '#6c757d' : undefined
+                                }}
+                            >
+                                {hasPendingRequest ? 'Cancel Request' : 'Add Roomie'}
+                            </MyButton>
+                        )}
+                    </div>
+                )}
 
                 {/*friends list */}
                 <FriendsList

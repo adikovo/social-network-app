@@ -2,10 +2,10 @@ const { Server } = require("socket.io");
 const Message = require('./models/Message');
 const Conversation = require('./models/Conversation');
 
-// Store the io instance globally so it can be used in controllers
+//store the io instance globally so it can be used in controllers
 let ioInstance = null;
 
-//initialize Socket.io server
+//initialize socket.io server
 const initSocket = (server) => {
     const io = new Server(server, {
         cors: {
@@ -14,7 +14,7 @@ const initSocket = (server) => {
         }
     });
 
-    // Store the io instance globally
+    //store the io instance globally
     ioInstance = io;
 
     //handle connection
@@ -33,10 +33,10 @@ const initSocket = (server) => {
             try {
                 const { senderId, receiverId, senderName, message } = data
 
-                // Create conversationId by sorting user IDs
+                //create conversationId by sorting user IDs
                 const conversationId = [senderId, receiverId].sort().join('_')
 
-                // Save message to database
+                //save message to database
                 const newMessage = new Message({
                     senderId: senderId,
                     receiverId: receiverId,
@@ -48,7 +48,7 @@ const initSocket = (server) => {
 
                 await newMessage.save()
 
-                // Update or create conversation
+                //update or create conversation
                 const conversation = await Conversation.findOneAndUpdate(
                     { conversationId: conversationId },
                     {
@@ -61,28 +61,28 @@ const initSocket = (server) => {
                     { upsert: true, new: true }
                 )
 
-                // Remove both users from deletedBy array when they send a message
+                //remove both users from deletedBy array when they send a message
                 await Conversation.findOneAndUpdate(
                     { conversationId: conversationId },
                     { $pull: { deletedBy: { $in: [senderId, receiverId] } } }
                 );
 
-                // Update unread counts for the receiver
+                //update unread counts for the receiver
                 if (conversation.unreadCounts && conversation.unreadCounts.length > 0) {
-                    // Find receiver's unread count entry
+                    //find receiver's unread count entry
                     const receiverUnreadIndex = conversation.unreadCounts.findIndex(
                         unreadCount => unreadCount.userId.toString() === receiverId
                     );
 
                     if (receiverUnreadIndex !== -1) {
-                        // Increment receiver's unread count
+                        //increment receiver's unread count
                         conversation.unreadCounts[receiverUnreadIndex].count += 1;
                     } else {
-                        // Add new unread count entry for receiver
+                        //add new unread count entry for receiver
                         conversation.unreadCounts.push({ userId: receiverId, count: 1 });
                     }
 
-                    // Ensure sender's unread count entry exists (but don't increment it)
+                    //ensure sender's unread count entry exists 
                     const senderUnreadIndex = conversation.unreadCounts.findIndex(
                         unreadCount => unreadCount.userId.toString() === senderId
                     );
@@ -93,7 +93,7 @@ const initSocket = (server) => {
 
                     await conversation.save();
                 } else {
-                    // Initialize unread counts array
+                    //initialize unread counts array
                     conversation.unreadCounts = [
                         { userId: senderId, count: 0 },
                         { userId: receiverId, count: 1 }
@@ -128,7 +128,7 @@ const initSocket = (server) => {
     return io;
 };
 
-// Function to emit notification to a specific user
+//function to emit notification to a specific user
 const emitNotification = (userId, notificationData) => {
     if (ioInstance) {
         ioInstance.to(`user-${userId}`).emit('new-notification', notificationData);

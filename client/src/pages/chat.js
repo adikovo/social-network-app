@@ -531,8 +531,8 @@ function Chat() {
                                                     maxWidth: '70%',
                                                     padding: '12px 16px',
                                                     borderRadius: '18px',
-                                                    backgroundColor: message.isOwn ? '#3b82f6' : 'white',
-                                                    color: message.isOwn ? 'white' : '#111827',
+                                                    backgroundColor: message.isOwn ? '#8B5CF6' : '#E9D5FF',
+                                                    color: message.isOwn ? 'white' : '#1E293B',
                                                     fontSize: '14px',
                                                     boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
                                                 }}>

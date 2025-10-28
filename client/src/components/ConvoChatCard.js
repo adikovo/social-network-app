@@ -29,8 +29,8 @@ function ConvoChatCard({
                 borderBottom: '1px solid #f3f4f6',
                 transition: 'background-color 0.2s ease',
                 position: 'relative',
-                backgroundColor: isSelected ? '#eff6ff' : 'transparent',
-                borderRight: isSelected ? '3px solid #3b82f6' : 'none'
+                backgroundColor: isSelected ? '#F3E8FF' : 'transparent',
+                borderRight: isSelected ? '3px solid #8B5CF6' : 'none'
             }}
             onClick={() => onSelect(conversation)}
             onMouseEnter={(e) => {
@@ -115,7 +115,7 @@ function ConvoChatCard({
                     </p>
                     {conversation.unreadCount > 0 && (
                         <span style={{
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#8B5CF6',
                             color: 'white',
                             borderRadius: '50%',
                             width: '20px',

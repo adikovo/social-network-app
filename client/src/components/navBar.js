@@ -274,9 +274,27 @@ function NavBar() {
     const handleDeclineRequest = (requestId) => {
         if (!user) return;
 
-        // TODO: Implement decline request logic
-        console.log('Decline request:', requestId);
-        setShowRequestDropdown(false);
+        axios.delete('http://localhost:3001/api/users/decline-friend-request', {
+            data: {
+                userId: user.id,
+                friendId: requestId
+            }
+        })
+            .then(res => {
+                console.log('Decline request response:', res.data);
+                showSuccess('Friend request declined successfully!');
+                setShowRequestDropdown(false);
+                //refresh both request lists and notifications
+                fetchRoomiesRequests();
+                // Add small delay to ensure notifications are created on server
+                setTimeout(() => {
+                    fetchNotifications();
+                }, 500);
+            })
+            .catch(err => {
+                console.error('Decline request error:', err);
+                showError('Failed to decline friend request');
+            })
     };
 
     const handleAcceptGroupJoinRequest = (request) => {

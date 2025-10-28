@@ -37,7 +37,7 @@ function BioForm({ bio, onBioChange, isEditing = true, showTitle = true }) {
                 {/* about me */}
                 <div className="mb-4">
                     <div className="d-flex align-items-center mb-3">
-                        <h6 className="mb-0 text-primary">Personal Details</h6>
+                        <h6 className="mb-0" style={{ color: '#6B46C1' }}>Personal Details</h6>
                     </div>
 
                     <FormField
@@ -56,7 +56,7 @@ function BioForm({ bio, onBioChange, isEditing = true, showTitle = true }) {
                     {/*basic info */}
                     <div className="col-md-6">
                         <div className="d-flex align-items-center mb-3">
-                            <h6 className="mb-0 text-primary">Basic Information</h6>
+                            <h6 className="mb-0" style={{ color: '#6B46C1' }}>Basic Information</h6>
                         </div>
                         <div className="row g-2">
                             <div className="col-12">
@@ -109,7 +109,7 @@ function BioForm({ bio, onBioChange, isEditing = true, showTitle = true }) {
                     {/*lifestyle*/}
                     <div className="col-md-6">
                         <div className="d-flex align-items-center mb-3">
-                            <h6 className="mb-0 text-primary">Lifestyle</h6>
+                            <h6 className="mb-0" style={{ color: '#6B46C1' }}>Lifestyle</h6>
                         </div>
                         <div className="row g-2">
                             <div className="col-12">
@@ -178,7 +178,7 @@ function BioForm({ bio, onBioChange, isEditing = true, showTitle = true }) {
                 {/*preferences */}
                 <div className="mb-4">
                     <div className="d-flex align-items-center mb-3">
-                        <h6 className="mb-0 text-primary">Roommate Preferences</h6>
+                        <h6 className="mb-0" style={{ color: '#6B46C1' }}>Roommate Preferences</h6>
                     </div>
                     <div className="row g-3">
                         <div className="col-md-6">

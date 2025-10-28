@@ -154,7 +154,15 @@ function Groups() {
             <NavBar></NavBar>
             <SearchSideBar onSearchResults={handleSearchResults} />
             <div style={{ padding: '20px', maxWidth: '800px', marginLeft: '320px', marginRight: 'auto', marginTop: '70px' }}>
-                <p>Your Groups:</p>
+                {/*header with title and create button */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <p style={{ margin: 0 }}>Your Groups:</p>
+                    <MyButton
+                        variant="primary"
+                        onClick={() => setShowCreateGroup(true)}>
+                        Create New Group
+                    </MyButton>
+                </div>
 
                 <div className="row">
                     {/* map through groups and display each group */}
@@ -176,16 +184,6 @@ function Groups() {
                         <p>No groups found. Join some groups to get started!</p>
                     </div>
                 )}
-
-                {/*navigation buttons */}
-                <div className="mt-4">
-                    <MyButton
-                        variant="primary"
-                        className="me-2"
-                        onClick={() => setShowCreateGroup(true)}>
-                        Create New Group
-                    </MyButton>
-                </div>
 
                 <CreateGroupForm
                     show={showCreateGroup}

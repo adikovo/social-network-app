@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ExtraInput from './ExtraInput';
+import { theme } from '../theme/colors';
 
 function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }) {
     const [commentText, setCommentText] = useState('');
@@ -101,18 +102,24 @@ function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }
                     <button
                         onClick={handleCancel}
                         style={{
-                            background: '#e9ecef',
-                            border: 'none',
+                            background: theme.light,
+                            border: `1px solid ${theme.border}`,
                             borderRadius: '6px',
                             padding: '8px 16px',
                             cursor: 'pointer',
-                            color: '#495057',
+                            color: theme.text,
                             fontSize: '14px',
                             fontWeight: '500',
-                            transition: 'background-color 0.2s ease'
+                            transition: 'all 0.2s ease'
                         }}
-                        onMouseEnter={(e) => e.target.style.backgroundColor = '#dee2e6'}
-                        onMouseLeave={(e) => e.target.style.backgroundColor = '#e9ecef'}
+                        onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = theme.border;
+                            e.target.style.borderColor = theme.text;
+                        }}
+                        onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = theme.light;
+                            e.target.style.borderColor = theme.border;
+                        }}
                     >
                         Cancel
                     </button>
@@ -122,7 +129,7 @@ function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }
                         onClick={handleSubmit}
                         disabled={!commentText.trim()}
                         style={{
-                            background: commentText.trim() ? '#007bff' : '#6c757d',
+                            background: commentText.trim() ? theme.primary : theme.border,
                             border: 'none',
                             borderRadius: '6px',
                             padding: '8px 16px',
@@ -130,16 +137,21 @@ function CommentInput({ onCancel, onSubmit, placeholder = "Write a comment..." }
                             color: 'white',
                             fontSize: '14px',
                             fontWeight: '500',
-                            transition: 'background-color 0.2s ease'
+                            transition: 'all 0.2s ease',
+                            boxShadow: commentText.trim() ? `0 2px 4px ${theme.primaryShadow}` : 'none'
                         }}
                         onMouseEnter={(e) => {
                             if (commentText.trim()) {
-                                e.target.style.backgroundColor = '#0056b3';
+                                e.target.style.backgroundColor = '#7C3AED';
+                                e.target.style.transform = 'translateY(-1px)';
+                                e.target.style.boxShadow = `0 4px 8px ${theme.primaryShadow}`;
                             }
                         }}
                         onMouseLeave={(e) => {
                             if (commentText.trim()) {
-                                e.target.style.backgroundColor = '#007bff';
+                                e.target.style.backgroundColor = theme.primary;
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = `0 2px 4px ${theme.primaryShadow}`;
                             }
                         }}
                     >
