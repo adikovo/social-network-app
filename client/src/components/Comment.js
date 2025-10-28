@@ -81,23 +81,17 @@ function Comment({ comment, onEdit, onDelete, post }) {
             padding: '16px',
             backgroundColor: '#f8f9fa',
             borderRadius: '8px',
-            border: '1px solid #e9ecef'
+            border: '1px solid #e9ecef',
+            position: 'relative'
         }}>
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '8px'
-            }}>
-                <UserInfo
-                    userId={comment.authorId}
-                    userName={comment.authorName || comment.author}
-                    profilePicture={comment.authorProfilePicture}
-                    size="small"
-                    date={comment.createdAt ? formatDate(comment.createdAt) : 'Unknown date'}
-                />
-
-                {/* 3 dot menu - show if user is author or group admin when comment in  its group */}
-                {canManageComment && (
+            {/* 3 dot menu - positioned in top-right corner */}
+            {canManageComment && (
+                <div style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    zIndex: 10
+                }}>
                     <ThreeDotMenu
                         menuItems={(() => {
                             const items = [];
@@ -115,7 +109,19 @@ function Comment({ comment, onEdit, onDelete, post }) {
                             }
                         }}
                     />
-                )}
+                </div>
+            )}
+
+            <div style={{
+                marginBottom: '8px'
+            }}>
+                <UserInfo
+                    userId={comment.authorId}
+                    userName={comment.authorName || comment.author}
+                    profilePicture={comment.authorProfilePicture}
+                    size="small"
+                    date={comment.createdAt ? formatDate(comment.createdAt) : 'Unknown date'}
+                />
             </div>
 
             {/* comment content or edit form */}
