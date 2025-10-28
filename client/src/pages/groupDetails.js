@@ -11,10 +11,7 @@ import GroupInfo from '../components/GroupInfo';
 import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
 import FriendsList from '../components/FriendsList';
-import TopContributorsChart from '../components/TopContributorsChart';
-import MemberJoinTimelineChart from '../components/MemberJoinTimelineChart';
-import StatsCard from '../components/StatsCard';
-import Tab from '../components/Tab';
+import GroupStats from '../components/GroupStats';
 import { useUserContext } from '../context/UserContext';
 import MyAlert from '../components/MyAlert';
 import useMyAlert from '../hooks/useMyAlert';
@@ -32,7 +29,6 @@ function GroupDetails() {
     const [groupPosts, setGroupPosts] = useState([]);
     const [hasPendingJoinRequest, setHasPendingJoinRequest] = useState(false);
     const [groupStats, setGroupStats] = useState(null);
-    const [activeTab, setActiveTab] = useState('contributors');
     const [showSearchOverlay, setShowSearchOverlay] = useState(false);
     const [searchData, setSearchData] = useState(null);
     const { alert, showSuccess, showError, showInfo, hideAlert } = useMyAlert();
@@ -260,7 +256,7 @@ function GroupDetails() {
     //check if current user is an admin of the group
     const isAdmin = user && group && group.admins?.includes(user.id);
 
-    // Show loading while checking for stored user
+    //show loading while checking for stored user
     if (isLoading) {
         return <div>Loading...</div>;
     }
@@ -332,67 +328,10 @@ function GroupDetails() {
 
                 {/* Show stats view */}
                 {showStats ? (
-                    <div style={{ marginTop: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                            <MyButton
-                                variant='secondary'
-                                onClick={() => setShowStats(false)}
-                                style={{ marginRight: '15px' }}
-                            >
-                                ← Back to Feed
-                            </MyButton>
-                        </div>
-                        {/*stats content with charts */}
-                        {groupStats ? (
-                            <div>
-                                {/*summary cards */}
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-                                    <StatsCard label="Total Posts" value={groupStats.totalPosts} />
-                                    <StatsCard label="Total Members" value={groupStats.totalMembers} />
-                                    <StatsCard label="Active Contributors" value={groupStats.topContributors.length} />
-                                </div>
-
-                                {/*tabs for different charts */}
-                                <div style={{ marginBottom: '20px' }}>
-                                    <div style={{ display: 'flex', borderBottom: '2px solid #e5e7eb' }}>
-                                        <Tab
-                                            label="Top Contributors"
-                                            isActive={activeTab === 'contributors'}
-                                            onClick={() => setActiveTab('contributors')}
-                                        />
-                                        <Tab
-                                            label="Member Join Timeline"
-                                            isActive={activeTab === 'timeline'}
-                                            onClick={() => setActiveTab('timeline')}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/*chart content based on active tab */}
-                                {activeTab === 'contributors' ? (
-                                    groupStats.topContributors && groupStats.topContributors.length > 0 ? (
-                                        <TopContributorsChart data={groupStats.topContributors} />
-                                    ) : (
-                                        <div style={{ padding: '40px', textAlign: 'center', color: '#666', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                            <p>No contributors data available yet. Posts will appear here as members create content.</p>
-                                        </div>
-                                    )
-                                ) : (
-                                    groupStats.memberJoinTimeline && groupStats.memberJoinTimeline.length > 0 ? (
-                                        <MemberJoinTimelineChart data={groupStats.memberJoinTimeline} />
-                                    ) : (
-                                        <div style={{ padding: '40px', textAlign: 'center', color: '#666', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                            <p>No join data available yet.</p>
-                                        </div>
-                                    )
-                                )}
-                            </div>
-                        ) : (
-                            <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-                                <p>Loading statistics...</p>
-                            </div>
-                        )}
-                    </div>
+                    <GroupStats
+                        groupStats={groupStats}
+                        onBack={() => setShowStats(false)}
+                    />
                 ) : (
                     <>
                         {user && group && !isMember && (
@@ -406,7 +345,7 @@ function GroupDetails() {
                         )}
                         {group && <GroupInfo group={group} />}
 
-                        {/* show create post for members only - hide when showing members */}
+                        {/*show create post for members only - hide when showing members */}
                         {isMember && !showMembers && (
                             <CreatePost
                                 onPostCreated={handlePostCreated}
@@ -414,7 +353,7 @@ function GroupDetails() {
                             />
                         )}
 
-                        {/* show members list or posts based on state */}
+                        {/*show members list or posts based on state */}
                         {showMembers ? (
                             <div style={{ marginTop: '20px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>

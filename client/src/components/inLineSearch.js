@@ -68,37 +68,6 @@ function InLineSearch({
         }
     }, [searchMode, userFriends]);
 
-    const fetchFriendsDetails = async (friendIds) => {
-        setIsLoadingFriends(true);
-        if (onLoadingChange) {
-            onLoadingChange(true);
-        }
-        try {
-            const friendsPromises = friendIds.map(async (friendId) => {
-                // Convert ObjectId to string if needed
-                const idString = friendId.toString ? friendId.toString() : friendId;
-                const response = await axios.get(`http://localhost:3001/api/users/${idString}`);
-                return response.data.success ? response.data.user : null;
-            });
-
-            const friends = await Promise.all(friendsPromises);
-            const validFriends = friends.filter(friend => friend && friend.name);
-
-            console.log('InlineSearch: Fetched friends with details:', validFriends);
-            setFriendsWithDetails(validFriends);
-            setFilteredFriends(validFriends);
-            if (onFriendResults) {
-                onFriendResults(validFriends);
-            }
-        } catch (error) {
-            console.error('Error fetching friends details:', error);
-        } finally {
-            setIsLoadingFriends(false);
-            if (onLoadingChange) {
-                onLoadingChange(false);
-            }
-        }
-    };
 
     const handleSearch = (term) => {
         setSearchTerm(term);

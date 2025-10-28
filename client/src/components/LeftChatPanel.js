@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import InLineSearch from './InlineSearch';
 import ConversationList from './ConversationList';
 import MyButton from './MyButton';
+import ProfilePicture from './ProfilePicture';
 
 function LeftChatPanel({
     conversations = [],
@@ -102,9 +103,7 @@ function LeftChatPanel({
                             padding: '8px 12px'
                         }}
                     >
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
+                        <span style={{ fontSize: '16px' }}>+</span>
                         {searchMode === 'conversations' ? 'New Chat' : 'Back to Chats'}
                     </MyButton>
                 </div>
@@ -154,20 +153,12 @@ function LeftChatPanel({
                                                 e.target.style.backgroundColor = 'transparent';
                                             }}
                                         >
-                                            <div style={{
-                                                width: '40px',
-                                                height: '40px',
-                                                borderRadius: '50%',
-                                                backgroundColor: '#10b981',
-                                                color: 'white',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '16px',
-                                                fontWeight: '600',
-                                                marginRight: '12px'
-                                            }}>
-                                                {(friend.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase()}
+                                            <div style={{ marginRight: '12px' }}>
+                                                <ProfilePicture
+                                                    currentImage={friend.profilePicture}
+                                                    size="small"
+                                                    editMode={false}
+                                                />
                                             </div>
                                             <div>
                                                 <div style={{

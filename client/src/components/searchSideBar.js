@@ -46,7 +46,12 @@ function SearchSideBar({ onSearchResults }) {
                 type: 'groups',
                 fields: ['name', 'description', 'createdBy'],
                 placeholder: 'Search groups...',
-                title: 'Search Groups'
+                title: 'Search Groups',
+                multiSearchFields: [
+                    { id: 'name', label: 'Name', type: 'text', placeholder: 'Search by group name...' },
+                    { id: 'description', label: 'Description', type: 'text', placeholder: 'Search by description...' },
+                    { id: 'createdBy', label: 'Created By', type: 'text', placeholder: 'Search by creator name...' }
+                ]
             };
         } else {
             return {

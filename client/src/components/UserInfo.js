@@ -26,7 +26,7 @@ function UserInfo({
                 textAlign: 'left',
                 marginLeft: '12px'
             }}>
-                {/* Group name - show above user name for group posts */}
+                {/*group name */}
                 {showGroupName && groupName && (
                     <div style={{
                         display: 'inline-block',
@@ -48,7 +48,7 @@ function UserInfo({
                     </div>
                 )}
 
-                {/* User name */}
+                {/*user name */}
                 <div style={{
                     fontWeight: '600',
                     fontSize: size === 'small' ? '18px' : size === 'medium' ? '20px' : '22px',
@@ -63,7 +63,7 @@ function UserInfo({
                     />
                 </div>
 
-                {/* Date - show under user name if provided */}
+                {/*date*/}
                 {date && (
                     <div style={{
                         fontSize: '14px',
@@ -76,7 +76,7 @@ function UserInfo({
                     </div>
                 )}
 
-                {/* Email - show under user name if provided */}
+                {/*email */}
                 {email && (
                     <div style={{
                         fontSize: '14px',
@@ -89,7 +89,7 @@ function UserInfo({
                     </div>
                 )}
 
-                {/* Roomies count - show under email if provided */}
+                {/*roomies count */}
                 {roomiesCount !== null && (
                     <div style={{
                         fontSize: '14px',
